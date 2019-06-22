@@ -14,7 +14,13 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
   @override
   void initState() {
     super.initState();
-    video = Video(store: VideoStore(src: src));
+    video = Video(
+        store: VideoStore(
+      src: src,
+      // isAutoplay: true,
+      // isLooping: true,
+      // volume: 0.0,
+    ));
   }
 
   @override

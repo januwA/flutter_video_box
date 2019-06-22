@@ -10,9 +10,7 @@ import 'package:screen/screen.dart';
 class Video {
   Video({
     this.store,
-  }) : videoBox = VideoBox(
-          store: store,
-        );
+  }) : videoBox = VideoBox(store: store);
   final VideoStore store;
   final VideoBox videoBox;
 
@@ -57,21 +55,20 @@ class _VideoBoxState extends State<VideoBox> {
   Widget build(BuildContext context) {
     return Observer(
       builder: (_) => isNull(videoStore.src)
-          ? VideoLoading()
+          ? _VideoLoading()
           : MultiProvider(
               providers: [Provider<VideoStore>.value(value: videoStore)],
               child: GestureDetector(
+                onDoubleTap: () {},
                 onTap: () =>
                     videoStore.showVideoCtrl(!videoStore.isShowVideoCtrl),
                 child: Stack(
                   alignment: AlignmentDirectional.center,
                   children: <Widget>[
                     videoStore.isVideoLoading
-                        ? VideoLoading()
+                        ? _VideoLoading()
                         : Container(
-                            decoration: BoxDecoration(
-                              color: Colors.black,
-                            ),
+                            decoration: BoxDecoration(color: Colors.black),
                             child: Center(
                               child: AspectRatio(
                                 aspectRatio:
@@ -80,8 +77,9 @@ class _VideoBoxState extends State<VideoBox> {
                               ),
                             ),
                           ),
-                    PlayButton(),
-                    VideoBottomCtrl(),
+                    _SeekToView(),
+                    _PlayButton(),
+                    _VideoBottomCtrl(),
                   ],
                 ),
               ),
@@ -90,8 +88,45 @@ class _VideoBoxState extends State<VideoBox> {
   }
 }
 
+/// 快进，快退两个隐藏的板块按钮
+class _SeekToView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final videoStore = Provider.of<VideoStore>(context);
+    return Positioned(
+      left: 0,
+      top: 0,
+      right: 0,
+      bottom: 0,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: GestureDetector(
+              onDoubleTap: videoStore.rewind,
+              child: Container(
+                decoration: BoxDecoration(),
+              ),
+            ),
+          ),
+          const SizedBox(width: 24),
+          Expanded(
+            flex: 1,
+            child: GestureDetector(
+              onDoubleTap: videoStore.fastForward,
+              child: Container(
+                decoration: BoxDecoration(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// video 中间的播放按钮
-class PlayButton extends StatelessWidget {
+class _PlayButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final videoStore = Provider.of<VideoStore>(context);
@@ -124,7 +159,42 @@ class PlayButton extends StatelessWidget {
 }
 
 /// video 底部的控制器
-class VideoBottomCtrl extends StatelessWidget {
+class _VideoBottomCtrl extends StatelessWidget {
+  Future<void> _onFullScreen(context, videoStore) async {
+    if (videoStore.isFullScreen) {
+      /// 退出全屏
+      Navigator.of(context).pop();
+    } else {
+      /// 开启全屏
+      videoStore.setLandscape();
+      Screen.keepOn(true);
+      SystemChrome.setEnabledSystemUIOverlays([]);
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => SafeArea(
+                child: Scaffold(
+                  body: Center(
+                    child: VideoBox(
+                      store: videoStore,
+                    ),
+                  ),
+                ),
+              ),
+        ),
+      );
+      videoStore.setPortrait();
+      Screen.keepOn(false);
+      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    }
+  }
+
+  /// 返回一个符合当前音量的icon
+  IconData _volumeIcon(double volume) {
+    return volume <= 0
+        ? Icons.volume_off
+        : volume <= 0.5 ? Icons.volume_down : Icons.volume_up;
+  }
+
   @override
   Widget build(BuildContext context) {
     final videoStore = Provider.of<VideoStore>(context);
@@ -140,74 +210,56 @@ class VideoBottomCtrl extends StatelessWidget {
                 decoration: BoxDecoration(color: Colors.black12),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Row(
-                    children: <Widget>[
-                      Text(
+                  child: Theme(
+                    data: Theme.of(context).copyWith(
+                      iconTheme: IconThemeData(color: Colors.white),
+                      sliderTheme: Theme.of(context).sliderTheme.copyWith(
+                            /// 进度之前的颜色
+                            activeTrackColor: Colors.white70,
+
+                            /// 进度之后的颜色
+                            inactiveTrackColor: Colors.white30,
+
+                            // 指示器的颜色
+                            thumbColor: Colors.white,
+                          ),
+                    ),
+                    child: Row(
+                      children: <Widget>[
+                        Text(
+                          videoStore.isVideoLoading
+                              ? '00:00/00:00'
+                              : "${videoStore.positionText}/${videoStore.durationText}",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        Expanded(
+                          child: Slider(
+                            // inactiveColor: Colors.grey[300],
+                            // activeColor: Colors.white,
+                            value: videoStore.sliderValue,
+                            onChanged: videoStore.sliderChanged,
+                          ),
+                        ),
                         videoStore.isVideoLoading
-                            ? '00:00/00:00'
-                            : "${videoStore.positionText}/${videoStore.durationText}",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Expanded(
-                        child: Slider(
-                          inactiveColor: Colors.grey[300],
-                          activeColor: Colors.white,
-                          value: videoStore.sliderValue,
-                          onChanged: videoStore.seekTo,
-                        ),
-                      ),
-                      videoStore.isVideoLoading
-                          ? IconButton(
-                              color: Colors.white,
-                              icon: Icon(Icons.volume_up),
-                              onPressed: () {},
-                            )
-                          : IconButton(
-                              color: Colors.white,
-                              icon: Icon(
-                                videoStore.videoCtrl.value.volume <= 0
-                                    ? Icons.volume_off
-                                    : Icons.volume_up,
+                            ? IconButton(
+                                icon: Icon(Icons.volume_up),
+                                onPressed: () {},
+                              )
+                            : IconButton(
+                                icon: Icon(_volumeIcon(
+                                    videoStore.videoCtrl.value.volume)),
+                                onPressed: videoStore.setVolume,
                               ),
-                              onPressed: videoStore.setVolume,
-                            ),
-                      IconButton(
-                        icon: Icon(
-                          !videoStore.isFullScreen
-                              ? Icons.fullscreen
-                              : Icons.fullscreen_exit,
-                          color: Colors.white,
+                        IconButton(
+                          icon: Icon(
+                            !videoStore.isFullScreen
+                                ? Icons.fullscreen
+                                : Icons.fullscreen_exit,
+                          ),
+                          onPressed: () => _onFullScreen(context, videoStore),
                         ),
-                        onPressed: () async {
-                          if (videoStore.isFullScreen) {
-                            /// 退出全屏
-                            Navigator.of(context).pop();
-                          } else {
-                            /// 开启全屏
-                            videoStore.setLandscape();
-                            Screen.keepOn(true);
-                            SystemChrome.setEnabledSystemUIOverlays([]);
-                            await Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) => SafeArea(
-                                      child: Scaffold(
-                                        body: Center(
-                                          child: VideoBox(
-                                            store: videoStore,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                              ),
-                            );
-                            videoStore.setPortrait();
-                            Screen.keepOn(false);
-                            SystemChrome.setEnabledSystemUIOverlays(
-                                SystemUiOverlay.values);
-                          }
-                        },
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -221,8 +273,8 @@ class VideoBottomCtrl extends StatelessWidget {
 }
 
 /// 没有src的时候，显示加载中
-class VideoLoading extends StatelessWidget {
-  const VideoLoading({
+class _VideoLoading extends StatelessWidget {
+  const _VideoLoading({
     Key key,
   }) : super(key: key);
 

@@ -43,6 +43,53 @@ mixin _$VideoStore on _VideoStore, Store {
     _$srcAtom.reportChanged();
   }
 
+  final _$isAutoplayAtom = Atom(name: '_VideoStore.isAutoplay');
+
+  @override
+  bool get isAutoplay {
+    _$isAutoplayAtom.reportObserved();
+    return super.isAutoplay;
+  }
+
+  @override
+  set isAutoplay(bool value) {
+    _$isAutoplayAtom.context
+        .checkIfStateModificationsAreAllowed(_$isAutoplayAtom);
+    super.isAutoplay = value;
+    _$isAutoplayAtom.reportChanged();
+  }
+
+  final _$isLoopingAtom = Atom(name: '_VideoStore.isLooping');
+
+  @override
+  bool get isLooping {
+    _$isLoopingAtom.reportObserved();
+    return super.isLooping;
+  }
+
+  @override
+  set isLooping(bool value) {
+    _$isLoopingAtom.context
+        .checkIfStateModificationsAreAllowed(_$isLoopingAtom);
+    super.isLooping = value;
+    _$isLoopingAtom.reportChanged();
+  }
+
+  final _$volumeAtom = Atom(name: '_VideoStore.volume');
+
+  @override
+  double get volume {
+    _$volumeAtom.reportObserved();
+    return super.volume;
+  }
+
+  @override
+  set volume(double value) {
+    _$volumeAtom.context.checkIfStateModificationsAreAllowed(_$volumeAtom);
+    super.volume = value;
+    _$volumeAtom.reportChanged();
+  }
+
   final _$videoCtrlAtom = Atom(name: '_VideoStore.videoCtrl');
 
   @override
@@ -137,6 +184,21 @@ mixin _$VideoStore on _VideoStore, Store {
     _$isFullScreenAtom.reportChanged();
   }
 
+  final _$skiptimeAtom = Atom(name: '_VideoStore.skiptime');
+
+  @override
+  Duration get skiptime {
+    _$skiptimeAtom.reportObserved();
+    return super.skiptime;
+  }
+
+  @override
+  set skiptime(Duration value) {
+    _$skiptimeAtom.context.checkIfStateModificationsAreAllowed(_$skiptimeAtom);
+    super.skiptime = value;
+    _$skiptimeAtom.reportChanged();
+  }
+
   final _$initVideoPlaerAsyncAction = AsyncAction('initVideoPlaer');
 
   @override
@@ -147,10 +209,10 @@ mixin _$VideoStore on _VideoStore, Store {
   final _$_VideoStoreActionController = ActionController(name: '_VideoStore');
 
   @override
-  void videoListenner() {
+  void _videoListenner() {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
-      return super.videoListenner();
+      return super._videoListenner();
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }
@@ -161,16 +223,6 @@ mixin _$VideoStore on _VideoStore, Store {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
       return super.togglePlay();
-    } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void setIsFullScreen(bool full) {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
-    try {
-      return super.setIsFullScreen(full);
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }

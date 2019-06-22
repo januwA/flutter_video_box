@@ -7,13 +7,31 @@ part 'video.store.g.dart';
 class VideoStore = _VideoStore with _$VideoStore;
 
 abstract class _VideoStore with Store {
-  _VideoStore({this.src}) {
+  _VideoStore({
+    this.src,
+    this.skiptime = const Duration(seconds: 10),
+    this.isAutoplay = false,
+    this.isLooping = false,
+    this.volume = 1.0,
+  }) {
     initVideoPlaer();
   }
 
   /// 播放地址
   @observable
   String src;
+
+  /// 自动播放 [false]
+  @observable
+  bool isAutoplay;
+
+  /// 是否循环播放 [false]
+  @observable
+  bool isLooping;
+
+  /// 音量 [1.0]
+  @observable
+  double volume;
 
   @observable
   VideoPlayerController videoCtrl;
@@ -37,6 +55,10 @@ abstract class _VideoStore with Store {
   /// 是否为全屏播放
   @observable
   bool isFullScreen = false;
+
+  /// 快进，快退的时间
+  @observable
+  Duration skiptime;
 
   /// 25:00 or 2:00:00 总时长
   @computed
@@ -78,7 +100,7 @@ abstract class _VideoStore with Store {
   }
 
   @action
-  void videoListenner() {
+  void _videoListenner() {
     position = videoCtrl.value.position;
   }
 
@@ -86,20 +108,20 @@ abstract class _VideoStore with Store {
   @action
   Future<void> initVideoPlaer() async {
     if (isNull(src)) return;
-    // 尝试关闭上一个video
-    videoCtrl?.pause();
-    videoCtrl?.setVolume(0.0);
-
     isVideoLoading = true;
     videoCtrl = VideoPlayerController.network(src);
 
     await videoCtrl.initialize();
 
-    videoCtrl.setVolume(1.0);
+    videoCtrl.setLooping(isLooping);
+    videoCtrl.setVolume(volume);
+    if (isAutoplay) {
+      videoCtrl.play();
+    }
     position = videoCtrl.value.position;
     duration = videoCtrl.value.duration;
     isVideoLoading = false;
-    videoCtrl.addListener(videoListenner);
+    videoCtrl.addListener(_videoListenner);
   }
 
   /// 开启声音或关闭
@@ -111,9 +133,9 @@ abstract class _VideoStore with Store {
     }
   }
 
-  /// 快进
-  void seekTo(double v) {
-    videoCtrl.seekTo(Duration(seconds: (v * duration.inSeconds).toInt()));
+  /// 手动改变进度条
+  void sliderChanged(double v) {
+    seekTo(Duration(seconds: (v * duration.inSeconds).toInt()));
   }
 
   /// 播放或暂停
@@ -126,20 +148,6 @@ abstract class _VideoStore with Store {
       videoCtrl.play();
       isShowVideoCtrl = false;
     }
-  }
-
-  /// 全屏播放切换事件
-  onFullScreen() {
-    if (isFullScreen) {
-      setPortrait();
-    } else {
-      setLandscape();
-    }
-  }
-
-  @action
-  void setIsFullScreen(bool full) {
-    isFullScreen = full;
   }
 
   @action
@@ -183,10 +191,34 @@ abstract class _VideoStore with Store {
     isShowVideoCtrl = true;
   }
 
+  /// 控制播放时间
+  seekTo(Duration d) async {
+    if (videoCtrl != null &&
+        videoCtrl.value != null &&
+        videoCtrl.value.isPlaying) {
+      videoCtrl.seekTo(d);
+    }
+  }
+
+  /// 快进
+  fastForward() {
+    if (videoCtrl.value.isPlaying) {
+      seekTo(videoCtrl.value.position + skiptime);
+    }
+  }
+
+  /// 快退
+  rewind() {
+    if (videoCtrl.value.isPlaying) {
+      seekTo(videoCtrl.value.position - skiptime);
+    }
+  }
+
   @override
   void dispose() {
-    videoCtrl?.removeListener(videoListenner);
+    videoCtrl?.removeListener(_videoListenner);
     videoCtrl?.pause();
     videoCtrl?.dispose();
+    super.dispose();
   }
 }
