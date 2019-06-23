@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobx/mobx.dart';
 import 'package:validators/validators.dart';
@@ -8,18 +9,31 @@ class VideoStore = _VideoStore with _$VideoStore;
 
 abstract class _VideoStore with Store {
   _VideoStore({
-    this.src,
+    String src,
     this.skiptime = const Duration(seconds: 10),
     this.isAutoplay = false,
     this.isLooping = false,
     this.volume = 1.0,
+    this.initPosition,
+    this.playingListenner,
+    this.cover,
   }) {
-    initVideoPlaer();
+    initVideoPlaer(src: src);
   }
 
-  /// 播放地址
-  @observable
-  String src;
+  Function playingListenner;
+
+  Widget cover;
+
+  @computed
+  bool get isShowCover {
+    if (cover == null) return false;
+    if (position == initPosition || position == Duration(seconds: 0)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   /// 自动播放 [false]
   @observable
@@ -36,9 +50,12 @@ abstract class _VideoStore with Store {
   @observable
   VideoPlayerController videoCtrl;
 
-  /// 加载视频中...
+  /// 加载 VideoPlayerController中
   @observable
   bool isVideoLoading = true;
+
+  @observable
+  Duration initPosition;
 
   /// 当前anime播放位置
   @observable
@@ -100,25 +117,36 @@ abstract class _VideoStore with Store {
   }
 
   @action
+  void setSrc(String s) {
+    videoCtrl?.pause();
+    videoCtrl?.removeListener(_videoListenner);
+    initVideoPlaer(src: s);
+  }
+
+  @action
   void _videoListenner() {
     position = videoCtrl.value.position;
+    if (playingListenner != null) {
+      playingListenner();
+    }
   }
 
   /// 初始化viedo控制器
   @action
-  Future<void> initVideoPlaer() async {
+  Future<void> initVideoPlaer({String src}) async {
     if (isNull(src)) return;
     isVideoLoading = true;
     videoCtrl = VideoPlayerController.network(src);
-
     await videoCtrl.initialize();
-
     videoCtrl.setLooping(isLooping);
     videoCtrl.setVolume(volume);
     if (isAutoplay) {
       videoCtrl.play();
     }
-    position = videoCtrl.value.position;
+    if (initPosition != null) {
+      seekTo(initPosition);
+    }
+    position = initPosition ?? videoCtrl.value.position;
     duration = videoCtrl.value.duration;
     isVideoLoading = false;
     videoCtrl.addListener(_videoListenner);
@@ -153,6 +181,13 @@ abstract class _VideoStore with Store {
   @action
   void showVideoCtrl(bool show) {
     isShowVideoCtrl = show;
+    if (show && videoCtrl.value.isPlaying) {
+      Future.delayed(Duration(seconds: 2)).then((_) {
+        if (videoCtrl.value.isPlaying) {
+          showVideoCtrl(false);
+        }
+      });
+    }
   }
 
   /// 设置为横屏模式
@@ -191,11 +226,10 @@ abstract class _VideoStore with Store {
     isShowVideoCtrl = true;
   }
 
-  /// 控制播放时间
-  seekTo(Duration d) async {
-    if (videoCtrl != null &&
-        videoCtrl.value != null &&
-        videoCtrl.value.isPlaying) {
+  /// 控制播放时间位置
+  @action
+  Future<void> seekTo(Duration d) async {
+    if (videoCtrl != null && videoCtrl.value != null) {
       videoCtrl.seekTo(d);
     }
   }
@@ -215,10 +249,74 @@ abstract class _VideoStore with Store {
   }
 
   @override
-  void dispose() {
+  Future<void> dispose() async {
     videoCtrl?.removeListener(_videoListenner);
-    videoCtrl?.pause();
-    videoCtrl?.dispose();
+    await videoCtrl?.pause();
+    await videoCtrl?.dispose();
     super.dispose();
   }
+
+  VideoState toJson() {
+    return VideoState(
+      src: videoCtrl.dataSource,
+      size: videoCtrl.value.size,
+      isAutoplay: isAutoplay,
+      isLooping: isLooping,
+      volume: volume,
+      initPosition: initPosition,
+      position: position,
+      duration: duration,
+      skiptime: skiptime,
+      positionText: positionText,
+      durationText: durationText,
+      sliderValue: sliderValue,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "src": videoCtrl.dataSource,
+      "size": videoCtrl.value.size,
+      "isAutoplay": isAutoplay,
+      "isLooping": isLooping,
+      "volume": volume,
+      "initPosition": initPosition,
+      "position": position,
+      "duration": duration,
+      "skiptime": skiptime,
+      "positionText": positionText,
+      "durationText": durationText,
+      "sliderValue": sliderValue,
+    };
+  }
+}
+
+class VideoState {
+  VideoState({
+    this.src,
+    this.size,
+    this.isLooping,
+    this.isAutoplay,
+    this.volume,
+    this.initPosition,
+    this.position,
+    this.duration,
+    this.skiptime,
+    this.positionText,
+    this.durationText,
+    this.sliderValue,
+  });
+
+  String src;
+  Size size;
+  bool isAutoplay;
+  bool isLooping;
+  double volume;
+  Duration initPosition;
+  Duration position;
+  Duration duration;
+  Duration skiptime;
+  String positionText;
+  String durationText;
+  double sliderValue;
 }

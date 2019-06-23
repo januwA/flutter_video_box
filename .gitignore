@@ -1,5 +1,5 @@
 # 发布包的时候不要发布 example，push到仓库时需要关闭需略
-# /example
+# example/
 
 # Miscellaneous
 *.class

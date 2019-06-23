@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:validators/validators.dart';
 import 'package:video_box/video.store.dart';
 import 'package:video_player/video_player.dart';
 import 'package:screen/screen.dart';
@@ -54,29 +53,36 @@ class _VideoBoxState extends State<VideoBox> {
   @override
   Widget build(BuildContext context) {
     return Observer(
-      builder: (_) => isNull(videoStore.src)
+      builder: (_) => videoStore.isVideoLoading
           ? _VideoLoading()
           : MultiProvider(
               providers: [Provider<VideoStore>.value(value: videoStore)],
               child: GestureDetector(
-                onDoubleTap: () {},
                 onTap: () =>
                     videoStore.showVideoCtrl(!videoStore.isShowVideoCtrl),
                 child: Stack(
                   alignment: AlignmentDirectional.center,
                   children: <Widget>[
-                    videoStore.isVideoLoading
-                        ? _VideoLoading()
-                        : Container(
-                            decoration: BoxDecoration(color: Colors.black),
-                            child: Center(
-                              child: AspectRatio(
-                                aspectRatio:
-                                    videoStore.videoCtrl.value.aspectRatio,
-                                child: VideoPlayer(videoStore.videoCtrl),
-                              ),
-                            ),
+                    AnimatedOpacity(
+                      opacity: videoStore.isShowCover ? 1.0 : 0.0,
+                      duration: Duration(milliseconds: 300),
+                      child: _VideoLoading(
+                        cover: videoStore.cover,
+                      ),
+                    ),
+                    AnimatedOpacity(
+                      opacity: !videoStore.isShowCover ? 1.0 : 0.0,
+                      duration: Duration(milliseconds: 300),
+                      child: Container(
+                        decoration: BoxDecoration(color: Colors.black),
+                        child: Center(
+                          child: AspectRatio(
+                            aspectRatio: videoStore.videoCtrl.value.aspectRatio,
+                            child: VideoPlayer(videoStore.videoCtrl),
                           ),
+                        ),
+                      ),
+                    ),
                     _SeekToView(),
                     _PlayButton(),
                     _VideoBottomCtrl(),
@@ -276,7 +282,10 @@ class _VideoBottomCtrl extends StatelessWidget {
 class _VideoLoading extends StatelessWidget {
   const _VideoLoading({
     Key key,
+    this.cover,
   }) : super(key: key);
+
+  final Widget cover;
 
   @override
   Widget build(BuildContext context) {
@@ -287,13 +296,15 @@ class _VideoLoading extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: <Widget>[
-            SizedBox(
-              height: 50,
-              width: 50,
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(Colors.white),
-              ),
-            )
+            cover == null
+                ? SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(Colors.white),
+                    ),
+                  )
+                : cover,
           ],
         ),
       ),

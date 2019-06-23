@@ -89,5 +89,20 @@ class _ListVideoState extends State<ListVideo> {
 }
 ```
 
+## options
+```
+video = Video(
+  store: VideoStore(
+    src, // 网络播放地址
+    skiptime, // 每次双击seekto的时间
+    isAutoplay, // 自动播放
+    isLooping, // 循环播放
+    volume, // 初始音量
+    initPosition, // 初始播放位置
+    playingListenner, // 播放时的回调函数
+    cover, // 视频第一次播放前，显示的封面
+  ),
+);
+```
 
 详情可以看下/example或则源码

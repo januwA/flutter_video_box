@@ -15,12 +15,21 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
   void initState() {
     super.initState();
     video = Video(
-        store: VideoStore(
-      src: src,
-      // isAutoplay: true,
-      // isLooping: true,
-      // volume: 0.0,
-    ));
+      store: VideoStore(
+        src: src1,
+        // initPosition: Duration(minutes: 20),
+        cover: Text(
+          'cover',
+          style: TextStyle(color: Colors.white),
+        ),
+        // playingListenner: () {
+        //   print(video.store.toMap());
+        // },
+        // isAutoplay: true,
+        // isLooping: true,
+        // volume: 0.0,
+      ),
+    );
   }
 
   @override

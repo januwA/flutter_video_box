@@ -19,7 +19,7 @@ class _OneVideoState extends State<OneVideo> {
         children: [
           VideoBox(
             isDispose: true,
-            src: src,
+            src: src1,
           ),
         ],
       ),

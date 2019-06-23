@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'change_video_src.dart';
 import 'list_video.dart';
 import 'one_video.dart';
 import 'one_video_ctrl.dart';
@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
         '/oneVideo': (BuildContext context) => OneVideo(),
         '/oneVideoCtrl': (BuildContext context) => OneVideoCtrl(),
         '/listVideo': (BuildContext context) => ListVideo(),
+        '/change_video_src': (BuildContext context) => ChangeVideoSrc(),
       },
       home: HomePage(),
     );
@@ -52,6 +53,12 @@ class _HomePageState extends State<HomePage> {
               child: Text('list video'),
               onPressed: () {
                 Navigator.of(context).pushNamed('/listVideo');
+              },
+            ),
+            RaisedButton(
+              child: Text('change video src'),
+              onPressed: () {
+                Navigator.of(context).pushNamed('/change_video_src');
               },
             ),
           ],

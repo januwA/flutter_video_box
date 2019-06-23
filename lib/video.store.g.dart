@@ -9,6 +9,11 @@ part of 'video.store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars
 
 mixin _$VideoStore on _VideoStore, Store {
+  Computed<bool> _$isShowCoverComputed;
+
+  @override
+  bool get isShowCover =>
+      (_$isShowCoverComputed ??= Computed<bool>(() => super.isShowCover)).value;
   Computed<String> _$durationTextComputed;
 
   @override
@@ -27,21 +32,6 @@ mixin _$VideoStore on _VideoStore, Store {
   double get sliderValue =>
       (_$sliderValueComputed ??= Computed<double>(() => super.sliderValue))
           .value;
-
-  final _$srcAtom = Atom(name: '_VideoStore.src');
-
-  @override
-  String get src {
-    _$srcAtom.reportObserved();
-    return super.src;
-  }
-
-  @override
-  set src(String value) {
-    _$srcAtom.context.checkIfStateModificationsAreAllowed(_$srcAtom);
-    super.src = value;
-    _$srcAtom.reportChanged();
-  }
 
   final _$isAutoplayAtom = Atom(name: '_VideoStore.isAutoplay');
 
@@ -120,6 +110,22 @@ mixin _$VideoStore on _VideoStore, Store {
         .checkIfStateModificationsAreAllowed(_$isVideoLoadingAtom);
     super.isVideoLoading = value;
     _$isVideoLoadingAtom.reportChanged();
+  }
+
+  final _$initPositionAtom = Atom(name: '_VideoStore.initPosition');
+
+  @override
+  Duration get initPosition {
+    _$initPositionAtom.reportObserved();
+    return super.initPosition;
+  }
+
+  @override
+  set initPosition(Duration value) {
+    _$initPositionAtom.context
+        .checkIfStateModificationsAreAllowed(_$initPositionAtom);
+    super.initPosition = value;
+    _$initPositionAtom.reportChanged();
   }
 
   final _$positionAtom = Atom(name: '_VideoStore.position');
@@ -202,11 +208,29 @@ mixin _$VideoStore on _VideoStore, Store {
   final _$initVideoPlaerAsyncAction = AsyncAction('initVideoPlaer');
 
   @override
-  Future<void> initVideoPlaer() {
-    return _$initVideoPlaerAsyncAction.run(() => super.initVideoPlaer());
+  Future<void> initVideoPlaer({String src}) {
+    return _$initVideoPlaerAsyncAction
+        .run(() => super.initVideoPlaer(src: src));
+  }
+
+  final _$seekToAsyncAction = AsyncAction('seekTo');
+
+  @override
+  Future<void> seekTo(Duration d) {
+    return _$seekToAsyncAction.run(() => super.seekTo(d));
   }
 
   final _$_VideoStoreActionController = ActionController(name: '_VideoStore');
+
+  @override
+  void setSrc(String s) {
+    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    try {
+      return super.setSrc(s);
+    } finally {
+      _$_VideoStoreActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void _videoListenner() {
