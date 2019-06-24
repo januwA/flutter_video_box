@@ -16,7 +16,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
     super.initState();
     video = Video(
       store: VideoStore(
-        src: src1,
+        videoDataSource: VideoDataSource.network(src1),
         // initPosition: Duration(minutes: 20),
         cover: Text(
           'cover',

@@ -1,6 +1,6 @@
 name: video_box
-description: 一个在flutter中播放视频的控件.
-version: 0.0.3
+description: 一个在flutter中播放视频的控件, 我让控件尽可能的灵活.
+version: 0.1.0
 author: Ajanuw <ajanuw1995@gmail.com>
 homepage: https://github.com/januwA/flutter_video_box
 
@@ -13,7 +13,7 @@ dependencies:
   video_player: ^0.10.1+3
   mobx: ^0.2.1+1
   flutter_mobx: ^0.2.3+1
-  validators:  ^2.0.0+1
+  validators: ^2.0.0+1
   provider: ^3.0.0+1
   screen: ^0.0.5
 

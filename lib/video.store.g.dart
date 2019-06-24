@@ -33,6 +33,21 @@ mixin _$VideoStore on _VideoStore, Store {
       (_$sliderValueComputed ??= Computed<double>(() => super.sliderValue))
           .value;
 
+  final _$coverAtom = Atom(name: '_VideoStore.cover');
+
+  @override
+  Widget get cover {
+    _$coverAtom.reportObserved();
+    return super.cover;
+  }
+
+  @override
+  set cover(Widget value) {
+    _$coverAtom.context.checkIfStateModificationsAreAllowed(_$coverAtom);
+    super.cover = value;
+    _$coverAtom.reportChanged();
+  }
+
   final _$isAutoplayAtom = Atom(name: '_VideoStore.isAutoplay');
 
   @override
@@ -208,9 +223,9 @@ mixin _$VideoStore on _VideoStore, Store {
   final _$initVideoPlaerAsyncAction = AsyncAction('initVideoPlaer');
 
   @override
-  Future<void> initVideoPlaer({String src}) {
+  Future<void> initVideoPlaer(VideoDataSource videoDataSource) {
     return _$initVideoPlaerAsyncAction
-        .run(() => super.initVideoPlaer(src: src));
+        .run(() => super.initVideoPlaer(videoDataSource));
   }
 
   final _$seekToAsyncAction = AsyncAction('seekTo');
@@ -223,30 +238,50 @@ mixin _$VideoStore on _VideoStore, Store {
   final _$_VideoStoreActionController = ActionController(name: '_VideoStore');
 
   @override
-  void setSrc(String s) {
+  void setCover(Widget newCover) {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
-      return super.setSrc(s);
+      return super.setCover(newCover);
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void _videoListenner() {
+  void setIsAutoplay(bool autoplay) {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
-      return super._videoListenner();
+      return super.setIsAutoplay(autoplay);
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void togglePlay() {
+  void setIsLooping(bool loop) {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
-      return super.togglePlay();
+      return super.setIsLooping(loop);
+    } finally {
+      _$_VideoStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setVolume(double v) {
+    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    try {
+      return super.setVolume(v);
+    } finally {
+      _$_VideoStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setInitPosition(Duration p) {
+    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    try {
+      return super.setInitPosition(p);
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }
@@ -263,7 +298,47 @@ mixin _$VideoStore on _VideoStore, Store {
   }
 
   @override
-  dynamic setLandscape() {
+  void setSkiptime(Duration st) {
+    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    try {
+      return super.setSkiptime(st);
+    } finally {
+      _$_VideoStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void _videoListenner() {
+    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    try {
+      return super._videoListenner();
+    } finally {
+      _$_VideoStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setSource([VideoDataSource videoDataSource]) {
+    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    try {
+      return super.setSource(videoDataSource);
+    } finally {
+      _$_VideoStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void togglePlay() {
+    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    try {
+      return super.togglePlay();
+    } finally {
+      _$_VideoStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setLandscape() {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
       return super.setLandscape();
@@ -273,7 +348,7 @@ mixin _$VideoStore on _VideoStore, Store {
   }
 
   @override
-  dynamic setPortrait() {
+  void setPortrait() {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
       return super.setPortrait();

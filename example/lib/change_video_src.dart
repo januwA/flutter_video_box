@@ -18,7 +18,8 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
   @override
   void initState() {
     super.initState();
-    video = Video(store: VideoStore(src: src));
+    video =
+        Video(store: VideoStore(videoDataSource: VideoDataSource.network(src)));
   }
 
   @override
@@ -40,10 +41,6 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
             padding: const EdgeInsets.all(8.0),
             child: Text('index: $index'),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(src),
-          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
@@ -57,7 +54,9 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
                   setState(() {
                     index = newindex;
                   });
-                  video.store.setSrc(src);
+                  video.store.setIsAutoplay(false);
+                  video.store.showVideoCtrl(true);
+                  video.store.setSource(VideoDataSource.network(src));
                 },
               ),
               RaisedButton(
@@ -70,7 +69,9 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
                   setState(() {
                     index = newindex;
                   });
-                  video.store.setSrc(src);
+                  video.store.setSource(VideoDataSource.network(src));
+                  video.store.setIsAutoplay(true);
+                  video.store.showVideoCtrl(false);
                 },
               ),
             ],

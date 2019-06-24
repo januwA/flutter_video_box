@@ -18,7 +18,7 @@ class _ListVideoState extends State<ListVideo> {
     for (var i = 0; i < 4; i++) {
       videos.add(
         Video(
-          store: VideoStore(src: src1),
+          store: VideoStore(videoDataSource: VideoDataSource.network(src1)),
         ),
       );
     }

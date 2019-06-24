@@ -1,30 +1,64 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobx/mobx.dart';
-import 'package:validators/validators.dart';
 import 'package:video_player/video_player.dart';
 part 'video.store.g.dart';
+
+/// 构造资源的类
+class VideoDataSource {
+  final DataSourceType dataSourceType;
+  final String dataSource;
+  final String package;
+
+  VideoDataSource.network(this.dataSource)
+      : dataSourceType = DataSourceType.network,
+        package = null;
+
+  VideoDataSource.file(File file)
+      : dataSource = 'file://${file.path}',
+        dataSourceType = DataSourceType.file,
+        package = null;
+
+  VideoDataSource.asset(this.dataSource, {this.package})
+      : dataSourceType = DataSourceType.asset;
+}
 
 class VideoStore = _VideoStore with _$VideoStore;
 
 abstract class _VideoStore with Store {
   _VideoStore({
-    String src,
+    VideoDataSource videoDataSource,
     this.skiptime = const Duration(seconds: 10),
     this.isAutoplay = false,
     this.isLooping = false,
     this.volume = 1.0,
     this.initPosition,
-    this.playingListenner,
     this.cover,
+    this.playingListenner,
+    this.playEnd,
   }) {
-    initVideoPlaer(src: src);
+    initVideoPlaer(videoDataSource);
   }
 
+  /// 用户可以发送一个callback的函数进来，video播放时触发
   Function playingListenner;
 
+  /// 播放完毕
+  Function playEnd;
+
+  /// 封面
+  @observable
   Widget cover;
 
+  /// 设置封面
+  @action
+  void setCover(Widget newCover) {
+    cover = newCover;
+  }
+
+  /// 是否显示封面，只有在第一次播放前显示
   @computed
   bool get isShowCover {
     if (cover == null) return false;
@@ -39,13 +73,32 @@ abstract class _VideoStore with Store {
   @observable
   bool isAutoplay;
 
+  /// set  [isAutoplay]
+  @action
+  void setIsAutoplay(bool autoplay) {
+    isAutoplay = autoplay;
+  }
+
   /// 是否循环播放 [false]
   @observable
   bool isLooping;
 
+  @action
+  void setIsLooping(bool loop) {
+    isLooping = loop;
+    videoCtrl?.setLooping(loop);
+  }
+
   /// 音量 [1.0]
   @observable
   double volume;
+
+  /// set [volume]
+  @action
+  void setVolume(double v) {
+    volume = v;
+    videoCtrl?.setVolume(v);
+  }
 
   @observable
   VideoPlayerController videoCtrl;
@@ -54,8 +107,15 @@ abstract class _VideoStore with Store {
   @observable
   bool isVideoLoading = true;
 
+  /// 初始化播放位置
   @observable
   Duration initPosition;
+
+  /// set [initPosition]
+  @action
+  void setInitPosition(Duration p) {
+    initPosition = p;
+  }
 
   /// 当前anime播放位置
   @observable
@@ -69,6 +129,19 @@ abstract class _VideoStore with Store {
   @observable
   bool isShowVideoCtrl = true;
 
+  /// set [isShowVideoCtrl]
+  @action
+  void showVideoCtrl(bool show) {
+    isShowVideoCtrl = show;
+    if (show && videoCtrl.value.isPlaying) {
+      Future.delayed(Duration(seconds: 2)).then((_) {
+        if (videoCtrl.value.isPlaying) {
+          showVideoCtrl(false);
+        }
+      });
+    }
+  }
+
   /// 是否为全屏播放
   @observable
   bool isFullScreen = false;
@@ -76,6 +149,12 @@ abstract class _VideoStore with Store {
   /// 快进，快退的时间
   @observable
   Duration skiptime;
+
+  /// set [skiptime]
+  @action
+  void setSkiptime(Duration st) {
+    skiptime = st;
+  }
 
   /// 25:00 or 2:00:00 总时长
   @computed
@@ -117,26 +196,43 @@ abstract class _VideoStore with Store {
   }
 
   @action
-  void setSrc(String s) {
-    videoCtrl?.pause();
-    videoCtrl?.removeListener(_videoListenner);
-    initVideoPlaer(src: s);
-  }
-
-  @action
   void _videoListenner() {
     position = videoCtrl.value.position;
     if (playingListenner != null) {
       playingListenner();
     }
+    if (this.playEnd != null && position >= duration) {
+      playEnd();
+    }
+  }
+
+  @action
+  void setSource([VideoDataSource videoDataSource]) {
+    videoCtrl?.pause();
+    videoCtrl?.removeListener(_videoListenner);
+    var oldCtrl = videoCtrl;
+
+    /// 延迟一秒清理资源
+    /// 如果以后出现 `Once you have called dispose() on a VideoPlayerController, it can no longer be used.`
+    /// 我将保留资源，并删除下面这段代码
+    Future.delayed(Duration(seconds: 1)).then((_) => oldCtrl?.dispose());
+    initVideoPlaer(videoDataSource);
   }
 
   /// 初始化viedo控制器
   @action
-  Future<void> initVideoPlaer({String src}) async {
-    if (isNull(src)) return;
+  Future<void> initVideoPlaer(VideoDataSource videoDataSource) async {
     isVideoLoading = true;
-    videoCtrl = VideoPlayerController.network(src);
+    if (videoDataSource == null) return;
+    DataSourceType dataSourceType = videoDataSource.dataSourceType;
+    if (dataSourceType == DataSourceType.network) {
+      videoCtrl = VideoPlayerController.network(videoDataSource.dataSource);
+    } else if (dataSourceType == DataSourceType.file) {
+      videoCtrl = VideoPlayerController.file(File(videoDataSource.dataSource));
+    } else if (dataSourceType == DataSourceType.asset) {
+      videoCtrl = VideoPlayerController.asset(videoDataSource.dataSource,
+          package: videoDataSource.package);
+    }
     await videoCtrl.initialize();
     videoCtrl.setLooping(isLooping);
     videoCtrl.setVolume(volume);
@@ -153,7 +249,7 @@ abstract class _VideoStore with Store {
   }
 
   /// 开启声音或关闭
-  void setVolume() {
+  void setOnSoundOrOff() {
     if (videoCtrl.value.volume > 0) {
       videoCtrl.setVolume(0.0);
     } else {
@@ -178,21 +274,9 @@ abstract class _VideoStore with Store {
     }
   }
 
-  @action
-  void showVideoCtrl(bool show) {
-    isShowVideoCtrl = show;
-    if (show && videoCtrl.value.isPlaying) {
-      Future.delayed(Duration(seconds: 2)).then((_) {
-        if (videoCtrl.value.isPlaying) {
-          showVideoCtrl(false);
-        }
-      });
-    }
-  }
-
   /// 设置为横屏模式
   @action
-  setLandscape() {
+  void setLandscape() {
     isFullScreen = true;
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
@@ -202,7 +286,7 @@ abstract class _VideoStore with Store {
 
   /// 设置为正常模式
   @action
-  setPortrait() {
+  void setPortrait() {
     isFullScreen = false;
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
@@ -235,16 +319,16 @@ abstract class _VideoStore with Store {
   }
 
   /// 快进
-  fastForward() {
+  void fastForward([Duration st]) {
     if (videoCtrl.value.isPlaying) {
-      seekTo(videoCtrl.value.position + skiptime);
+      seekTo(videoCtrl.value.position + (st ?? skiptime));
     }
   }
 
   /// 快退
-  rewind() {
+  void rewind([Duration st]) {
     if (videoCtrl.value.isPlaying) {
-      seekTo(videoCtrl.value.position - skiptime);
+      seekTo(videoCtrl.value.position - (st ?? skiptime));
     }
   }
 

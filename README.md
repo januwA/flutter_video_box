@@ -55,7 +55,7 @@ class _ListVideoState extends State<ListVideo> {
     for (var i = 0; i < 4; i++) {
       videos.add(
         Video(
-          store: VideoStore(src: src),
+          store: VideoStore(videoDataSource: VideoDataSource.network(src)),
         ),
       );
     }
@@ -90,16 +90,17 @@ class _ListVideoState extends State<ListVideo> {
 ```
 
 ## options
-```
+```dart
 video = Video(
   store: VideoStore(
-    src, // 网络播放地址
+    videoDataSource, // 资源 [network file asset]
     skiptime, // 每次双击seekto的时间
     isAutoplay, // 自动播放
     isLooping, // 循环播放
     volume, // 初始音量
     initPosition, // 初始播放位置
     playingListenner, // 播放时的回调函数
+    playEnd, // 播放结束
     cover, // 视频第一次播放前，显示的封面
   ),
 );

@@ -6,13 +6,25 @@ import 'package:video_box/video.store.dart';
 import 'package:video_player/video_player.dart';
 import 'package:screen/screen.dart';
 
+/// 下面是一个简单的example，更具体使用何以看 /example下面的代码或则源码
+/// ```dart
+/// Video video = Video(store: VideoStore(videoDataSource: VideoDataSource.network('http://example.com/example.mp4')));
+///
+/// @override
+/// void dispose() {
+///   video.dispose();
+///   super.dispose();
+/// }
+///
+/// // 在ui中展示
+/// Container(child: video.videoBox),
+/// ```
 class Video {
   Video({
     this.store,
   }) : videoBox = VideoBox(store: store);
   final VideoStore store;
   final VideoBox videoBox;
-
   dispose() {
     store.dispose();
   }
@@ -21,12 +33,12 @@ class Video {
 class VideoBox extends StatefulWidget {
   VideoBox({
     Key key,
-    this.src,
+    this.videoDataSource,
     this.store,
     this.isDispose = false,
   }) : super(key: key);
 
-  final String src;
+  final VideoDataSource videoDataSource;
   final VideoStore store;
   final isDispose;
   @override
@@ -39,7 +51,8 @@ class _VideoBoxState extends State<VideoBox> {
   @override
   void initState() {
     super.initState();
-    videoStore = widget.store ?? VideoStore(src: widget.src);
+    videoStore =
+        widget.store ?? VideoStore(videoDataSource: widget.videoDataSource);
   }
 
   @override
@@ -254,7 +267,7 @@ class _VideoBottomCtrl extends StatelessWidget {
                             : IconButton(
                                 icon: Icon(_volumeIcon(
                                     videoStore.videoCtrl.value.volume)),
-                                onPressed: videoStore.setVolume,
+                                onPressed: videoStore.setOnSoundOrOff,
                               ),
                         IconButton(
                           icon: Icon(
