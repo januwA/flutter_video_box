@@ -3,7 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobx/mobx.dart';
+import 'package:screen/screen.dart';
 import 'package:video_player/video_player.dart';
+
+import 'video_box.dart';
 part 'video.store.g.dart';
 
 /// 构造资源的类
@@ -329,6 +332,34 @@ abstract class _VideoStore with Store {
   void rewind([Duration st]) {
     if (videoCtrl.value.isPlaying) {
       seekTo(videoCtrl.value.position - (st ?? skiptime));
+    }
+  }
+
+  Future<void> onFullScreen(context) async {
+    if (isFullScreen) {
+      /// 退出全屏
+      Navigator.of(context).pop();
+    } else {
+      /// 开启全屏
+      setLandscape();
+      Screen.keepOn(true);
+      SystemChrome.setEnabledSystemUIOverlays([]);
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => SafeArea(
+            child: Scaffold(
+              body: Center(
+                child: VideoBox(
+                  store: this,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+      setPortrait();
+      Screen.keepOn(false);
+      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     }
   }
 

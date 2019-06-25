@@ -64,6 +64,12 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
                   video.store.pause();
                 },
               ),
+              RaisedButton(
+                child: Text('full screen'),
+                onPressed: () {
+                  video.store.onFullScreen(context);
+                },
+              ),
             ],
           ),
         ],

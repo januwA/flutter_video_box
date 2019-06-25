@@ -151,62 +151,34 @@ class _PlayButton extends StatelessWidget {
     final videoStore = Provider.of<VideoStore>(context);
     return Observer(
       builder: (_) => AnimatedCrossFade(
-            duration: const Duration(milliseconds: 300),
-            firstChild: Container(),
-            secondChild: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                color: Colors.black,
-                icon: Icon(
-                  videoStore.videoCtrl == null ||
-                          videoStore.videoCtrl.value.isPlaying
-                      ? Icons.pause
-                      : Icons.play_arrow,
-                ),
-                onPressed: videoStore.togglePlay,
-              ),
-            ),
-            crossFadeState: videoStore.isShowVideoCtrl
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
+        duration: const Duration(milliseconds: 300),
+        firstChild: Container(),
+        secondChild: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            shape: BoxShape.circle,
           ),
+          child: IconButton(
+            color: Colors.black,
+            icon: Icon(
+              videoStore.videoCtrl == null ||
+                      videoStore.videoCtrl.value.isPlaying
+                  ? Icons.pause
+                  : Icons.play_arrow,
+            ),
+            onPressed: videoStore.togglePlay,
+          ),
+        ),
+        crossFadeState: videoStore.isShowVideoCtrl
+            ? CrossFadeState.showSecond
+            : CrossFadeState.showFirst,
+      ),
     );
   }
 }
 
 /// video 底部的控制器
 class _VideoBottomCtrl extends StatelessWidget {
-  Future<void> _onFullScreen(context, videoStore) async {
-    if (videoStore.isFullScreen) {
-      /// 退出全屏
-      Navigator.of(context).pop();
-    } else {
-      /// 开启全屏
-      videoStore.setLandscape();
-      Screen.keepOn(true);
-      SystemChrome.setEnabledSystemUIOverlays([]);
-      await Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => SafeArea(
-                child: Scaffold(
-                  body: Center(
-                    child: VideoBox(
-                      store: videoStore,
-                    ),
-                  ),
-                ),
-              ),
-        ),
-      );
-      videoStore.setPortrait();
-      Screen.keepOn(false);
-      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    }
-  }
-
   /// 返回一个符合当前音量的icon
   IconData _volumeIcon(double volume) {
     return volume <= 0
@@ -219,74 +191,74 @@ class _VideoBottomCtrl extends StatelessWidget {
     final videoStore = Provider.of<VideoStore>(context);
     return Observer(
       builder: (_) => Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: AnimatedCrossFade(
-              duration: Duration(milliseconds: 300),
-              firstChild: Container(),
-              secondChild: Container(
-                decoration: BoxDecoration(color: Colors.black12),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Theme(
-                    data: Theme.of(context).copyWith(
-                      iconTheme: IconThemeData(color: Colors.white),
-                      sliderTheme: Theme.of(context).sliderTheme.copyWith(
-                            /// 进度之前的颜色
-                            activeTrackColor: Colors.white70,
+        bottom: 0,
+        left: 0,
+        right: 0,
+        child: AnimatedCrossFade(
+          duration: Duration(milliseconds: 300),
+          firstChild: Container(),
+          secondChild: Container(
+            decoration: BoxDecoration(color: Colors.black12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Theme(
+                data: Theme.of(context).copyWith(
+                  iconTheme: IconThemeData(color: Colors.white),
+                  sliderTheme: Theme.of(context).sliderTheme.copyWith(
+                        /// 进度之前的颜色
+                        activeTrackColor: Colors.white70,
 
-                            /// 进度之后的颜色
-                            inactiveTrackColor: Colors.white30,
+                        /// 进度之后的颜色
+                        inactiveTrackColor: Colors.white30,
 
-                            // 指示器的颜色
-                            thumbColor: Colors.white,
-                          ),
+                        // 指示器的颜色
+                        thumbColor: Colors.white,
+                      ),
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Text(
+                      videoStore.isVideoLoading
+                          ? '00:00/00:00'
+                          : "${videoStore.positionText}/${videoStore.durationText}",
+                      style: TextStyle(color: Colors.white),
                     ),
-                    child: Row(
-                      children: <Widget>[
-                        Text(
-                          videoStore.isVideoLoading
-                              ? '00:00/00:00'
-                              : "${videoStore.positionText}/${videoStore.durationText}",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        Expanded(
-                          child: Slider(
-                            // inactiveColor: Colors.grey[300],
-                            // activeColor: Colors.white,
-                            value: videoStore.sliderValue,
-                            onChanged: videoStore.sliderChanged,
-                          ),
-                        ),
-                        videoStore.isVideoLoading
-                            ? IconButton(
-                                icon: Icon(Icons.volume_up),
-                                onPressed: () {},
-                              )
-                            : IconButton(
-                                icon: Icon(_volumeIcon(
-                                    videoStore.videoCtrl.value.volume)),
-                                onPressed: videoStore.setOnSoundOrOff,
-                              ),
-                        IconButton(
-                          icon: Icon(
-                            !videoStore.isFullScreen
-                                ? Icons.fullscreen
-                                : Icons.fullscreen_exit,
-                          ),
-                          onPressed: () => _onFullScreen(context, videoStore),
-                        ),
-                      ],
+                    Expanded(
+                      child: Slider(
+                        // inactiveColor: Colors.grey[300],
+                        // activeColor: Colors.white,
+                        value: videoStore.sliderValue,
+                        onChanged: videoStore.sliderChanged,
+                      ),
                     ),
-                  ),
+                    videoStore.isVideoLoading
+                        ? IconButton(
+                            icon: Icon(Icons.volume_up),
+                            onPressed: () {},
+                          )
+                        : IconButton(
+                            icon: Icon(
+                                _volumeIcon(videoStore.videoCtrl.value.volume)),
+                            onPressed: videoStore.setOnSoundOrOff,
+                          ),
+                    IconButton(
+                      icon: Icon(
+                        !videoStore.isFullScreen
+                            ? Icons.fullscreen
+                            : Icons.fullscreen_exit,
+                      ),
+                      onPressed: () => videoStore.onFullScreen(context),
+                    ),
+                  ],
                 ),
               ),
-              crossFadeState: videoStore.isShowVideoCtrl
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
             ),
           ),
+          crossFadeState: videoStore.isShowVideoCtrl
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
+        ),
+      ),
     );
   }
 }
