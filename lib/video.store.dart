@@ -9,7 +9,7 @@ import 'package:video_player/video_player.dart';
 import 'video_box.dart';
 part 'video.store.g.dart';
 
-/// 构造资源的类
+/// Construction a resources
 class VideoDataSource {
   final DataSourceType dataSourceType;
   final String dataSource;
@@ -48,14 +48,14 @@ abstract class _VideoStore with Store {
   /// 用户可以发送一个callback的函数进来，video播放时触发
   Function playingListenner;
 
-  /// 播放完毕
+  /// Played out
   Function playEnd;
 
-  /// 封面
+  /// cover
   @observable
   Widget cover;
 
-  /// 设置封面
+  /// set cover
   @action
   void setCover(Widget newCover) {
     cover = newCover;
@@ -72,17 +72,17 @@ abstract class _VideoStore with Store {
     }
   }
 
-  /// 自动播放 [false]
+  /// autoplay [false]
   @observable
   bool isAutoplay;
 
-  /// set  [isAutoplay]
+  /// set [isAutoplay]
   @action
   void setIsAutoplay(bool autoplay) {
     isAutoplay = autoplay;
   }
 
-  /// 是否循环播放 [false]
+  /// Loop [false]
   @observable
   bool isLooping;
 
@@ -92,7 +92,7 @@ abstract class _VideoStore with Store {
     videoCtrl?.setLooping(loop);
   }
 
-  /// 音量 [1.0]
+  /// volume [1.0]
   @observable
   double volume;
 
@@ -106,11 +106,17 @@ abstract class _VideoStore with Store {
   @observable
   VideoPlayerController videoCtrl;
 
-  /// 加载 VideoPlayerController中
+  /// loading VideoPlayerController
   @observable
   bool isVideoLoading = true;
 
-  /// 初始化播放位置
+  /// set [isVideoLoading]
+  @action
+  void setVideoLoading(bool v) {
+    isVideoLoading = v;
+  }
+
+  /// Initialize the play position
   @observable
   Duration initPosition;
 
@@ -120,7 +126,7 @@ abstract class _VideoStore with Store {
     initPosition = p;
   }
 
-  /// 当前anime播放位置
+  /// Current position
   @observable
   Duration position;
 
@@ -128,7 +134,7 @@ abstract class _VideoStore with Store {
   @observable
   Duration duration;
 
-  /// 是否显示控制器
+  /// total length
   @observable
   bool isShowVideoCtrl = true;
 
@@ -210,22 +216,18 @@ abstract class _VideoStore with Store {
   }
 
   @action
-  void setSource([VideoDataSource videoDataSource]) {
+  Future<void> setSource(VideoDataSource videoDataSource) async {
     videoCtrl?.pause();
     videoCtrl?.removeListener(_videoListenner);
     var oldCtrl = videoCtrl;
-
-    /// 延迟一秒清理资源
-    /// 如果以后出现 `Once you have called dispose() on a VideoPlayerController, it can no longer be used.`
-    /// 我将保留资源，并删除下面这段代码
     Future.delayed(Duration(seconds: 1)).then((_) => oldCtrl?.dispose());
-    initVideoPlaer(videoDataSource);
+    await initVideoPlaer(videoDataSource);
   }
 
   /// 初始化viedo控制器
   @action
   Future<void> initVideoPlaer(VideoDataSource videoDataSource) async {
-    isVideoLoading = true;
+    setVideoLoading(true);
     if (videoDataSource == null) return;
     DataSourceType dataSourceType = videoDataSource.dataSourceType;
     if (dataSourceType == DataSourceType.network) {
@@ -247,7 +249,7 @@ abstract class _VideoStore with Store {
     }
     position = initPosition ?? videoCtrl.value.position;
     duration = videoCtrl.value.duration;
-    isVideoLoading = false;
+    setVideoLoading(false);
     videoCtrl.addListener(_videoListenner);
   }
 
@@ -279,7 +281,7 @@ abstract class _VideoStore with Store {
 
   /// 设置为横屏模式
   @action
-  void setLandscape() {
+  void _setLandscape() {
     isFullScreen = true;
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
@@ -289,7 +291,7 @@ abstract class _VideoStore with Store {
 
   /// 设置为正常模式
   @action
-  void setPortrait() {
+  void _setPortrait() {
     isFullScreen = false;
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
@@ -341,7 +343,7 @@ abstract class _VideoStore with Store {
       Navigator.of(context).pop();
     } else {
       /// 开启全屏
-      setLandscape();
+      _setLandscape();
       Screen.keepOn(true);
       SystemChrome.setEnabledSystemUIOverlays([]);
       await Navigator.of(context).push(
@@ -357,7 +359,7 @@ abstract class _VideoStore with Store {
           ),
         ),
       );
-      setPortrait();
+      _setPortrait();
       Screen.keepOn(false);
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     }

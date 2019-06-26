@@ -37,187 +37,223 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   Widget get cover {
+    _$coverAtom.context.enforceReadPolicy(_$coverAtom);
     _$coverAtom.reportObserved();
     return super.cover;
   }
 
   @override
   set cover(Widget value) {
-    _$coverAtom.context.checkIfStateModificationsAreAllowed(_$coverAtom);
-    super.cover = value;
-    _$coverAtom.reportChanged();
+    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
+    _$coverAtom.context.conditionallyRunInAction(() {
+      super.cover = value;
+      _$coverAtom.reportChanged();
+    }, name: '${_$coverAtom.name}_set');
   }
 
   final _$isAutoplayAtom = Atom(name: '_VideoStore.isAutoplay');
 
   @override
   bool get isAutoplay {
+    _$isAutoplayAtom.context.enforceReadPolicy(_$isAutoplayAtom);
     _$isAutoplayAtom.reportObserved();
     return super.isAutoplay;
   }
 
   @override
   set isAutoplay(bool value) {
-    _$isAutoplayAtom.context
-        .checkIfStateModificationsAreAllowed(_$isAutoplayAtom);
-    super.isAutoplay = value;
-    _$isAutoplayAtom.reportChanged();
+    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
+    _$isAutoplayAtom.context.conditionallyRunInAction(() {
+      super.isAutoplay = value;
+      _$isAutoplayAtom.reportChanged();
+    }, name: '${_$isAutoplayAtom.name}_set');
   }
 
   final _$isLoopingAtom = Atom(name: '_VideoStore.isLooping');
 
   @override
   bool get isLooping {
+    _$isLoopingAtom.context.enforceReadPolicy(_$isLoopingAtom);
     _$isLoopingAtom.reportObserved();
     return super.isLooping;
   }
 
   @override
   set isLooping(bool value) {
-    _$isLoopingAtom.context
-        .checkIfStateModificationsAreAllowed(_$isLoopingAtom);
-    super.isLooping = value;
-    _$isLoopingAtom.reportChanged();
+    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
+    _$isLoopingAtom.context.conditionallyRunInAction(() {
+      super.isLooping = value;
+      _$isLoopingAtom.reportChanged();
+    }, name: '${_$isLoopingAtom.name}_set');
   }
 
   final _$volumeAtom = Atom(name: '_VideoStore.volume');
 
   @override
   double get volume {
+    _$volumeAtom.context.enforceReadPolicy(_$volumeAtom);
     _$volumeAtom.reportObserved();
     return super.volume;
   }
 
   @override
   set volume(double value) {
-    _$volumeAtom.context.checkIfStateModificationsAreAllowed(_$volumeAtom);
-    super.volume = value;
-    _$volumeAtom.reportChanged();
+    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
+    _$volumeAtom.context.conditionallyRunInAction(() {
+      super.volume = value;
+      _$volumeAtom.reportChanged();
+    }, name: '${_$volumeAtom.name}_set');
   }
 
   final _$videoCtrlAtom = Atom(name: '_VideoStore.videoCtrl');
 
   @override
   VideoPlayerController get videoCtrl {
+    _$videoCtrlAtom.context.enforceReadPolicy(_$videoCtrlAtom);
     _$videoCtrlAtom.reportObserved();
     return super.videoCtrl;
   }
 
   @override
   set videoCtrl(VideoPlayerController value) {
-    _$videoCtrlAtom.context
-        .checkIfStateModificationsAreAllowed(_$videoCtrlAtom);
-    super.videoCtrl = value;
-    _$videoCtrlAtom.reportChanged();
+    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
+    _$videoCtrlAtom.context.conditionallyRunInAction(() {
+      super.videoCtrl = value;
+      _$videoCtrlAtom.reportChanged();
+    }, name: '${_$videoCtrlAtom.name}_set');
   }
 
   final _$isVideoLoadingAtom = Atom(name: '_VideoStore.isVideoLoading');
 
   @override
   bool get isVideoLoading {
+    _$isVideoLoadingAtom.context.enforceReadPolicy(_$isVideoLoadingAtom);
     _$isVideoLoadingAtom.reportObserved();
     return super.isVideoLoading;
   }
 
   @override
   set isVideoLoading(bool value) {
-    _$isVideoLoadingAtom.context
-        .checkIfStateModificationsAreAllowed(_$isVideoLoadingAtom);
-    super.isVideoLoading = value;
-    _$isVideoLoadingAtom.reportChanged();
+    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
+    _$isVideoLoadingAtom.context.conditionallyRunInAction(() {
+      super.isVideoLoading = value;
+      _$isVideoLoadingAtom.reportChanged();
+    }, name: '${_$isVideoLoadingAtom.name}_set');
   }
 
   final _$initPositionAtom = Atom(name: '_VideoStore.initPosition');
 
   @override
   Duration get initPosition {
+    _$initPositionAtom.context.enforceReadPolicy(_$initPositionAtom);
     _$initPositionAtom.reportObserved();
     return super.initPosition;
   }
 
   @override
   set initPosition(Duration value) {
-    _$initPositionAtom.context
-        .checkIfStateModificationsAreAllowed(_$initPositionAtom);
-    super.initPosition = value;
-    _$initPositionAtom.reportChanged();
+    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
+    _$initPositionAtom.context.conditionallyRunInAction(() {
+      super.initPosition = value;
+      _$initPositionAtom.reportChanged();
+    }, name: '${_$initPositionAtom.name}_set');
   }
 
   final _$positionAtom = Atom(name: '_VideoStore.position');
 
   @override
   Duration get position {
+    _$positionAtom.context.enforceReadPolicy(_$positionAtom);
     _$positionAtom.reportObserved();
     return super.position;
   }
 
   @override
   set position(Duration value) {
-    _$positionAtom.context.checkIfStateModificationsAreAllowed(_$positionAtom);
-    super.position = value;
-    _$positionAtom.reportChanged();
+    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
+    _$positionAtom.context.conditionallyRunInAction(() {
+      super.position = value;
+      _$positionAtom.reportChanged();
+    }, name: '${_$positionAtom.name}_set');
   }
 
   final _$durationAtom = Atom(name: '_VideoStore.duration');
 
   @override
   Duration get duration {
+    _$durationAtom.context.enforceReadPolicy(_$durationAtom);
     _$durationAtom.reportObserved();
     return super.duration;
   }
 
   @override
   set duration(Duration value) {
-    _$durationAtom.context.checkIfStateModificationsAreAllowed(_$durationAtom);
-    super.duration = value;
-    _$durationAtom.reportChanged();
+    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
+    _$durationAtom.context.conditionallyRunInAction(() {
+      super.duration = value;
+      _$durationAtom.reportChanged();
+    }, name: '${_$durationAtom.name}_set');
   }
 
   final _$isShowVideoCtrlAtom = Atom(name: '_VideoStore.isShowVideoCtrl');
 
   @override
   bool get isShowVideoCtrl {
+    _$isShowVideoCtrlAtom.context.enforceReadPolicy(_$isShowVideoCtrlAtom);
     _$isShowVideoCtrlAtom.reportObserved();
     return super.isShowVideoCtrl;
   }
 
   @override
   set isShowVideoCtrl(bool value) {
-    _$isShowVideoCtrlAtom.context
-        .checkIfStateModificationsAreAllowed(_$isShowVideoCtrlAtom);
-    super.isShowVideoCtrl = value;
-    _$isShowVideoCtrlAtom.reportChanged();
+    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
+    _$isShowVideoCtrlAtom.context.conditionallyRunInAction(() {
+      super.isShowVideoCtrl = value;
+      _$isShowVideoCtrlAtom.reportChanged();
+    }, name: '${_$isShowVideoCtrlAtom.name}_set');
   }
 
   final _$isFullScreenAtom = Atom(name: '_VideoStore.isFullScreen');
 
   @override
   bool get isFullScreen {
+    _$isFullScreenAtom.context.enforceReadPolicy(_$isFullScreenAtom);
     _$isFullScreenAtom.reportObserved();
     return super.isFullScreen;
   }
 
   @override
   set isFullScreen(bool value) {
-    _$isFullScreenAtom.context
-        .checkIfStateModificationsAreAllowed(_$isFullScreenAtom);
-    super.isFullScreen = value;
-    _$isFullScreenAtom.reportChanged();
+    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
+    _$isFullScreenAtom.context.conditionallyRunInAction(() {
+      super.isFullScreen = value;
+      _$isFullScreenAtom.reportChanged();
+    }, name: '${_$isFullScreenAtom.name}_set');
   }
 
   final _$skiptimeAtom = Atom(name: '_VideoStore.skiptime');
 
   @override
   Duration get skiptime {
+    _$skiptimeAtom.context.enforceReadPolicy(_$skiptimeAtom);
     _$skiptimeAtom.reportObserved();
     return super.skiptime;
   }
 
   @override
   set skiptime(Duration value) {
-    _$skiptimeAtom.context.checkIfStateModificationsAreAllowed(_$skiptimeAtom);
-    super.skiptime = value;
-    _$skiptimeAtom.reportChanged();
+    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
+    _$skiptimeAtom.context.conditionallyRunInAction(() {
+      super.skiptime = value;
+      _$skiptimeAtom.reportChanged();
+    }, name: '${_$skiptimeAtom.name}_set');
+  }
+
+  final _$setSourceAsyncAction = AsyncAction('setSource');
+
+  @override
+  Future<void> setSource(VideoDataSource videoDataSource) {
+    return _$setSourceAsyncAction.run(() => super.setSource(videoDataSource));
   }
 
   final _$initVideoPlaerAsyncAction = AsyncAction('initVideoPlaer');
@@ -278,6 +314,16 @@ mixin _$VideoStore on _VideoStore, Store {
   }
 
   @override
+  void setVideoLoading(bool v) {
+    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    try {
+      return super.setVideoLoading(v);
+    } finally {
+      _$_VideoStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void setInitPosition(Duration p) {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
@@ -318,16 +364,6 @@ mixin _$VideoStore on _VideoStore, Store {
   }
 
   @override
-  void setSource([VideoDataSource videoDataSource]) {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
-    try {
-      return super.setSource(videoDataSource);
-    } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void togglePlay() {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
@@ -338,20 +374,20 @@ mixin _$VideoStore on _VideoStore, Store {
   }
 
   @override
-  void setLandscape() {
+  void _setLandscape() {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
-      return super.setLandscape();
+      return super._setLandscape();
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void setPortrait() {
+  void _setPortrait() {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
-      return super.setPortrait();
+      return super._setPortrait();
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }

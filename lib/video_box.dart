@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
 import 'package:video_box/video.store.dart';
 import 'package:video_player/video_player.dart';
-import 'package:screen/screen.dart';
 
 /// 下面是一个简单的example，更具体使用何以看 /example下面的代码或则源码
 /// ```dart
@@ -76,6 +74,20 @@ class _VideoBoxState extends State<VideoBox> {
                 child: Stack(
                   alignment: AlignmentDirectional.center,
                   children: <Widget>[
+                    // videoStore.isShowCover
+                    //     ? _VideoLoading(
+                    //         cover: videoStore.cover,
+                    //       )
+                    //     : Container(
+                    //         decoration: BoxDecoration(color: Colors.black),
+                    //         child: Center(
+                    //           child: AspectRatio(
+                    //             aspectRatio:
+                    //                 videoStore.videoCtrl.value.aspectRatio,
+                    //             child: VideoPlayer(videoStore.videoCtrl),
+                    //           ),
+                    //         ),
+                    //       ),
                     AnimatedOpacity(
                       opacity: videoStore.isShowCover ? 1.0 : 0.0,
                       duration: Duration(milliseconds: 300),

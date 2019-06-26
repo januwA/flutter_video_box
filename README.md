@@ -1,13 +1,13 @@
 # video_box
 
-## 一个在flutter中播放视频的控件
+ A control that plays video in flutter, I make the control as flexible as possible, can play a single video, video list on the page.
 
-注意：
-* 只在android上面测试过
-* 没有ios测试
-* 开发中api随时可能更改
+note:
+* Only tested on android
+* No ios test
+* Development api may change at any time
 
-## 安装配置
+## Install
 ```
 dependencies:
   video_box:
@@ -35,7 +35,7 @@ ios: Info.plist
 </plist>
 ```
 
-## 使用
+## Usage
 ```dart
 import 'package:flutter/material.dart';
 import 'package:video_box/video.store.dart';
@@ -93,17 +93,17 @@ class _ListVideoState extends State<ListVideo> {
 ```dart
 video = Video(
   store: VideoStore(
-    videoDataSource, // 资源 [network file asset]
-    skiptime, // 每次双击seekto的时间
-    isAutoplay, // 自动播放
-    isLooping, // 循环播放
-    volume, // 初始音量
-    initPosition, // 初始播放位置
-    playingListenner, // 播放时的回调函数
-    playEnd, // 播放结束
-    cover, // 视频第一次播放前，显示的封面
+    videoDataSource, // source [network file asset]
+    skiptime,
+    isAutoplay,
+    isLooping, 
+    volume,
+    initPosition,
+    playingListenner, 
+    playEnd,
+    cover,
   ),
 );
 ```
 
-详情可以看下/example或则源码
+For details, see /example or source code.
