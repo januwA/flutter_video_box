@@ -44,11 +44,10 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   set cover(Widget value) {
-    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
     _$coverAtom.context.conditionallyRunInAction(() {
       super.cover = value;
       _$coverAtom.reportChanged();
-    }, name: '${_$coverAtom.name}_set');
+    }, _$coverAtom, name: '${_$coverAtom.name}_set');
   }
 
   final _$isAutoplayAtom = Atom(name: '_VideoStore.isAutoplay');
@@ -62,11 +61,10 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   set isAutoplay(bool value) {
-    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
     _$isAutoplayAtom.context.conditionallyRunInAction(() {
       super.isAutoplay = value;
       _$isAutoplayAtom.reportChanged();
-    }, name: '${_$isAutoplayAtom.name}_set');
+    }, _$isAutoplayAtom, name: '${_$isAutoplayAtom.name}_set');
   }
 
   final _$isLoopingAtom = Atom(name: '_VideoStore.isLooping');
@@ -80,11 +78,10 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   set isLooping(bool value) {
-    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
     _$isLoopingAtom.context.conditionallyRunInAction(() {
       super.isLooping = value;
       _$isLoopingAtom.reportChanged();
-    }, name: '${_$isLoopingAtom.name}_set');
+    }, _$isLoopingAtom, name: '${_$isLoopingAtom.name}_set');
   }
 
   final _$volumeAtom = Atom(name: '_VideoStore.volume');
@@ -98,11 +95,10 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   set volume(double value) {
-    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
     _$volumeAtom.context.conditionallyRunInAction(() {
       super.volume = value;
       _$volumeAtom.reportChanged();
-    }, name: '${_$volumeAtom.name}_set');
+    }, _$volumeAtom, name: '${_$volumeAtom.name}_set');
   }
 
   final _$videoCtrlAtom = Atom(name: '_VideoStore.videoCtrl');
@@ -116,11 +112,10 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   set videoCtrl(VideoPlayerController value) {
-    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
     _$videoCtrlAtom.context.conditionallyRunInAction(() {
       super.videoCtrl = value;
       _$videoCtrlAtom.reportChanged();
-    }, name: '${_$videoCtrlAtom.name}_set');
+    }, _$videoCtrlAtom, name: '${_$videoCtrlAtom.name}_set');
   }
 
   final _$isVideoLoadingAtom = Atom(name: '_VideoStore.isVideoLoading');
@@ -134,11 +129,10 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   set isVideoLoading(bool value) {
-    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
     _$isVideoLoadingAtom.context.conditionallyRunInAction(() {
       super.isVideoLoading = value;
       _$isVideoLoadingAtom.reportChanged();
-    }, name: '${_$isVideoLoadingAtom.name}_set');
+    }, _$isVideoLoadingAtom, name: '${_$isVideoLoadingAtom.name}_set');
   }
 
   final _$initPositionAtom = Atom(name: '_VideoStore.initPosition');
@@ -152,11 +146,10 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   set initPosition(Duration value) {
-    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
     _$initPositionAtom.context.conditionallyRunInAction(() {
       super.initPosition = value;
       _$initPositionAtom.reportChanged();
-    }, name: '${_$initPositionAtom.name}_set');
+    }, _$initPositionAtom, name: '${_$initPositionAtom.name}_set');
   }
 
   final _$positionAtom = Atom(name: '_VideoStore.position');
@@ -170,11 +163,10 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   set position(Duration value) {
-    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
     _$positionAtom.context.conditionallyRunInAction(() {
       super.position = value;
       _$positionAtom.reportChanged();
-    }, name: '${_$positionAtom.name}_set');
+    }, _$positionAtom, name: '${_$positionAtom.name}_set');
   }
 
   final _$durationAtom = Atom(name: '_VideoStore.duration');
@@ -188,11 +180,10 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   set duration(Duration value) {
-    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
     _$durationAtom.context.conditionallyRunInAction(() {
       super.duration = value;
       _$durationAtom.reportChanged();
-    }, name: '${_$durationAtom.name}_set');
+    }, _$durationAtom, name: '${_$durationAtom.name}_set');
   }
 
   final _$isShowVideoCtrlAtom = Atom(name: '_VideoStore.isShowVideoCtrl');
@@ -206,11 +197,10 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   set isShowVideoCtrl(bool value) {
-    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
     _$isShowVideoCtrlAtom.context.conditionallyRunInAction(() {
       super.isShowVideoCtrl = value;
       _$isShowVideoCtrlAtom.reportChanged();
-    }, name: '${_$isShowVideoCtrlAtom.name}_set');
+    }, _$isShowVideoCtrlAtom, name: '${_$isShowVideoCtrlAtom.name}_set');
   }
 
   final _$isFullScreenAtom = Atom(name: '_VideoStore.isFullScreen');
@@ -224,11 +214,10 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   set isFullScreen(bool value) {
-    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
     _$isFullScreenAtom.context.conditionallyRunInAction(() {
       super.isFullScreen = value;
       _$isFullScreenAtom.reportChanged();
-    }, name: '${_$isFullScreenAtom.name}_set');
+    }, _$isFullScreenAtom, name: '${_$isFullScreenAtom.name}_set');
   }
 
   final _$skiptimeAtom = Atom(name: '_VideoStore.skiptime');
@@ -242,11 +231,10 @@ mixin _$VideoStore on _VideoStore, Store {
 
   @override
   set skiptime(Duration value) {
-    // Since we are conditionally wrapping within an Action, there is no need to enforceWritePolicy
     _$skiptimeAtom.context.conditionallyRunInAction(() {
       super.skiptime = value;
       _$skiptimeAtom.reportChanged();
-    }, name: '${_$skiptimeAtom.name}_set');
+    }, _$skiptimeAtom, name: '${_$skiptimeAtom.name}_set');
   }
 
   final _$setSourceAsyncAction = AsyncAction('setSource');
