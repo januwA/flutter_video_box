@@ -89,21 +89,4 @@ class _ListVideoState extends State<ListVideo> {
 }
 ```
 
-## options
-```dart
-video = Video(
-  store: VideoStore(
-    videoDataSource, // source [network file asset]
-    skiptime,
-    isAutoplay,
-    isLooping, 
-    volume,
-    initPosition,
-    playingListenner, 
-    playEnd,
-    cover,
-  ),
-);
-```
-
 For details, see /example or source code.

@@ -95,6 +95,7 @@ class _VideoBoxState extends State<VideoBox> {
                           ? CrossFadeState.showFirst
                           : CrossFadeState.showSecond,
                     ),
+                    if (videoStore.isBfLoading) _CircularProgressIndicatorBig(),
                     _SeekToView(),
                     _PlayButton(),
                     _VideoBottomCtrl(),
@@ -200,11 +201,11 @@ class _VideoBottomCtrl extends StatelessWidget {
           secondChild: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment(0.0, 0.3),
+                begin: Alignment(0.0, -1.0),
                 end: Alignment(0.0, 1.0),
                 colors: [
-                  Colors.black12,
-                  Colors.black54,
+                  Colors.black12.withOpacity(0),
+                  Colors.black87,
                 ],
               ),
             ),
@@ -246,16 +247,14 @@ class _VideoBottomCtrl extends StatelessWidget {
                 ),
                 subtitle: Theme(
                   data: Theme.of(context).copyWith(
-                    sliderTheme: SliderThemeData(
-                      // trackHeight: 4, // line的高度
-                      // overlayShape: RoundSliderOverlayShape(
-                      //   overlayRadius: 0,
-                      // ), // 用于绘制[Slider]叠加层的形状
-                      overlayShape: SliderComponentShape.noOverlay,
-                      thumbShape: RoundSliderThumbShape(
-                        enabledThumbRadius: 5.0,
-                      ), // 拇指的形状和大小
-                    ),
+                    sliderTheme: Theme.of(context).sliderTheme.copyWith(
+                          trackHeight: 4, // line的高度
+                          overlayShape: SliderComponentShape.noOverlay,
+                          thumbShape: RoundSliderThumbShape(
+                            // 拇指的形状和大小
+                            enabledThumbRadius: 6.0,
+                          ),
+                        ),
                   ),
                   child: Slider(
                     activeColor: Colors.white,
@@ -285,7 +284,6 @@ class _VideoLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const double size = 50;
     return AspectRatio(
       aspectRatio: 16.0 / 9.0,
       child: Container(
@@ -293,17 +291,27 @@ class _VideoLoading extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: <Widget>[
-            cover == null
-                ? SizedBox(
-                    height: size,
-                    width: size,
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(Colors.white),
-                    ),
-                  )
-                : cover,
+            cover == null ? _CircularProgressIndicatorBig() : cover,
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _CircularProgressIndicatorBig extends StatelessWidget {
+  final double size;
+
+  const _CircularProgressIndicatorBig({Key key, this.size = 50})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: size,
+      width: size,
+      child: CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation(Colors.white),
       ),
     );
   }

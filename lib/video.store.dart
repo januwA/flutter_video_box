@@ -55,6 +55,14 @@ abstract class _VideoStore with Store {
   @observable
   Widget cover;
 
+  @observable
+  bool isBfLoading = false;
+
+  @action
+  void _setIsBfLoading(bool v) {
+    isBfLoading = v;
+  }
+
   /// set cover
   @action
   void setCover(Widget newCover) {
@@ -144,7 +152,7 @@ abstract class _VideoStore with Store {
     isShowVideoCtrl = show;
     if (show && videoCtrl.value.isPlaying) {
       Future.delayed(Duration(seconds: 2)).then((_) {
-        if (videoCtrl.value.isPlaying) {
+        if (videoCtrl.value.isPlaying && !isBfLoading) {
           showVideoCtrl(false);
         }
       });
@@ -207,6 +215,9 @@ abstract class _VideoStore with Store {
   @action
   void _videoListenner() {
     position = videoCtrl.value.position;
+
+    DurationRange bfs = videoCtrl.value.buffered[0];
+    _setIsBfLoading(videoCtrl.value.position >= bfs.end);
     if (playingListenner != null) {
       playingListenner();
     }

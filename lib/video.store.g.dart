@@ -50,6 +50,23 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$coverAtom, name: '${_$coverAtom.name}_set');
   }
 
+  final _$isBfLoadingAtom = Atom(name: '_VideoStore.isBfLoading');
+
+  @override
+  bool get isBfLoading {
+    _$isBfLoadingAtom.context.enforceReadPolicy(_$isBfLoadingAtom);
+    _$isBfLoadingAtom.reportObserved();
+    return super.isBfLoading;
+  }
+
+  @override
+  set isBfLoading(bool value) {
+    _$isBfLoadingAtom.context.conditionallyRunInAction(() {
+      super.isBfLoading = value;
+      _$isBfLoadingAtom.reportChanged();
+    }, _$isBfLoadingAtom, name: '${_$isBfLoadingAtom.name}_set');
+  }
+
   final _$autoplayAtom = Atom(name: '_VideoStore.autoplay');
 
   @override
@@ -260,6 +277,16 @@ mixin _$VideoStore on _VideoStore, Store {
   }
 
   final _$_VideoStoreActionController = ActionController(name: '_VideoStore');
+
+  @override
+  void _setIsBfLoading(bool v) {
+    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    try {
+      return super._setIsBfLoading(v);
+    } finally {
+      _$_VideoStoreActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void setCover(Widget newCover) {
