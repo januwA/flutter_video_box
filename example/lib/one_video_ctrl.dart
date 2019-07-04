@@ -22,12 +22,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
           'cover',
           style: TextStyle(color: Colors.white),
         ),
-        // playingListenner: () {
-        //   print(video.store.toMap());
-        // },
-        // isAutoplay: true,
-        // isLooping: true,
-        // volume: 0.0,
+        loop: true,
       ),
     );
   }

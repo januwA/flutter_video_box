@@ -50,38 +50,38 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$coverAtom, name: '${_$coverAtom.name}_set');
   }
 
-  final _$isAutoplayAtom = Atom(name: '_VideoStore.isAutoplay');
+  final _$autoplayAtom = Atom(name: '_VideoStore.autoplay');
 
   @override
-  bool get isAutoplay {
-    _$isAutoplayAtom.context.enforceReadPolicy(_$isAutoplayAtom);
-    _$isAutoplayAtom.reportObserved();
-    return super.isAutoplay;
+  bool get autoplay {
+    _$autoplayAtom.context.enforceReadPolicy(_$autoplayAtom);
+    _$autoplayAtom.reportObserved();
+    return super.autoplay;
   }
 
   @override
-  set isAutoplay(bool value) {
-    _$isAutoplayAtom.context.conditionallyRunInAction(() {
-      super.isAutoplay = value;
-      _$isAutoplayAtom.reportChanged();
-    }, _$isAutoplayAtom, name: '${_$isAutoplayAtom.name}_set');
+  set autoplay(bool value) {
+    _$autoplayAtom.context.conditionallyRunInAction(() {
+      super.autoplay = value;
+      _$autoplayAtom.reportChanged();
+    }, _$autoplayAtom, name: '${_$autoplayAtom.name}_set');
   }
 
-  final _$isLoopingAtom = Atom(name: '_VideoStore.isLooping');
+  final _$loopAtom = Atom(name: '_VideoStore.loop');
 
   @override
-  bool get isLooping {
-    _$isLoopingAtom.context.enforceReadPolicy(_$isLoopingAtom);
-    _$isLoopingAtom.reportObserved();
-    return super.isLooping;
+  bool get loop {
+    _$loopAtom.context.enforceReadPolicy(_$loopAtom);
+    _$loopAtom.reportObserved();
+    return super.loop;
   }
 
   @override
-  set isLooping(bool value) {
-    _$isLoopingAtom.context.conditionallyRunInAction(() {
-      super.isLooping = value;
-      _$isLoopingAtom.reportChanged();
-    }, _$isLoopingAtom, name: '${_$isLoopingAtom.name}_set');
+  set loop(bool value) {
+    _$loopAtom.context.conditionallyRunInAction(() {
+      super.loop = value;
+      _$loopAtom.reportChanged();
+    }, _$loopAtom, name: '${_$loopAtom.name}_set');
   }
 
   final _$volumeAtom = Atom(name: '_VideoStore.volume');
@@ -272,20 +272,20 @@ mixin _$VideoStore on _VideoStore, Store {
   }
 
   @override
-  void setIsAutoplay(bool autoplay) {
+  void setAutoplay(bool autoplay) {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
-      return super.setIsAutoplay(autoplay);
+      return super.setAutoplay(autoplay);
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void setIsLooping(bool loop) {
+  void setLoop(bool loop) {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
-      return super.setIsLooping(loop);
+      return super.setLoop(loop);
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }
@@ -352,16 +352,6 @@ mixin _$VideoStore on _VideoStore, Store {
   }
 
   @override
-  void togglePlay() {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
-    try {
-      return super.togglePlay();
-    } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void _setLandscape() {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
@@ -376,6 +366,16 @@ mixin _$VideoStore on _VideoStore, Store {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
       return super._setPortrait();
+    } finally {
+      _$_VideoStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void togglePlay() {
+    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    try {
+      return super.togglePlay();
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }

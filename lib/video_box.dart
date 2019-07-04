@@ -5,8 +5,11 @@ import 'package:video_box/video.store.dart';
 import 'package:video_player/video_player.dart';
 
 /// 下面是一个简单的example，更具体使用何以看 /example下面的代码或则源码
+///
 /// ```dart
-/// Video video = Video(store: VideoStore(videoDataSource: VideoDataSource.network('http://example.com/example.mp4')));
+/// Video video = Video(
+///   store: VideoStore(videoDataSource: VideoDataSource.network('http://example.com/example.mp4')),
+/// );
 ///
 /// @override
 /// void dispose() {
@@ -74,31 +77,12 @@ class _VideoBoxState extends State<VideoBox> {
                 child: Stack(
                   alignment: AlignmentDirectional.center,
                   children: <Widget>[
-                    // videoStore.isShowCover
-                    //     ? _VideoLoading(
-                    //         cover: videoStore.cover,
-                    //       )
-                    //     : Container(
-                    //         decoration: BoxDecoration(color: Colors.black),
-                    //         child: Center(
-                    //           child: AspectRatio(
-                    //             aspectRatio:
-                    //                 videoStore.videoCtrl.value.aspectRatio,
-                    //             child: VideoPlayer(videoStore.videoCtrl),
-                    //           ),
-                    //         ),
-                    //       ),
-                    AnimatedOpacity(
-                      opacity: videoStore.isShowCover ? 1.0 : 0.0,
-                      duration: Duration(milliseconds: 300),
-                      child: _VideoLoading(
+                    AnimatedCrossFade(
+                      duration: const Duration(milliseconds: 300),
+                      firstChild: _VideoLoading(
                         cover: videoStore.cover,
                       ),
-                    ),
-                    AnimatedOpacity(
-                      opacity: !videoStore.isShowCover ? 1.0 : 0.0,
-                      duration: Duration(milliseconds: 300),
-                      child: Container(
+                      secondChild: Container(
                         decoration: BoxDecoration(color: Colors.black),
                         child: Center(
                           child: AspectRatio(
@@ -107,6 +91,9 @@ class _VideoBoxState extends State<VideoBox> {
                           ),
                         ),
                       ),
+                      crossFadeState: videoStore.isShowCover
+                          ? CrossFadeState.showFirst
+                          : CrossFadeState.showSecond,
                     ),
                     _SeekToView(),
                     _PlayButton(),
@@ -178,7 +165,8 @@ class _PlayButton extends StatelessWidget {
                   ? Icons.pause
                   : Icons.play_arrow,
             ),
-            onPressed: videoStore.togglePlay,
+            onPressed:
+                videoStore.isShowVideoCtrl ? videoStore.togglePlay : null,
           ),
         ),
         crossFadeState: videoStore.isShowVideoCtrl
@@ -210,61 +198,72 @@ class _VideoBottomCtrl extends StatelessWidget {
           duration: Duration(milliseconds: 300),
           firstChild: Container(),
           secondChild: Container(
-            decoration: BoxDecoration(color: Colors.black12),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  iconTheme: IconThemeData(color: Colors.white),
-                  sliderTheme: Theme.of(context).sliderTheme.copyWith(
-                        /// 进度之前的颜色
-                        activeTrackColor: Colors.white70,
-
-                        /// 进度之后的颜色
-                        inactiveTrackColor: Colors.white30,
-
-                        // 指示器的颜色
-                        thumbColor: Colors.white,
-                      ),
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Text(
-                      videoStore.isVideoLoading
-                          ? '00:00/00:00'
-                          : "${videoStore.positionText}/${videoStore.durationText}",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Expanded(
-                      child: Slider(
-                        // inactiveColor: Colors.grey[300],
-                        // activeColor: Colors.white,
-                        value: videoStore.sliderValue,
-                        onChanged: videoStore.sliderChanged,
-                      ),
-                    ),
-                    videoStore.isVideoLoading
-                        ? IconButton(
-                            icon: Icon(Icons.volume_up),
-                            onPressed: () {},
-                          )
-                        : IconButton(
-                            icon: Icon(
-                                _volumeIcon(videoStore.videoCtrl.value.volume)),
-                            onPressed: videoStore.setOnSoundOrOff,
-                          ),
-                    IconButton(
-                      icon: Icon(
-                        !videoStore.isFullScreen
-                            ? Icons.fullscreen
-                            : Icons.fullscreen_exit,
-                      ),
-                      onPressed: () => videoStore.onFullScreen(context),
-                    ),
-                  ],
-                ),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment(0.0, 0.3),
+                end: Alignment(0.0, 1.0),
+                colors: [
+                  Colors.black12,
+                  Colors.black54,
+                ],
               ),
             ),
+            child: ListTile(
+                title: Theme(
+                  data: Theme.of(context).copyWith(
+                    iconTheme: IconThemeData(color: Colors.white),
+                  ),
+                  child: Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          videoStore.isVideoLoading
+                              ? '00:00/00:00'
+                              : "${videoStore.positionText}/${videoStore.durationText}",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      videoStore.isVideoLoading
+                          ? IconButton(
+                              icon: Icon(Icons.volume_up),
+                              onPressed: () {},
+                            )
+                          : IconButton(
+                              icon: Icon(_volumeIcon(
+                                  videoStore.videoCtrl.value.volume)),
+                              onPressed: videoStore.setOnSoundOrOff,
+                            ),
+                      IconButton(
+                        icon: Icon(
+                          !videoStore.isFullScreen
+                              ? Icons.fullscreen
+                              : Icons.fullscreen_exit,
+                        ),
+                        onPressed: () => videoStore.onFullScreen(context),
+                      ),
+                    ],
+                  ),
+                ),
+                subtitle: Theme(
+                  data: Theme.of(context).copyWith(
+                    sliderTheme: SliderThemeData(
+                      // trackHeight: 4, // line的高度
+                      // overlayShape: RoundSliderOverlayShape(
+                      //   overlayRadius: 0,
+                      // ), // 用于绘制[Slider]叠加层的形状
+                      overlayShape: SliderComponentShape.noOverlay,
+                      thumbShape: RoundSliderThumbShape(
+                        enabledThumbRadius: 5.0,
+                      ), // 拇指的形状和大小
+                    ),
+                  ),
+                  child: Slider(
+                    activeColor: Colors.white,
+                    inactiveColor: Colors.white24,
+                    value: videoStore.sliderValue,
+                    onChanged: videoStore.sliderChanged,
+                  ),
+                )),
           ),
           crossFadeState: videoStore.isShowVideoCtrl
               ? CrossFadeState.showSecond
@@ -286,6 +285,7 @@ class _VideoLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const double size = 50;
     return AspectRatio(
       aspectRatio: 16.0 / 9.0,
       child: Container(
@@ -295,8 +295,8 @@ class _VideoLoading extends StatelessWidget {
           children: <Widget>[
             cover == null
                 ? SizedBox(
-                    height: 50,
-                    width: 50,
+                    height: size,
+                    width: size,
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation(Colors.white),
                     ),

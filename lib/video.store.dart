@@ -34,8 +34,8 @@ abstract class _VideoStore with Store {
   _VideoStore({
     VideoDataSource videoDataSource,
     this.skiptime = const Duration(seconds: 10),
-    this.isAutoplay = false,
-    this.isLooping = false,
+    this.autoplay = false,
+    this.loop = false,
     this.volume = 1.0,
     this.initPosition,
     this.cover,
@@ -74,21 +74,21 @@ abstract class _VideoStore with Store {
 
   /// autoplay [false]
   @observable
-  bool isAutoplay;
+  bool autoplay;
 
-  /// set [isAutoplay]
+  /// set [autoplay]
   @action
-  void setIsAutoplay(bool autoplay) {
-    isAutoplay = autoplay;
+  void setAutoplay(bool autoplay) {
+    autoplay = autoplay;
   }
 
   /// Loop [false]
   @observable
-  bool isLooping;
+  bool loop;
 
   @action
-  void setIsLooping(bool loop) {
-    isLooping = loop;
+  void setLoop(bool loop) {
+    loop = loop;
     videoCtrl?.setLooping(loop);
   }
 
@@ -239,9 +239,9 @@ abstract class _VideoStore with Store {
           package: videoDataSource.package);
     }
     await videoCtrl.initialize();
-    videoCtrl.setLooping(isLooping);
+    videoCtrl.setLooping(loop);
     videoCtrl.setVolume(volume);
-    if (isAutoplay) {
+    if (autoplay) {
       videoCtrl.play();
     }
     if (initPosition != null) {
@@ -267,18 +267,6 @@ abstract class _VideoStore with Store {
     seekTo(Duration(seconds: (v * duration.inSeconds).toInt()));
   }
 
-  /// 播放或暂停
-  @action
-  void togglePlay() {
-    if (videoCtrl.value.isPlaying) {
-      videoCtrl.pause();
-      isShowVideoCtrl = true;
-    } else {
-      videoCtrl.play();
-      isShowVideoCtrl = false;
-    }
-  }
-
   /// 设置为横屏模式
   @action
   void _setLandscape() {
@@ -299,6 +287,18 @@ abstract class _VideoStore with Store {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+  }
+
+  /// 播放或暂停
+  @action
+  void togglePlay() {
+    if (videoCtrl.value.isPlaying) {
+      videoCtrl.pause();
+      isShowVideoCtrl = true;
+    } else {
+      videoCtrl.play();
+      isShowVideoCtrl = false;
+    }
   }
 
   /// 播放
@@ -377,8 +377,8 @@ abstract class _VideoStore with Store {
     return VideoState(
       src: videoCtrl.dataSource,
       size: videoCtrl.value.size,
-      isAutoplay: isAutoplay,
-      isLooping: isLooping,
+      autoplay: autoplay,
+      loop: loop,
       volume: volume,
       initPosition: initPosition,
       position: position,
@@ -394,8 +394,8 @@ abstract class _VideoStore with Store {
     return {
       "src": videoCtrl.dataSource,
       "size": videoCtrl.value.size,
-      "isAutoplay": isAutoplay,
-      "isLooping": isLooping,
+      "autoplay": autoplay,
+      "loop": loop,
       "volume": volume,
       "initPosition": initPosition,
       "position": position,
@@ -412,8 +412,8 @@ class VideoState {
   VideoState({
     this.src,
     this.size,
-    this.isLooping,
-    this.isAutoplay,
+    this.loop,
+    this.autoplay,
     this.volume,
     this.initPosition,
     this.position,
@@ -426,8 +426,8 @@ class VideoState {
 
   String src;
   Size size;
-  bool isAutoplay;
-  bool isLooping;
+  bool autoplay;
+  bool loop;
   double volume;
   Duration initPosition;
   Duration position;

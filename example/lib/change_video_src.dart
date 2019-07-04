@@ -54,7 +54,7 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
                   setState(() {
                     index = newindex;
                   });
-                  video.store.setIsAutoplay(false);
+                  video.store.setAutoplay(false);
                   video.store.showVideoCtrl(true);
                   video.store.setSource(VideoDataSource.network(src));
                 },
@@ -70,7 +70,7 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
                     index = newindex;
                   });
                   video.store.setSource(VideoDataSource.network(src));
-                  video.store.setIsAutoplay(true);
+                  video.store.setAutoplay(true);
                   video.store.showVideoCtrl(false);
                 },
               ),
