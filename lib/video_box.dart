@@ -95,9 +95,12 @@ class _VideoBoxState extends State<VideoBox> {
                           ? CrossFadeState.showFirst
                           : CrossFadeState.showSecond,
                     ),
-                    if (videoStore.isBfLoading) _CircularProgressIndicatorBig(),
                     _SeekToView(),
                     _PlayButton(),
+                    if (videoStore.isBfLoading)
+                      _CircularProgressIndicatorBig(
+                        color: Colors.black87,
+                      ),
                     _VideoBottomCtrl(),
                   ],
                 ),
@@ -120,22 +123,18 @@ class _SeekToView extends StatelessWidget {
       child: Row(
         children: <Widget>[
           Expanded(
-            flex: 1,
             child: GestureDetector(
+              onTap: () =>
+                  videoStore.showVideoCtrl(!videoStore.isShowVideoCtrl),
               onDoubleTap: videoStore.rewind,
-              child: Container(
-                decoration: BoxDecoration(),
-              ),
             ),
           ),
           const SizedBox(width: 24),
           Expanded(
-            flex: 1,
             child: GestureDetector(
+              onTap: () =>
+                  videoStore.showVideoCtrl(!videoStore.isShowVideoCtrl),
               onDoubleTap: videoStore.fastForward,
-              child: Container(
-                decoration: BoxDecoration(),
-              ),
             ),
           ),
         ],
@@ -145,7 +144,29 @@ class _SeekToView extends StatelessWidget {
 }
 
 /// video 中间的播放按钮
-class _PlayButton extends StatelessWidget {
+class _PlayButton extends StatefulWidget {
+  @override
+  __PlayButtonState createState() => __PlayButtonState();
+}
+
+class __PlayButtonState extends State<_PlayButton>
+    with SingleTickerProviderStateMixin {
+  AnimationController _controller;
+  Animation<double> _tween;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _tween = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(_controller);
+  }
+
   @override
   Widget build(BuildContext context) {
     final videoStore = Provider.of<VideoStore>(context);
@@ -160,14 +181,15 @@ class _PlayButton extends StatelessWidget {
           ),
           child: IconButton(
             color: Colors.black,
-            icon: Icon(
-              videoStore.videoCtrl == null ||
-                      videoStore.videoCtrl.value.isPlaying
-                  ? Icons.pause
-                  : Icons.play_arrow,
+            icon: AnimatedIcon(
+              icon: videoStore.autoplay
+                  ? AnimatedIcons.pause_play
+                  : AnimatedIcons.play_pause,
+              progress: _tween,
             ),
-            onPressed:
-                videoStore.isShowVideoCtrl ? videoStore.togglePlay : null,
+            onPressed: videoStore.isShowVideoCtrl
+                ? () => videoStore.togglePlay(_controller)
+                : null,
           ),
         ),
         crossFadeState: videoStore.isShowVideoCtrl
@@ -301,9 +323,13 @@ class _VideoLoading extends StatelessWidget {
 
 class _CircularProgressIndicatorBig extends StatelessWidget {
   final double size;
+  final Color color;
 
-  const _CircularProgressIndicatorBig({Key key, this.size = 50})
-      : super(key: key);
+  const _CircularProgressIndicatorBig({
+    Key key,
+    this.size = 50,
+    this.color = Colors.white,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -311,7 +337,7 @@ class _CircularProgressIndicatorBig extends StatelessWidget {
       height: size,
       width: size,
       child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation(Colors.white),
+        valueColor: AlwaysStoppedAnimation(color),
       ),
     );
   }

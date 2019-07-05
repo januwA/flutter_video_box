@@ -18,8 +18,12 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
   @override
   void initState() {
     super.initState();
-    video =
-        Video(store: VideoStore(videoDataSource: VideoDataSource.network(src)));
+    video = Video(
+      store: VideoStore(
+        videoDataSource: VideoDataSource.network(src),
+        autoplay: true,
+      ),
+    );
   }
 
   @override

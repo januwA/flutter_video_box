@@ -59,8 +59,8 @@ abstract class _VideoStore with Store {
   bool isBfLoading = false;
 
   @action
-  void _setIsBfLoading(bool v) {
-    isBfLoading = v;
+  void _setIsBfLoading() {
+    isBfLoading = videoCtrl.value.position >= videoCtrl.value.buffered[0].end;
   }
 
   /// set cover
@@ -216,8 +216,7 @@ abstract class _VideoStore with Store {
   void _videoListenner() {
     position = videoCtrl.value.position;
 
-    DurationRange bfs = videoCtrl.value.buffered[0];
-    _setIsBfLoading(videoCtrl.value.position >= bfs.end);
+    _setIsBfLoading();
     if (playingListenner != null) {
       playingListenner();
     }
@@ -302,13 +301,25 @@ abstract class _VideoStore with Store {
 
   /// 播放或暂停
   @action
-  void togglePlay() {
+  void togglePlay(AnimationController controller) {
     if (videoCtrl.value.isPlaying) {
       videoCtrl.pause();
       isShowVideoCtrl = true;
+      if (autoplay) {
+        controller.forward();
+      } else {
+        controller.reverse();
+      }
     } else {
       videoCtrl.play();
-      isShowVideoCtrl = false;
+      if (autoplay) {
+        controller.reverse();
+      } else {
+        controller.forward();
+      }
+      Future.delayed(Duration(milliseconds: 600)).then((_) {
+        isShowVideoCtrl = false;
+      });
     }
   }
 
@@ -331,6 +342,7 @@ abstract class _VideoStore with Store {
   Future<void> seekTo(Duration d) async {
     if (videoCtrl != null && videoCtrl.value != null) {
       videoCtrl.seekTo(d);
+      _setIsBfLoading();
     }
   }
 

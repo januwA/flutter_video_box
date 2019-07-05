@@ -9,11 +9,17 @@ class OneVideoCtrl extends StatefulWidget {
   _OneVideoCtrlState createState() => _OneVideoCtrlState();
 }
 
-class _OneVideoCtrlState extends State<OneVideoCtrl> {
+class _OneVideoCtrlState extends State<OneVideoCtrl>
+    with SingleTickerProviderStateMixin {
   Video video;
+  AnimationController controller;
   @override
   void initState() {
     super.initState();
+    controller = AnimationController(
+      duration: Duration(milliseconds: 300),
+      vsync: this,
+    );
     video = Video(
       store: VideoStore(
         videoDataSource: VideoDataSource.network(src1),

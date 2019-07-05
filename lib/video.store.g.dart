@@ -279,10 +279,10 @@ mixin _$VideoStore on _VideoStore, Store {
   final _$_VideoStoreActionController = ActionController(name: '_VideoStore');
 
   @override
-  void _setIsBfLoading(bool v) {
+  void _setIsBfLoading() {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
-      return super._setIsBfLoading(v);
+      return super._setIsBfLoading();
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }
@@ -399,10 +399,10 @@ mixin _$VideoStore on _VideoStore, Store {
   }
 
   @override
-  void togglePlay() {
+  void togglePlay(AnimationController controller) {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
-      return super.togglePlay();
+      return super.togglePlay(controller);
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }
