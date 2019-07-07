@@ -60,7 +60,10 @@ abstract class _VideoStore with Store {
 
   @action
   void _setIsBfLoading() {
-    isBfLoading = videoCtrl.value.position >= videoCtrl.value.buffered[0].end;
+    if (videoCtrl.value.buffered == null || videoCtrl.value.buffered.isEmpty)
+      return;
+    isBfLoading =
+        videoCtrl.value.position >= videoCtrl.value.buffered.first.end;
   }
 
   /// set cover
@@ -305,18 +308,10 @@ abstract class _VideoStore with Store {
     if (videoCtrl.value.isPlaying) {
       videoCtrl.pause();
       isShowVideoCtrl = true;
-      if (autoplay) {
-        controller.forward();
-      } else {
-        controller.reverse();
-      }
+      controller.reverse();
     } else {
       videoCtrl.play();
-      if (autoplay) {
-        controller.reverse();
-      } else {
-        controller.forward();
-      }
+      controller.forward();
       Future.delayed(Duration(milliseconds: 600)).then((_) {
         isShowVideoCtrl = false;
       });
@@ -374,10 +369,9 @@ abstract class _VideoStore with Store {
           builder: (_) => SafeArea(
             child: Scaffold(
               body: Center(
-                child: VideoBox(
-                  store: this,
-                ),
+                child: VideoBox(store: this),
               ),
+              backgroundColor: Colors.black,
             ),
           ),
         ),

@@ -170,6 +170,11 @@ class __PlayButtonState extends State<_PlayButton>
   @override
   Widget build(BuildContext context) {
     final videoStore = Provider.of<VideoStore>(context);
+    if (!videoStore.videoCtrl.value.isPlaying) {
+      _controller.reset();
+    } else {
+      _controller.forward();
+    }
     return Observer(
       builder: (_) => AnimatedCrossFade(
         duration: const Duration(milliseconds: 300),
@@ -182,9 +187,7 @@ class __PlayButtonState extends State<_PlayButton>
           child: IconButton(
             color: Colors.black,
             icon: AnimatedIcon(
-              icon: videoStore.autoplay
-                  ? AnimatedIcons.pause_play
-                  : AnimatedIcons.play_pause,
+              icon: AnimatedIcons.play_pause,
               progress: _tween,
             ),
             onPressed: videoStore.isShowVideoCtrl

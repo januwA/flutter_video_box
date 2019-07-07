@@ -23,6 +23,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl>
     video = Video(
       store: VideoStore(
         videoDataSource: VideoDataSource.network(src1),
+        // autoplay: true,
         // initPosition: Duration(minutes: 20),
         cover: Text(
           'cover',
