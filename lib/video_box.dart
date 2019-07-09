@@ -96,11 +96,11 @@ class _VideoBoxState extends State<VideoBox> {
                           : CrossFadeState.showSecond,
                     ),
                     _SeekToView(),
-                    _PlayButton(),
                     if (videoStore.isBfLoading)
                       _CircularProgressIndicatorBig(
                         color: Colors.black87,
                       ),
+                    _PlayButton(),
                     _VideoBottomCtrl(),
                   ],
                 ),

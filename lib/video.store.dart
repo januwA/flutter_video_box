@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -44,6 +45,9 @@ abstract class _VideoStore with Store {
   }) {
     initVideoPlaer(videoDataSource);
   }
+
+  /// 自动关闭 videoCtrl 的计时器
+  Timer showCtrlTimer;
 
   /// 用户可以发送一个callback的函数进来，video播放时触发
   Function playingListenner;
@@ -154,11 +158,16 @@ abstract class _VideoStore with Store {
   void showVideoCtrl(bool show) {
     isShowVideoCtrl = show;
     if (show && videoCtrl.value.isPlaying) {
-      Future.delayed(Duration(seconds: 2)).then((_) {
-        if (videoCtrl.value.isPlaying && !isBfLoading) {
-          showVideoCtrl(false);
-        }
-      });
+      if (showCtrlTimer?.isActive ?? false) {
+        showCtrlTimer?.cancel();
+      } else {
+        showCtrlTimer = Timer(Duration(seconds: 2), () {
+          isShowVideoCtrl = false;
+          if (videoCtrl.value.isPlaying && !isBfLoading) {
+            showVideoCtrl(false);
+          }
+        });
+      }
     }
   }
 
@@ -241,6 +250,7 @@ abstract class _VideoStore with Store {
   @action
   Future<void> initVideoPlaer(VideoDataSource videoDataSource) async {
     setVideoLoading(true);
+    isBfLoading = false;
     if (videoDataSource == null) return;
     DataSourceType dataSourceType = videoDataSource.dataSourceType;
     if (dataSourceType == DataSourceType.network) {
@@ -305,6 +315,7 @@ abstract class _VideoStore with Store {
   /// 播放或暂停
   @action
   void togglePlay(AnimationController controller) {
+    print(videoCtrl.value);
     if (videoCtrl.value.isPlaying) {
       videoCtrl.pause();
       isShowVideoCtrl = true;
@@ -312,9 +323,15 @@ abstract class _VideoStore with Store {
     } else {
       videoCtrl.play();
       controller.forward();
-      Future.delayed(Duration(milliseconds: 600)).then((_) {
-        isShowVideoCtrl = false;
-      });
+
+      /// 避免闪烁
+      if (showCtrlTimer?.isActive ?? false) {
+        showCtrlTimer?.cancel();
+      } else {
+        showCtrlTimer = Timer(Duration(seconds: 2), () {
+          isShowVideoCtrl = false;
+        });
+      }
     }
   }
 
@@ -343,16 +360,12 @@ abstract class _VideoStore with Store {
 
   /// 快进
   void fastForward([Duration st]) {
-    if (videoCtrl.value.isPlaying) {
-      seekTo(videoCtrl.value.position + (st ?? skiptime));
-    }
+    seekTo(videoCtrl.value.position + (st ?? skiptime));
   }
 
   /// 快退
   void rewind([Duration st]) {
-    if (videoCtrl.value.isPlaying) {
-      seekTo(videoCtrl.value.position - (st ?? skiptime));
-    }
+    seekTo(videoCtrl.value.position - (st ?? skiptime));
   }
 
   Future<void> onFullScreen(context) async {

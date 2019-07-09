@@ -21,7 +21,7 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
     video = Video(
       store: VideoStore(
         videoDataSource: VideoDataSource.network(src),
-        autoplay: true,
+        // autoplay: true,
       ),
     );
   }
@@ -74,8 +74,8 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
                     index = newindex;
                   });
                   video.store.setSource(VideoDataSource.network(src));
-                  video.store.setAutoplay(true);
-                  video.store.showVideoCtrl(false);
+                  // video.store.setAutoplay(true);
+                  // video.store.showVideoCtrl(false);
                 },
               ),
             ],
