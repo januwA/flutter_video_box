@@ -34,12 +34,12 @@ class Video {
 class VideoBox extends StatefulWidget {
   VideoBox({
     Key key,
-    this.videoDataSource,
+    this.source,
     this.store,
     this.isDispose = false,
   }) : super(key: key);
 
-  final VideoDataSource videoDataSource;
+  final VideoPlayerController source;
   final VideoStore store;
   final isDispose;
   @override
@@ -47,19 +47,18 @@ class VideoBox extends StatefulWidget {
 }
 
 class _VideoBoxState extends State<VideoBox> {
-  VideoStore videoStore;
+  VideoStore store;
 
   @override
   void initState() {
     super.initState();
-    videoStore =
-        widget.store ?? VideoStore(videoDataSource: widget.videoDataSource);
+    store = widget.store ?? VideoStore(source: widget.source);
   }
 
   @override
   void dispose() {
     if (widget.isDispose) {
-      videoStore.dispose();
+      store.dispose();
     }
     super.dispose();
   }
@@ -67,36 +66,37 @@ class _VideoBoxState extends State<VideoBox> {
   @override
   Widget build(BuildContext context) {
     return Observer(
-      builder: (_) => videoStore.isVideoLoading
+      builder: (_) => store.isVideoLoading
           ? _VideoLoading()
           : MultiProvider(
-              providers: [Provider<VideoStore>.value(value: videoStore)],
+              providers: [Provider<VideoStore>.value(value: store)],
               child: GestureDetector(
-                onTap: () =>
-                    videoStore.showVideoCtrl(!videoStore.isShowVideoCtrl),
+                onTap: () => store.showVideoCtrl(!store.isShowVideoCtrl),
                 child: Stack(
                   alignment: AlignmentDirectional.center,
                   children: <Widget>[
                     AnimatedCrossFade(
                       duration: const Duration(milliseconds: 300),
                       firstChild: _VideoLoading(
-                        cover: videoStore.cover,
+                        cover: store.cover,
                       ),
                       secondChild: Container(
                         decoration: BoxDecoration(color: Colors.black),
                         child: Center(
                           child: AspectRatio(
-                            aspectRatio: videoStore.videoCtrl.value.aspectRatio,
-                            child: VideoPlayer(videoStore.videoCtrl),
+                            aspectRatio: store.videoCtrl.value.aspectRatio,
+                            child: VideoPlayer(store.videoCtrl),
                           ),
                         ),
                       ),
-                      crossFadeState: videoStore.isShowCover
+                      crossFadeState: store.isShowCover
                           ? CrossFadeState.showFirst
                           : CrossFadeState.showSecond,
                     ),
                     _SeekToView(),
-                    if (videoStore.isBfLoading)
+
+                    /// 视频进入缓冲状态,显示laoding
+                    if (store.isBfLoading)
                       _CircularProgressIndicatorBig(
                         color: Colors.black87,
                       ),
@@ -114,7 +114,7 @@ class _VideoBoxState extends State<VideoBox> {
 class _SeekToView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final videoStore = Provider.of<VideoStore>(context);
+    final store = Provider.of<VideoStore>(context);
     return Positioned(
       left: 0,
       top: 0,
@@ -124,17 +124,15 @@ class _SeekToView extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: GestureDetector(
-              onTap: () =>
-                  videoStore.showVideoCtrl(!videoStore.isShowVideoCtrl),
-              onDoubleTap: videoStore.rewind,
+              onTap: () => store.showVideoCtrl(!store.isShowVideoCtrl),
+              onDoubleTap: store.rewind,
             ),
           ),
           const SizedBox(width: 24),
           Expanded(
             child: GestureDetector(
-              onTap: () =>
-                  videoStore.showVideoCtrl(!videoStore.isShowVideoCtrl),
-              onDoubleTap: videoStore.fastForward,
+              onTap: () => store.showVideoCtrl(!store.isShowVideoCtrl),
+              onDoubleTap: store.fastForward,
             ),
           ),
         ],
@@ -143,8 +141,9 @@ class _SeekToView extends StatelessWidget {
   }
 }
 
-/// video 中间的播放按钮
 class _PlayButton extends StatefulWidget {
+  /// video box 中间的播放按钮
+  const _PlayButton();
   @override
   __PlayButtonState createState() => __PlayButtonState();
 }
@@ -169,8 +168,8 @@ class __PlayButtonState extends State<_PlayButton>
 
   @override
   Widget build(BuildContext context) {
-    final videoStore = Provider.of<VideoStore>(context);
-    if (!videoStore.videoCtrl.value.isPlaying) {
+    final store = Provider.of<VideoStore>(context);
+    if (!store.videoCtrl.value.isPlaying) {
       _controller.reset();
     } else {
       _controller.forward();
@@ -178,7 +177,7 @@ class __PlayButtonState extends State<_PlayButton>
     return Observer(
       builder: (_) => AnimatedCrossFade(
         duration: const Duration(milliseconds: 300),
-        firstChild: Container(),
+        firstChild: const SizedBox(),
         secondChild: Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -190,12 +189,10 @@ class __PlayButtonState extends State<_PlayButton>
               icon: AnimatedIcons.play_pause,
               progress: _tween,
             ),
-            onPressed: videoStore.isShowVideoCtrl
-                ? () => videoStore.togglePlay(_controller)
-                : null,
+            onPressed: () => store.togglePlay(_controller),
           ),
         ),
-        crossFadeState: videoStore.isShowVideoCtrl
+        crossFadeState: store.isShowVideoCtrl
             ? CrossFadeState.showSecond
             : CrossFadeState.showFirst,
       ),
@@ -214,7 +211,7 @@ class _VideoBottomCtrl extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final videoStore = Provider.of<VideoStore>(context);
+    final store = Provider.of<VideoStore>(context);
     return Observer(
       builder: (_) => Positioned(
         bottom: 0,
@@ -243,29 +240,29 @@ class _VideoBottomCtrl extends StatelessWidget {
                     children: <Widget>[
                       Expanded(
                         child: Text(
-                          videoStore.isVideoLoading
+                          store.isVideoLoading
                               ? '00:00/00:00'
-                              : "${videoStore.positionText}/${videoStore.durationText}",
+                              : "${store.positionText}/${store.durationText}",
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      videoStore.isVideoLoading
+                      store.isVideoLoading
                           ? IconButton(
                               icon: Icon(Icons.volume_up),
                               onPressed: () {},
                             )
                           : IconButton(
-                              icon: Icon(_volumeIcon(
-                                  videoStore.videoCtrl.value.volume)),
-                              onPressed: videoStore.setOnSoundOrOff,
+                              icon: Icon(
+                                  _volumeIcon(store.videoCtrl.value.volume)),
+                              onPressed: store.setOnSoundOrOff,
                             ),
                       IconButton(
                         icon: Icon(
-                          !videoStore.isFullScreen
+                          !store.isFullScreen
                               ? Icons.fullscreen
                               : Icons.fullscreen_exit,
                         ),
-                        onPressed: () => videoStore.onFullScreen(context),
+                        onPressed: () => store.onFullScreen(context),
                       ),
                     ],
                   ),
@@ -284,12 +281,12 @@ class _VideoBottomCtrl extends StatelessWidget {
                   child: Slider(
                     activeColor: Colors.white,
                     inactiveColor: Colors.white24,
-                    value: videoStore.sliderValue,
-                    onChanged: videoStore.sliderChanged,
+                    value: store.sliderValue,
+                    onChanged: store.sliderChanged,
                   ),
                 )),
           ),
-          crossFadeState: videoStore.isShowVideoCtrl
+          crossFadeState: store.isShowVideoCtrl
               ? CrossFadeState.showSecond
               : CrossFadeState.showFirst,
         ),
@@ -324,13 +321,15 @@ class _VideoLoading extends StatelessWidget {
   }
 }
 
+/// 稍微大一点的loading
 class _CircularProgressIndicatorBig extends StatelessWidget {
+  static const double SIZE = 50;
   final double size;
   final Color color;
 
   const _CircularProgressIndicatorBig({
     Key key,
-    this.size = 50,
+    this.size = SIZE,
     this.color = Colors.white,
   }) : super(key: key);
 

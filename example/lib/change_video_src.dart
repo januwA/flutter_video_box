@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:video_box/video.store.dart';
 import 'package:video_box/video_box.dart';
+import 'package:video_player/video_player.dart';
 
 import 'globals.dart';
 
@@ -20,7 +21,7 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
     super.initState();
     video = Video(
       store: VideoStore(
-        videoDataSource: VideoDataSource.network(src),
+        source: VideoPlayerController.network(src),
         // autoplay: true,
       ),
     );
@@ -60,7 +61,7 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
                   });
                   video.store.setAutoplay(false);
                   video.store.showVideoCtrl(true);
-                  video.store.setSource(VideoDataSource.network(src));
+                  video.store.setSource(VideoPlayerController.network(src));
                 },
               ),
               RaisedButton(
@@ -73,7 +74,7 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
                   setState(() {
                     index = newindex;
                   });
-                  video.store.setSource(VideoDataSource.network(src));
+                  video.store.setSource(VideoPlayerController.network(src));
                   // video.store.setAutoplay(true);
                   // video.store.showVideoCtrl(false);
                 },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:video_box/video.store.dart';
 import 'package:video_box/video_box.dart';
+import 'package:video_player/video_player.dart';
 
 import 'globals.dart';
 
@@ -22,7 +23,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl>
     );
     video = Video(
       store: VideoStore(
-        videoDataSource: VideoDataSource.network(src1),
+        source: VideoPlayerController.network(src1),
         // autoplay: true,
         // initPosition: Duration(minutes: 20),
         cover: Text(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:video_box/video.store.dart';
 import 'package:video_box/video_box.dart';
+import 'package:video_player/video_player.dart';
 
 import 'globals.dart';
 
@@ -18,7 +19,7 @@ class _ListVideoState extends State<ListVideo> {
     for (var i = 0; i < 4; i++) {
       videos.add(
         Video(
-          store: VideoStore(videoDataSource: VideoDataSource.network(src1)),
+          store: VideoStore(source: VideoPlayerController.network(src1)),
         ),
       );
     }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,30 +9,11 @@ import 'package:video_player/video_player.dart';
 import 'video_box.dart';
 part 'video.store.g.dart';
 
-/// Construction a resources
-class VideoDataSource {
-  final DataSourceType dataSourceType;
-  final String dataSource;
-  final String package;
-
-  VideoDataSource.network(this.dataSource)
-      : dataSourceType = DataSourceType.network,
-        package = null;
-
-  VideoDataSource.file(File file)
-      : dataSource = 'file://${file.path}',
-        dataSourceType = DataSourceType.file,
-        package = null;
-
-  VideoDataSource.asset(this.dataSource, {this.package})
-      : dataSourceType = DataSourceType.asset;
-}
-
 class VideoStore = _VideoStore with _$VideoStore;
 
 abstract class _VideoStore with Store {
   _VideoStore({
-    VideoDataSource videoDataSource,
+    VideoPlayerController source,
     this.skiptime = const Duration(seconds: 10),
     this.autoplay = false,
     this.loop = false,
@@ -43,11 +23,14 @@ abstract class _VideoStore with Store {
     this.playingListenner,
     this.playEnd,
   }) {
-    initVideoPlaer(videoDataSource);
+    initVideoPlaer(source);
   }
 
+  @observable
+  bool isPlayEnd = false;
+
   /// 自动关闭 videoCtrl 的计时器
-  Timer showCtrlTimer;
+  Timer _showCtrlTimer;
 
   /// 用户可以发送一个callback的函数进来，video播放时触发
   Function playingListenner;
@@ -66,8 +49,9 @@ abstract class _VideoStore with Store {
   void _setIsBfLoading() {
     if (videoCtrl.value.buffered == null || videoCtrl.value.buffered.isEmpty)
       return;
-    isBfLoading =
-        videoCtrl.value.position >= videoCtrl.value.buffered.first.end;
+
+    /// 当前播放的位置，大于了缓冲的位置，就会进入加载状态
+    isBfLoading = videoCtrl.value.position >= videoCtrl.value.buffered.last.end;
   }
 
   /// set cover
@@ -158,10 +142,10 @@ abstract class _VideoStore with Store {
   void showVideoCtrl(bool show) {
     isShowVideoCtrl = show;
     if (show && videoCtrl.value.isPlaying) {
-      if (showCtrlTimer?.isActive ?? false) {
-        showCtrlTimer?.cancel();
+      if (_showCtrlTimer?.isActive ?? false) {
+        _showCtrlTimer?.cancel();
       } else {
-        showCtrlTimer = Timer(Duration(seconds: 2), () {
+        _showCtrlTimer = Timer(Duration(seconds: 2), () {
           isShowVideoCtrl = false;
           if (videoCtrl.value.isPlaying && !isBfLoading) {
             showVideoCtrl(false);
@@ -224,6 +208,7 @@ abstract class _VideoStore with Store {
     }
   }
 
+  /// 视频播放时的监听器
   @action
   void _videoListenner() {
     position = videoCtrl.value.position;
@@ -232,13 +217,23 @@ abstract class _VideoStore with Store {
     if (playingListenner != null) {
       playingListenner();
     }
-    if (this.playEnd != null && position >= duration) {
-      playEnd();
+
+    /// video播放结束
+    if (position >= duration) {
+      /// 如果用户调用了播放结束的监听器
+      if (this.playEnd != null) {
+        playEnd();
+      }
+      isPlayEnd = true;
+      isBfLoading = false; // 播放结束缓冲什么的都不存在了
+      showVideoCtrl(true); // 播放结束默认弹起video的控制器
+    } else {
+      isPlayEnd = false;
     }
   }
 
   @action
-  Future<void> setSource(VideoDataSource videoDataSource) async {
+  Future<void> setSource(VideoPlayerController videoDataSource) async {
     videoCtrl?.pause();
     videoCtrl?.removeListener(_videoListenner);
     var oldCtrl = videoCtrl;
@@ -248,19 +243,11 @@ abstract class _VideoStore with Store {
 
   /// 初始化viedo控制器
   @action
-  Future<void> initVideoPlaer(VideoDataSource videoDataSource) async {
+  Future<void> initVideoPlaer(VideoPlayerController videoDataSource) async {
     setVideoLoading(true);
     isBfLoading = false;
     if (videoDataSource == null) return;
-    DataSourceType dataSourceType = videoDataSource.dataSourceType;
-    if (dataSourceType == DataSourceType.network) {
-      videoCtrl = VideoPlayerController.network(videoDataSource.dataSource);
-    } else if (dataSourceType == DataSourceType.file) {
-      videoCtrl = VideoPlayerController.file(File(videoDataSource.dataSource));
-    } else if (dataSourceType == DataSourceType.asset) {
-      videoCtrl = VideoPlayerController.asset(videoDataSource.dataSource,
-          package: videoDataSource.package);
-    }
+    videoCtrl = videoDataSource;
     await videoCtrl.initialize();
     videoCtrl.setLooping(loop);
     videoCtrl.setVolume(volume);
@@ -315,20 +302,27 @@ abstract class _VideoStore with Store {
   /// 播放或暂停
   @action
   void togglePlay(AnimationController controller) {
-    print(videoCtrl.value);
+    assert(isShowVideoCtrl == true);
+    if (!isShowVideoCtrl) return;
+
     if (videoCtrl.value.isPlaying) {
       videoCtrl.pause();
       isShowVideoCtrl = true;
       controller.reverse();
     } else {
+      /// 如果视频播放结束
+      /// 再点击播放则重头开始播放
+      if (isPlayEnd) {
+        videoCtrl.seekTo(Duration(seconds: 0));
+      }
       videoCtrl.play();
       controller.forward();
 
       /// 避免闪烁
-      if (showCtrlTimer?.isActive ?? false) {
-        showCtrlTimer?.cancel();
+      if (_showCtrlTimer?.isActive ?? false) {
+        _showCtrlTimer?.cancel();
       } else {
-        showCtrlTimer = Timer(Duration(seconds: 2), () {
+        _showCtrlTimer = Timer(Duration(seconds: 2), () {
           isShowVideoCtrl = false;
         });
       }

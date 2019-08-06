@@ -33,6 +33,23 @@ mixin _$VideoStore on _VideoStore, Store {
       (_$sliderValueComputed ??= Computed<double>(() => super.sliderValue))
           .value;
 
+  final _$isPlayEndAtom = Atom(name: '_VideoStore.isPlayEnd');
+
+  @override
+  bool get isPlayEnd {
+    _$isPlayEndAtom.context.enforceReadPolicy(_$isPlayEndAtom);
+    _$isPlayEndAtom.reportObserved();
+    return super.isPlayEnd;
+  }
+
+  @override
+  set isPlayEnd(bool value) {
+    _$isPlayEndAtom.context.conditionallyRunInAction(() {
+      super.isPlayEnd = value;
+      _$isPlayEndAtom.reportChanged();
+    }, _$isPlayEndAtom, name: '${_$isPlayEndAtom.name}_set');
+  }
+
   final _$coverAtom = Atom(name: '_VideoStore.cover');
 
   @override
@@ -257,14 +274,14 @@ mixin _$VideoStore on _VideoStore, Store {
   final _$setSourceAsyncAction = AsyncAction('setSource');
 
   @override
-  Future<void> setSource(VideoDataSource videoDataSource) {
+  Future<void> setSource(VideoPlayerController videoDataSource) {
     return _$setSourceAsyncAction.run(() => super.setSource(videoDataSource));
   }
 
   final _$initVideoPlaerAsyncAction = AsyncAction('initVideoPlaer');
 
   @override
-  Future<void> initVideoPlaer(VideoDataSource videoDataSource) {
+  Future<void> initVideoPlaer(VideoPlayerController videoDataSource) {
     return _$initVideoPlaerAsyncAction
         .run(() => super.initVideoPlaer(videoDataSource));
   }

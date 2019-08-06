@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:video_box/video.store.dart';
 import 'package:video_box/video_box.dart';
+import 'package:video_player/video_player.dart';
 
 import 'globals.dart';
 
@@ -20,7 +20,7 @@ class _OneVideoState extends State<OneVideo> {
         children: [
           VideoBox(
             isDispose: true,
-            videoDataSource: VideoDataSource.network(src1),
+            source: VideoPlayerController.network(src1),
           ),
         ],
       ),

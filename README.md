@@ -40,6 +40,7 @@ ios: Info.plist
 import 'package:flutter/material.dart';
 import 'package:video_box/video.store.dart';
 import 'package:video_box/video_box.dart';
+import 'package:video_player/video_player.dart';
 
 class ListVideo extends StatefulWidget {
   @override
@@ -55,7 +56,7 @@ class _ListVideoState extends State<ListVideo> {
     for (var i = 0; i < 4; i++) {
       videos.add(
         Video(
-          store: VideoStore(videoDataSource: VideoDataSource.network(src)),
+          store: VideoStore(source: VideoPlayerController.network(src1)),
         ),
       );
     }
