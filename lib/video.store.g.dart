@@ -26,11 +26,23 @@ mixin _$VideoStore on _VideoStore, Store {
   String get positionText =>
       (_$positionTextComputed ??= Computed<String>(() => super.positionText))
           .value;
+  Computed<String> _$videoBoxTimeTextComputed;
+
+  @override
+  String get videoBoxTimeText => (_$videoBoxTimeTextComputed ??=
+          Computed<String>(() => super.videoBoxTimeText))
+      .value;
   Computed<double> _$sliderValueComputed;
 
   @override
   double get sliderValue =>
       (_$sliderValueComputed ??= Computed<double>(() => super.sliderValue))
+          .value;
+  Computed<IconData> _$volumeIconComputed;
+
+  @override
+  IconData get volumeIcon =>
+      (_$volumeIconComputed ??= Computed<IconData>(() => super.volumeIcon))
           .value;
 
   final _$isPlayEndAtom = Atom(name: '_VideoStore.isPlayEnd');
@@ -390,6 +402,16 @@ mixin _$VideoStore on _VideoStore, Store {
     final _$actionInfo = _$_VideoStoreActionController.startAction();
     try {
       return super._videoListenner();
+    } finally {
+      _$_VideoStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setOnSoundOrOff() {
+    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    try {
+      return super.setOnSoundOrOff();
     } finally {
       _$_VideoStoreActionController.endAction(_$actionInfo);
     }

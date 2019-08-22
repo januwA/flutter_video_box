@@ -1,3 +1,8 @@
+## 0.3.1 - 2019-8-22
+
+* 优化ui
+* 使用'AnimatedSwitcher'代替'AnimatedCrossFade'
+
 ## 0.3.0 - 2019-8-6
 
 * api变更

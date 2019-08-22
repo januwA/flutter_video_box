@@ -7,9 +7,7 @@ import 'package:video_player/video_player.dart';
 /// 下面是一个简单的example，更具体使用何以看 /example下面的代码或则源码
 ///
 /// ```dart
-/// Video video = Video(
-///   store: VideoStore(videoDataSource: VideoDataSource.network('http://example.com/example.mp4')),
-/// );
+/// Video video = Video(source: VideoPlayerController.network(src));
 ///
 /// @override
 /// void dispose() {
@@ -17,7 +15,7 @@ import 'package:video_player/video_player.dart';
 ///   super.dispose();
 /// }
 ///
-/// // 在ui中展示
+/// // display videoBox
 /// Container(child: video.videoBox),
 /// ```
 class Video {
@@ -75,37 +73,43 @@ class _VideoBoxState extends State<VideoBox> {
                 child: Stack(
                   alignment: AlignmentDirectional.center,
                   children: <Widget>[
-                    AnimatedCrossFade(
+                    AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
-                      firstChild: _VideoLoading(
-                        cover: store.cover,
-                      ),
-                      secondChild: Container(
-                        decoration: BoxDecoration(color: Colors.black),
-                        child: Center(
-                          child: AspectRatio(
-                            aspectRatio: store.videoCtrl.value.aspectRatio,
-                            child: VideoPlayer(store.videoCtrl),
-                          ),
-                        ),
-                      ),
-                      crossFadeState: store.isShowCover
-                          ? CrossFadeState.showFirst
-                          : CrossFadeState.showSecond,
+                      child: store.isShowCover
+                          ? _VideoLoading(cover: store.cover)
+                          : Container(
+                              decoration: BoxDecoration(color: Colors.black),
+                              child: Center(
+                                child: AspectRatio(
+                                  aspectRatio:
+                                      store.videoCtrl.value.aspectRatio,
+                                  child: VideoPlayer(store.videoCtrl),
+                                ),
+                              ),
+                            ),
                     ),
                     _SeekToView(),
-
-                    /// 视频进入缓冲状态,显示laoding
-                    if (store.isBfLoading)
-                      _CircularProgressIndicatorBig(
-                        color: Colors.black87,
-                      ),
+                    _Bfloading(),
                     _PlayButton(),
                     _VideoBottomCtrl(),
                   ],
                 ),
               ),
             ),
+    );
+  }
+}
+
+/// 视频进入缓冲状态,显示laoding
+class _Bfloading extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final store = Provider.of<VideoStore>(context);
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: store.isBfLoading
+          ? _CircularProgressIndicatorBig(color: Colors.black87)
+          : SizedBox(),
     );
   }
 }
@@ -141,9 +145,8 @@ class _SeekToView extends StatelessWidget {
   }
 }
 
+/// video box 中间的播放按钮
 class _PlayButton extends StatefulWidget {
-  /// video box 中间的播放按钮
-  const _PlayButton();
   @override
   __PlayButtonState createState() => __PlayButtonState();
 }
@@ -157,7 +160,7 @@ class __PlayButtonState extends State<_PlayButton>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 400),
       vsync: this,
     );
     _tween = Tween<double>(
@@ -175,26 +178,24 @@ class __PlayButtonState extends State<_PlayButton>
       _controller.forward();
     }
     return Observer(
-      builder: (_) => AnimatedCrossFade(
+      builder: (_) => AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
-        firstChild: const SizedBox(),
-        secondChild: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
-          child: IconButton(
-            color: Colors.black,
-            icon: AnimatedIcon(
-              icon: AnimatedIcons.play_pause,
-              progress: _tween,
-            ),
-            onPressed: () => store.togglePlay(_controller),
-          ),
-        ),
-        crossFadeState: store.isShowVideoCtrl
-            ? CrossFadeState.showSecond
-            : CrossFadeState.showFirst,
+        child: store.isShowVideoCtrl
+            ? Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  color: Colors.black,
+                  icon: AnimatedIcon(
+                    icon: AnimatedIcons.play_pause,
+                    progress: _tween,
+                  ),
+                  onPressed: () => store.togglePlay(_controller),
+                ),
+              )
+            : SizedBox(),
       ),
     );
   }
@@ -202,13 +203,6 @@ class __PlayButtonState extends State<_PlayButton>
 
 /// video 底部的控制器
 class _VideoBottomCtrl extends StatelessWidget {
-  /// 返回一个符合当前音量的icon
-  IconData _volumeIcon(double volume) {
-    return volume <= 0
-        ? Icons.volume_off
-        : volume <= 0.5 ? Icons.volume_down : Icons.volume_up;
-  }
-
   @override
   Widget build(BuildContext context) {
     final store = Provider.of<VideoStore>(context);
@@ -240,22 +234,14 @@ class _VideoBottomCtrl extends StatelessWidget {
                     children: <Widget>[
                       Expanded(
                         child: Text(
-                          store.isVideoLoading
-                              ? '00:00/00:00'
-                              : "${store.positionText}/${store.durationText}",
+                          store.videoBoxTimeText,
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
-                      store.isVideoLoading
-                          ? IconButton(
-                              icon: Icon(Icons.volume_up),
-                              onPressed: () {},
-                            )
-                          : IconButton(
-                              icon: Icon(
-                                  _volumeIcon(store.videoCtrl.value.volume)),
-                              onPressed: store.setOnSoundOrOff,
-                            ),
+                      IconButton(
+                        icon: Icon(store.volumeIcon),
+                        onPressed: store.setOnSoundOrOff,
+                      ),
                       IconButton(
                         icon: Icon(
                           !store.isFullScreen

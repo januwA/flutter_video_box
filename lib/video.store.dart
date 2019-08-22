@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:mobx/mobx.dart';
 import 'package:screen/screen.dart';
 import 'package:video_player/video_player.dart';
+import 'package:video_box/util/duration_string.dart' show durationString;
 
 import 'video_box.dart';
 part 'video.store.g.dart';
@@ -172,32 +173,18 @@ abstract class _VideoStore with Store {
   /// 25:00 or 2:00:00 总时长
   @computed
   String get durationText {
-    return duration == null
-        ? ''
-        : duration
-            .toString()
-            .split('.')
-            .first
-            .split(':')
-            .where((String e) => e != '0')
-            .toList()
-            .join(':');
+    return duration == null ? '' : durationString(duration);
   }
 
   /// 00:01 当前时间
   @computed
   String get positionText {
-    return (videoCtrl == null)
-        ? ''
-        : position
-            .toString()
-            .split('.')
-            .first
-            .split(':')
-            .where((String e) => e != '0')
-            .toList()
-            .join(':');
+    return (videoCtrl == null) ? '' : durationString(position);
   }
+
+  @computed
+  String get videoBoxTimeText =>
+      isVideoLoading ? '00:00/00:00' : "$positionText/$durationText";
 
   @computed
   double get sliderValue {
@@ -206,6 +193,17 @@ abstract class _VideoStore with Store {
     } else {
       return 0.0;
     }
+  }
+
+  /// 返回一个符合当前音量的icon
+  @computed
+  IconData get volumeIcon {
+    if (isVideoLoading) {
+      return Icons.volume_up;
+    }
+    return volume <= 0
+        ? Icons.volume_off
+        : volume <= 0.5 ? Icons.volume_down : Icons.volume_up;
   }
 
   /// 视频播放时的监听器
@@ -264,11 +262,13 @@ abstract class _VideoStore with Store {
   }
 
   /// 开启声音或关闭
+  @action
   void setOnSoundOrOff() {
+    if (isVideoLoading) return;
     if (videoCtrl.value.volume > 0) {
-      videoCtrl.setVolume(0.0);
+      setVolume(0.0);
     } else {
-      videoCtrl.setVolume(1.0);
+      setVolume(1.0);
     }
   }
 

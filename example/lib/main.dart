@@ -36,40 +36,43 @@ class _HomePageState extends State<HomePage> {
         title: Text('video_box example'),
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            RaisedButton(
-              child: Text('one video'),
-              onPressed: () {
-                Navigator.of(context).pushNamed('/oneVideo');
-              },
-            ),
-            RaisedButton(
-              child: Text('one video ctrl'),
-              onPressed: () {
-                Navigator.of(context).pushNamed('/oneVideoCtrl');
-              },
-            ),
-            RaisedButton(
-              child: Text('list video'),
-              onPressed: () {
-                Navigator.of(context).pushNamed('/listVideo');
-              },
-            ),
-            RaisedButton(
-              child: Text('change video src'),
-              onPressed: () {
-                Navigator.of(context).pushNamed('/change_video_src');
-              },
-            ),
-            RaisedButton(
-              child: Text('videos'),
-              onPressed: () {
-                Navigator.of(context).pushNamed('/videos');
-              },
-            ),
-          ],
+        child: IntrinsicWidth(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              RaisedButton(
+                child: Text('one video'),
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/oneVideo');
+                },
+              ),
+              RaisedButton(
+                child: Text('one video ctrl'),
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/oneVideoCtrl');
+                },
+              ),
+              RaisedButton(
+                child: Text('list video'),
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/listVideo');
+                },
+              ),
+              RaisedButton(
+                child: Text('change video src'),
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/change_video_src');
+                },
+              ),
+              RaisedButton(
+                child: Text('videos'),
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/videos');
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
