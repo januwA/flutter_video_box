@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'videos.dart';
 import 'change_video_src.dart';
 import 'list_video.dart';
-import 'one_video.dart';
 import 'one_video_ctrl.dart';
 
 void main() => runApp(MyApp());
@@ -12,7 +11,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       routes: <String, WidgetBuilder>{
-        '/oneVideo': (BuildContext context) => OneVideo(),
         '/oneVideoCtrl': (BuildContext context) => OneVideoCtrl(),
         '/listVideo': (BuildContext context) => ListVideo(),
         '/change_video_src': (BuildContext context) => ChangeVideoSrc(),
@@ -41,12 +39,6 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              RaisedButton(
-                child: Text('one video'),
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/oneVideo');
-                },
-              ),
               RaisedButton(
                 child: Text('one video ctrl'),
                 onPressed: () {

@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'video.store.dart';
+part of 'video.controller.dart';
 
 // **************************************************************************
 // StoreGenerator
@@ -8,7 +8,7 @@ part of 'video.store.dart';
 
 // ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars
 
-mixin _$VideoStore on _VideoStore, Store {
+mixin _$VideoController on _VideoController, Store {
   Computed<bool> _$isShowCoverComputed;
 
   @override
@@ -45,7 +45,7 @@ mixin _$VideoStore on _VideoStore, Store {
       (_$volumeIconComputed ??= Computed<IconData>(() => super.volumeIcon))
           .value;
 
-  final _$isPlayEndAtom = Atom(name: '_VideoStore.isPlayEnd');
+  final _$isPlayEndAtom = Atom(name: '_VideoController.isPlayEnd');
 
   @override
   bool get isPlayEnd {
@@ -62,7 +62,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$isPlayEndAtom, name: '${_$isPlayEndAtom.name}_set');
   }
 
-  final _$coverAtom = Atom(name: '_VideoStore.cover');
+  final _$coverAtom = Atom(name: '_VideoController.cover');
 
   @override
   Widget get cover {
@@ -79,7 +79,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$coverAtom, name: '${_$coverAtom.name}_set');
   }
 
-  final _$isBfLoadingAtom = Atom(name: '_VideoStore.isBfLoading');
+  final _$isBfLoadingAtom = Atom(name: '_VideoController.isBfLoading');
 
   @override
   bool get isBfLoading {
@@ -96,7 +96,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$isBfLoadingAtom, name: '${_$isBfLoadingAtom.name}_set');
   }
 
-  final _$autoplayAtom = Atom(name: '_VideoStore.autoplay');
+  final _$autoplayAtom = Atom(name: '_VideoController.autoplay');
 
   @override
   bool get autoplay {
@@ -113,7 +113,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$autoplayAtom, name: '${_$autoplayAtom.name}_set');
   }
 
-  final _$loopAtom = Atom(name: '_VideoStore.loop');
+  final _$loopAtom = Atom(name: '_VideoController.loop');
 
   @override
   bool get loop {
@@ -130,7 +130,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$loopAtom, name: '${_$loopAtom.name}_set');
   }
 
-  final _$volumeAtom = Atom(name: '_VideoStore.volume');
+  final _$volumeAtom = Atom(name: '_VideoController.volume');
 
   @override
   double get volume {
@@ -147,7 +147,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$volumeAtom, name: '${_$volumeAtom.name}_set');
   }
 
-  final _$videoCtrlAtom = Atom(name: '_VideoStore.videoCtrl');
+  final _$videoCtrlAtom = Atom(name: '_VideoController.videoCtrl');
 
   @override
   VideoPlayerController get videoCtrl {
@@ -164,7 +164,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$videoCtrlAtom, name: '${_$videoCtrlAtom.name}_set');
   }
 
-  final _$isVideoLoadingAtom = Atom(name: '_VideoStore.isVideoLoading');
+  final _$isVideoLoadingAtom = Atom(name: '_VideoController.isVideoLoading');
 
   @override
   bool get isVideoLoading {
@@ -181,7 +181,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$isVideoLoadingAtom, name: '${_$isVideoLoadingAtom.name}_set');
   }
 
-  final _$initPositionAtom = Atom(name: '_VideoStore.initPosition');
+  final _$initPositionAtom = Atom(name: '_VideoController.initPosition');
 
   @override
   Duration get initPosition {
@@ -198,7 +198,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$initPositionAtom, name: '${_$initPositionAtom.name}_set');
   }
 
-  final _$positionAtom = Atom(name: '_VideoStore.position');
+  final _$positionAtom = Atom(name: '_VideoController.position');
 
   @override
   Duration get position {
@@ -215,7 +215,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$positionAtom, name: '${_$positionAtom.name}_set');
   }
 
-  final _$durationAtom = Atom(name: '_VideoStore.duration');
+  final _$durationAtom = Atom(name: '_VideoController.duration');
 
   @override
   Duration get duration {
@@ -232,7 +232,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$durationAtom, name: '${_$durationAtom.name}_set');
   }
 
-  final _$isShowVideoCtrlAtom = Atom(name: '_VideoStore.isShowVideoCtrl');
+  final _$isShowVideoCtrlAtom = Atom(name: '_VideoController.isShowVideoCtrl');
 
   @override
   bool get isShowVideoCtrl {
@@ -249,7 +249,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$isShowVideoCtrlAtom, name: '${_$isShowVideoCtrlAtom.name}_set');
   }
 
-  final _$isFullScreenAtom = Atom(name: '_VideoStore.isFullScreen');
+  final _$isFullScreenAtom = Atom(name: '_VideoController.isFullScreen');
 
   @override
   bool get isFullScreen {
@@ -266,7 +266,7 @@ mixin _$VideoStore on _VideoStore, Store {
     }, _$isFullScreenAtom, name: '${_$isFullScreenAtom.name}_set');
   }
 
-  final _$skiptimeAtom = Atom(name: '_VideoStore.skiptime');
+  final _$skiptimeAtom = Atom(name: '_VideoController.skiptime');
 
   @override
   Duration get skiptime {
@@ -305,165 +305,166 @@ mixin _$VideoStore on _VideoStore, Store {
     return _$seekToAsyncAction.run(() => super.seekTo(d));
   }
 
-  final _$_VideoStoreActionController = ActionController(name: '_VideoStore');
+  final _$_VideoControllerActionController =
+      ActionController(name: '_VideoController');
 
   @override
   void _setIsBfLoading() {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super._setIsBfLoading();
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void setCover(Widget newCover) {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.setCover(newCover);
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void setAutoplay(bool autoplay) {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.setAutoplay(autoplay);
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void setLoop(bool loop) {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.setLoop(loop);
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void setVolume(double v) {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.setVolume(v);
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void setVideoLoading(bool v) {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.setVideoLoading(v);
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void setInitPosition(Duration p) {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.setInitPosition(p);
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void showVideoCtrl(bool show) {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.showVideoCtrl(show);
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void setSkiptime(Duration st) {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.setSkiptime(st);
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void _videoListenner() {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super._videoListenner();
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void setOnSoundOrOff() {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.setOnSoundOrOff();
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void _setLandscape() {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super._setLandscape();
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void _setPortrait() {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super._setPortrait();
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void togglePlay(AnimationController controller) {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+  void togglePlay() {
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
-      return super.togglePlay(controller);
+      return super.togglePlay();
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void play() {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.play();
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
   void pause() {
-    final _$actionInfo = _$_VideoStoreActionController.startAction();
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.pause();
     } finally {
-      _$_VideoStoreActionController.endAction(_$actionInfo);
+      _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 }

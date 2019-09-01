@@ -1,91 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:video_box/video.store.dart';
+import 'package:video_box/video.controller.dart';
 import 'package:video_player/video_player.dart';
 
-/// 下面是一个简单的example，更具体使用何以看 /example下面的代码或则源码
-///
-/// ```dart
-/// Video video = Video(source: VideoPlayerController.network(src));
-///
-/// @override
-/// void dispose() {
-///   video.dispose();
-///   super.dispose();
-/// }
-///
-/// // display videoBox
-/// Container(child: video.videoBox),
-/// ```
-class Video {
-  Video({
-    this.store,
-  }) : videoBox = VideoBox(store: store);
-  final VideoStore store;
-  final VideoBox videoBox;
-  dispose() {
-    store.dispose();
-  }
-}
-
 class VideoBox extends StatefulWidget {
+  /// Example:
+  ///
+  /// ```dart
+  /// VideoController vc = VideoController(source: VideoPlayerController.network('xxx.mp4'));
+  ///
+  /// @override
+  /// void dispose() {
+  ///   vc.dispose();
+  /// }
+  ///
+  /// // display videoBox
+  /// AspectRatio(
+  ///   aspectRatio: 16 / 9,
+  ///   child: VideoBox(controller: vc),
+  /// )
+  /// ```
+  /// 
+  /// see also:
+  /// 
+  /// https://github.com/januwA/flutter_video_box/tree/master/example
   VideoBox({
     Key key,
-    this.source,
-    this.store,
-    this.isDispose = false,
+    this.controller,
   }) : super(key: key);
 
-  final VideoPlayerController source;
-  final VideoStore store;
-  final isDispose;
+  final VideoController controller;
   @override
   _VideoBoxState createState() => _VideoBoxState();
 }
 
-class _VideoBoxState extends State<VideoBox> {
-  VideoStore store;
+class _VideoBoxState extends State<VideoBox>
+    with SingleTickerProviderStateMixin {
+  VideoController controller;
 
   @override
   void initState() {
     super.initState();
-    store = widget.store ?? VideoStore(source: widget.source);
-  }
-
-  @override
-  void dispose() {
-    if (widget.isDispose) {
-      store.dispose();
-    }
-    super.dispose();
+    controller = widget.controller..initAnimetedIconController(this);
   }
 
   @override
   Widget build(BuildContext context) {
     return Observer(
-      builder: (_) => store.isVideoLoading
+      builder: (_) => controller.isVideoLoading
           ? _VideoLoading()
           : MultiProvider(
-              providers: [Provider<VideoStore>.value(value: store)],
+              providers: [Provider<VideoController>.value(value: controller)],
               child: GestureDetector(
-                onTap: () => store.showVideoCtrl(!store.isShowVideoCtrl),
+                onTap: () =>
+                    controller.showVideoCtrl(!controller.isShowVideoCtrl),
                 child: Stack(
                   alignment: AlignmentDirectional.center,
                   children: <Widget>[
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 300),
-                      child: store.isShowCover
-                          ? _VideoLoading(cover: store.cover)
+                      child: controller.isShowCover
+                          ? _VideoLoading(cover: controller.cover)
                           : Container(
-                              decoration: BoxDecoration(color: Colors.black),
-                              child: Center(
-                                child: AspectRatio(
-                                  aspectRatio:
-                                      store.videoCtrl.value.aspectRatio,
-                                  child: VideoPlayer(store.videoCtrl),
-                                ),
-                              ),
+                              width: double.infinity,
+                              height: double.infinity,
+                              color: Colors.black,
+                              child: VideoPlayer(controller.videoCtrl),
                             ),
                     ),
                     _SeekToView(),
@@ -104,7 +85,7 @@ class _VideoBoxState extends State<VideoBox> {
 class _Bfloading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<VideoStore>(context);
+    final store = Provider.of<VideoController>(context);
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       child: store.isBfLoading
@@ -118,7 +99,7 @@ class _Bfloading extends StatelessWidget {
 class _SeekToView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<VideoStore>(context);
+    final store = Provider.of<VideoController>(context);
     return Positioned(
       left: 0,
       top: 0,
@@ -146,36 +127,14 @@ class _SeekToView extends StatelessWidget {
 }
 
 /// video box 中间的播放按钮
-class _PlayButton extends StatefulWidget {
-  @override
-  __PlayButtonState createState() => __PlayButtonState();
-}
-
-class __PlayButtonState extends State<_PlayButton>
-    with SingleTickerProviderStateMixin {
-  AnimationController _controller;
-  Animation<double> _tween;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-    _tween = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(_controller);
-  }
-
+class _PlayButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<VideoStore>(context);
+    final store = Provider.of<VideoController>(context);
     if (!store.videoCtrl.value.isPlaying) {
-      _controller.reset();
+      store.animetedIconController.reset();
     } else {
-      _controller.forward();
+      store.animetedIconController.forward();
     }
     return Observer(
       builder: (_) => AnimatedSwitcher(
@@ -190,9 +149,9 @@ class __PlayButtonState extends State<_PlayButton>
                   color: Colors.black,
                   icon: AnimatedIcon(
                     icon: AnimatedIcons.play_pause,
-                    progress: _tween,
+                    progress: store.animetedIconTween,
                   ),
-                  onPressed: () => store.togglePlay(_controller),
+                  onPressed: () => store.togglePlay(),
                 ),
               )
             : SizedBox(),
@@ -205,7 +164,7 @@ class __PlayButtonState extends State<_PlayButton>
 class _VideoBottomCtrl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<VideoStore>(context);
+    final store = Provider.of<VideoController>(context);
     return Observer(
       builder: (_) => Positioned(
         bottom: 0,
@@ -292,16 +251,13 @@ class _VideoLoading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 16.0 / 9.0,
-      child: Container(
-        color: Colors.black,
-        child: Stack(
-          alignment: Alignment.center,
-          children: <Widget>[
-            cover == null ? _CircularProgressIndicatorBig() : cover,
-          ],
-        ),
+    return Container(
+      color: Colors.black,
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          cover == null ? _CircularProgressIndicatorBig() : cover,
+        ],
       ),
     );
   }

@@ -8,12 +8,12 @@ import 'package:video_player/video_player.dart';
 import 'package:video_box/util/duration_string.dart' show durationString;
 
 import 'video_box.dart';
-part 'video.store.g.dart';
+part 'video.controller.g.dart';
 
-class VideoStore = _VideoStore with _$VideoStore;
+class VideoController = _VideoController with _$VideoController;
 
-abstract class _VideoStore with Store {
-  _VideoStore({
+abstract class _VideoController with Store {
+  _VideoController({
     VideoPlayerController source,
     this.skiptime = const Duration(seconds: 10),
     this.autoplay = false,
@@ -26,6 +26,21 @@ abstract class _VideoStore with Store {
   }) {
     initVideoPlaer(source);
   }
+
+  /// init animated icon
+  initAnimetedIconController(TickerProvider vsync) {
+    animetedIconController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: vsync,
+    );
+    animetedIconTween = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(animetedIconController);
+  }
+
+  AnimationController animetedIconController;
+  Animation<double> animetedIconTween;
 
   @observable
   bool isPlayEnd = false;
@@ -142,15 +157,14 @@ abstract class _VideoStore with Store {
   @action
   void showVideoCtrl(bool show) {
     isShowVideoCtrl = show;
-    if (show && videoCtrl.value.isPlaying) {
+    if (show) {
       if (_showCtrlTimer?.isActive ?? false) {
         _showCtrlTimer?.cancel();
       } else {
         _showCtrlTimer = Timer(Duration(seconds: 2), () {
-          isShowVideoCtrl = false;
-          if (videoCtrl.value.isPlaying && !isBfLoading) {
-            showVideoCtrl(false);
-          }
+          // 2秒后，如果为暂停状态，则不自动关闭
+          bool isClose = videoCtrl.value.isPlaying && !isBfLoading;
+          isShowVideoCtrl = !isClose;
         });
       }
     }
@@ -301,46 +315,36 @@ abstract class _VideoStore with Store {
 
   /// 播放或暂停
   @action
-  void togglePlay(AnimationController controller) {
+  void togglePlay() {
     assert(isShowVideoCtrl == true);
     if (!isShowVideoCtrl) return;
 
     if (videoCtrl.value.isPlaying) {
-      videoCtrl.pause();
-      isShowVideoCtrl = true;
-      controller.reverse();
+      pause();
     } else {
-      /// 如果视频播放结束
-      /// 再点击播放则重头开始播放
-      if (isPlayEnd) {
-        videoCtrl.seekTo(Duration(seconds: 0));
-      }
-      videoCtrl.play();
-      controller.forward();
-
-      /// 避免闪烁
-      if (_showCtrlTimer?.isActive ?? false) {
-        _showCtrlTimer?.cancel();
-      } else {
-        _showCtrlTimer = Timer(Duration(seconds: 2), () {
-          isShowVideoCtrl = false;
-        });
-      }
+      play();
     }
   }
 
   /// 播放
   @action
   void play() {
+    // 如果视频播放结束
+    // 再点击播放则重头开始播放
+    if (isPlayEnd) {
+      videoCtrl.seekTo(Duration(seconds: 0));
+    }
     videoCtrl.play();
-    isShowVideoCtrl = false;
+    showVideoCtrl(false);
+    animetedIconController.forward();
   }
 
   /// 暂停
   @action
   void pause() {
     videoCtrl.pause();
-    isShowVideoCtrl = true;
+    showVideoCtrl(true);
+    animetedIconController.reverse();
   }
 
   /// 控制播放时间位置
@@ -376,7 +380,7 @@ abstract class _VideoStore with Store {
           builder: (_) => SafeArea(
             child: Scaffold(
               body: Center(
-                child: VideoBox(store: this),
+                child: VideoBox(controller: this),
               ),
               backgroundColor: Colors.black,
             ),
@@ -394,10 +398,11 @@ abstract class _VideoStore with Store {
     videoCtrl?.removeListener(_videoListenner);
     await videoCtrl?.pause();
     await videoCtrl?.dispose();
+    animetedIconController.dispose();
     super.dispose();
   }
 
-  VideoState toJson() {
+  VideoState toObject() {
     return VideoState(
       src: videoCtrl.dataSource,
       size: videoCtrl.value.size,

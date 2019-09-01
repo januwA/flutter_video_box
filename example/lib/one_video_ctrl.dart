@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:video_box/video.store.dart';
+import 'package:video_box/video.controller.dart';
 import 'package:video_box/video_box.dart';
 import 'package:video_player/video_player.dart';
 
@@ -12,32 +12,26 @@ class OneVideoCtrl extends StatefulWidget {
 
 class _OneVideoCtrlState extends State<OneVideoCtrl>
     with SingleTickerProviderStateMixin {
-  Video video;
-  AnimationController controller;
+  VideoController vc;
+
   @override
   void initState() {
     super.initState();
-    controller = AnimationController(
-      duration: Duration(milliseconds: 300),
-      vsync: this,
-    );
-    video = Video(
-      store: VideoStore(
-        source: VideoPlayerController.network(src1),
-        // autoplay: true,
-        // initPosition: Duration(minutes: 20),
-        cover: Text(
-          'cover',
-          style: TextStyle(color: Colors.white),
-        ),
-        loop: true,
+    vc = VideoController(
+      source: VideoPlayerController.network(src1),
+      autoplay: true,
+      loop: true,
+      // initPosition: Duration(minutes: 20),
+      cover: Text(
+        'cover',
+        style: TextStyle(color: Colors.white),
       ),
     );
   }
 
   @override
   void dispose() {
-    video.dispose();
+    vc.dispose();
     super.dispose();
   }
 
@@ -49,28 +43,37 @@ class _OneVideoCtrlState extends State<OneVideoCtrl>
       ),
       body: ListView(
         children: <Widget>[
-          video.videoBox,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: VideoBox(
+              controller: vc,
+            ),
+          ),
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
             children: <Widget>[
               RaisedButton(
                 child: Text('play'),
                 onPressed: () {
-                  // video.store.videoCtrl.play();
-                  video.store.play();
+                  vc.play();
                 },
               ),
               RaisedButton(
                 child: Text('pause'),
                 onPressed: () {
-                  // video.store.videoCtrl.pause();
-                  video.store.pause();
+                  vc.pause();
                 },
               ),
               RaisedButton(
                 child: Text('full screen'),
                 onPressed: () {
-                  video.store.onFullScreen(context);
+                  vc.onFullScreen(context);
+                },
+              ),
+              RaisedButton(
+                child: Text('print'),
+                onPressed: () {
+                  print(vc.toMap());
                 },
               ),
             ],

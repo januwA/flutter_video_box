@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:video_box/video.store.dart';
+import 'package:video_box/video.controller.dart';
 import 'package:video_box/video_box.dart';
 import 'package:video_player/video_player.dart';
 
@@ -12,24 +12,22 @@ class ChangeVideoSrc extends StatefulWidget {
 
 class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
   List<String> source = [src1, src2, src3];
+
   int index = 0;
+
   String get src => source[index];
-  Video video;
+
+  VideoController vc;
 
   @override
   void initState() {
     super.initState();
-    video = Video(
-      store: VideoStore(
-        source: VideoPlayerController.network(src),
-        // autoplay: true,
-      ),
-    );
+    vc = VideoController(source: VideoPlayerController.network(src));
   }
 
   @override
   void dispose() {
-    video.dispose();
+    vc.dispose();
     super.dispose();
   }
 
@@ -41,7 +39,13 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
       ),
       body: ListView(
         children: <Widget>[
-          video.videoBox,
+          Center(
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.8,
+              height: MediaQuery.of(context).size.width * 0.8,
+              child: VideoBox(controller: vc),
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text('index: $index'),
@@ -59,9 +63,9 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
                   setState(() {
                     index = newindex;
                   });
-                  video.store.setAutoplay(false);
-                  video.store.showVideoCtrl(true);
-                  video.store.setSource(VideoPlayerController.network(src));
+                  vc.setAutoplay(false);
+                  vc.showVideoCtrl(true);
+                  vc.setSource(VideoPlayerController.network(src));
                 },
               ),
               RaisedButton(
@@ -74,9 +78,7 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
                   setState(() {
                     index = newindex;
                   });
-                  video.store.setSource(VideoPlayerController.network(src));
-                  // video.store.setAutoplay(true);
-                  // video.store.showVideoCtrl(false);
+                  vc.setSource(VideoPlayerController.network(src));
                 },
               ),
             ],
