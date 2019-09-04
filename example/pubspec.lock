@@ -56,7 +56,7 @@ packages:
       name: crypto
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.1.1+1"
+    version: "2.1.2"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -218,14 +218,14 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.4.0"
+    version: "0.4.1"
   video_player:
     dependency: transitive
     description:
       name: video_player
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.10.1+6"
+    version: "0.10.2+1"
   xml:
     dependency: transitive
     description:
