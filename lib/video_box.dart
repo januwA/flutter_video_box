@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
+import 'package:video_box/custom_slider.dart';
 import 'package:video_box/video.controller.dart';
 import 'package:video_player/video_player.dart';
 
@@ -21,9 +22,9 @@ class VideoBox extends StatefulWidget {
   ///   child: VideoBox(controller: vc),
   /// )
   /// ```
-  /// 
+  ///
   /// see also:
-  /// 
+  ///
   /// https://github.com/januwA/flutter_video_box/tree/master/example
   VideoBox({
     Key key,
@@ -185,51 +186,54 @@ class _VideoBottomCtrl extends StatelessWidget {
               ),
             ),
             child: ListTile(
-                title: Theme(
-                  data: Theme.of(context).copyWith(
-                    iconTheme: IconThemeData(color: Colors.white),
-                  ),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Text(
-                          store.videoBoxTimeText,
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(store.volumeIcon),
-                        onPressed: store.setOnSoundOrOff,
-                      ),
-                      IconButton(
-                        icon: Icon(
-                          !store.isFullScreen
-                              ? Icons.fullscreen
-                              : Icons.fullscreen_exit,
-                        ),
-                        onPressed: () => store.onFullScreen(context),
-                      ),
-                    ],
-                  ),
+              title: Theme(
+                data: Theme.of(context).copyWith(
+                  iconTheme: IconThemeData(color: Colors.white),
                 ),
-                subtitle: Theme(
-                  data: Theme.of(context).copyWith(
-                    sliderTheme: Theme.of(context).sliderTheme.copyWith(
-                          trackHeight: 4, // line的高度
-                          overlayShape: SliderComponentShape.noOverlay,
-                          thumbShape: RoundSliderThumbShape(
-                            // 拇指的形状和大小
-                            enabledThumbRadius: 6.0,
-                          ),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Text(
+                        store.videoBoxTimeText,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(store.volumeIcon),
+                      onPressed: store.setOnSoundOrOff,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        !store.isFullScreen
+                            ? Icons.fullscreen
+                            : Icons.fullscreen_exit,
+                      ),
+                      onPressed: () => store.onFullScreen(context),
+                    ),
+                  ],
+                ),
+              ),
+              subtitle: Theme(
+                data: Theme.of(context).copyWith(
+                  sliderTheme: Theme.of(context).sliderTheme.copyWith(
+                        trackHeight: 2, // line的高度
+                        overlayShape: SliderComponentShape.noOverlay,
+                        thumbShape: RoundSliderThumbShape(
+                          // 拇指的形状和大小
+                          enabledThumbRadius: 4.0,
                         ),
-                  ),
-                  child: Slider(
-                    activeColor: Colors.white,
-                    inactiveColor: Colors.white24,
-                    value: store.sliderValue,
-                    onChanged: store.sliderChanged,
-                  ),
-                )),
+                      ),
+                ),
+                child: CustomSlider(
+                  inactiveColor: Colors.white24,
+                  bufferColor: Colors.white38,
+                  activeColor: Colors.white,
+                  value: store.sliderValue,
+                  bufferValue: store.sliderBufferValue,
+                  onChanged: store.sliderChanged,
+                ),
+              ),
+            ),
           ),
           crossFadeState: store.isShowVideoCtrl
               ? CrossFadeState.showSecond

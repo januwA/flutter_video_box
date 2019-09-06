@@ -209,6 +209,9 @@ abstract class _VideoController with Store {
     }
   }
 
+  @observable
+  double sliderBufferValue = 0.0;
+
   /// 返回一个符合当前音量的icon
   @computed
   IconData get volumeIcon {
@@ -224,6 +227,8 @@ abstract class _VideoController with Store {
   @action
   void _videoListenner() {
     position = videoCtrl.value.position;
+    sliderBufferValue =
+        videoCtrl.value.buffered.last.end.inSeconds / duration.inSeconds;
 
     _setIsBfLoading();
     if (playingListenner != null) {
@@ -366,7 +371,8 @@ abstract class _VideoController with Store {
     seekTo(videoCtrl.value.position - (st ?? skiptime));
   }
 
-  Future<void> onFullScreen(context) async {
+  /// screen  自定义全屏page
+  Future<void> onFullScreen(BuildContext context, [Widget screen]) async {
     if (isFullScreen) {
       /// 退出全屏
       Navigator.of(context).pop();
@@ -377,14 +383,7 @@ abstract class _VideoController with Store {
       SystemChrome.setEnabledSystemUIOverlays([]);
       await Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => SafeArea(
-            child: Scaffold(
-              body: Center(
-                child: VideoBox(controller: this),
-              ),
-              backgroundColor: Colors.black,
-            ),
-          ),
+          builder: (_) => screen ?? _FullPageVideo(controller: this),
         ),
       );
       _setPortrait();
@@ -465,4 +464,21 @@ class VideoState {
   String positionText;
   String durationText;
   double sliderValue;
+}
+
+class _FullPageVideo extends StatelessWidget {
+  final VideoController controller;
+
+  const _FullPageVideo({Key key, this.controller}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: VideoBox(controller: controller),
+        ),
+        backgroundColor: Colors.black,
+      ),
+    );
+  }
 }

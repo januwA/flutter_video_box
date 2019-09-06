@@ -67,7 +67,20 @@ class _OneVideoCtrlState extends State<OneVideoCtrl>
               RaisedButton(
                 child: Text('full screen'),
                 onPressed: () {
-                  vc.onFullScreen(context);
+                  vc.onFullScreen(
+                    context,
+                    SafeArea(
+                      child: Scaffold(
+                        body: Center(
+                          child: AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: VideoBox(controller: vc),
+                          ),
+                        ),
+                        backgroundColor: Colors.black,
+                      ),
+                    ),
+                  );
                 },
               ),
               RaisedButton(

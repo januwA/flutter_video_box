@@ -283,6 +283,24 @@ mixin _$VideoController on _VideoController, Store {
     }, _$skiptimeAtom, name: '${_$skiptimeAtom.name}_set');
   }
 
+  final _$sliderBufferValueAtom =
+      Atom(name: '_VideoController.sliderBufferValue');
+
+  @override
+  double get sliderBufferValue {
+    _$sliderBufferValueAtom.context.enforceReadPolicy(_$sliderBufferValueAtom);
+    _$sliderBufferValueAtom.reportObserved();
+    return super.sliderBufferValue;
+  }
+
+  @override
+  set sliderBufferValue(double value) {
+    _$sliderBufferValueAtom.context.conditionallyRunInAction(() {
+      super.sliderBufferValue = value;
+      _$sliderBufferValueAtom.reportChanged();
+    }, _$sliderBufferValueAtom, name: '${_$sliderBufferValueAtom.name}_set');
+  }
+
   final _$setSourceAsyncAction = AsyncAction('setSource');
 
   @override
