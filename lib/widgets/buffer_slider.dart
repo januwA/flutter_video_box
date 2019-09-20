@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 typedef ValueChanged<T> = void Function(T value);
 
-class CustomSlider extends StatelessWidget {
+class BufferSlider extends StatelessWidget {
   final double value;
   final double bufferValue;
   final ValueChanged<double> onChanged;
@@ -35,7 +35,7 @@ class CustomSlider extends StatelessWidget {
   static const ShowValueIndicator _defaultShowValueIndicator =
       ShowValueIndicator.onlyForDiscrete;
 
-  const CustomSlider({
+  const BufferSlider({
     Key key,
     @required this.value,
     @required this.onChanged,

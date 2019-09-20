@@ -19,28 +19,42 @@ abstract class _VideoController with Store {
     this.autoplay = false,
     this.loop = false,
     this.volume = 1.0,
-    this.initPosition,
+    this.initPosition = const Duration(seconds: 0),
     this.cover,
     this.playingListenner,
     this.playEnd,
+    this.controllerWidgets = true,
   }) {
+    assert(source != null);
     initVideoPlaer(source);
   }
 
-  /// init animated icon
   initAnimetedIconController(TickerProvider vsync) {
     animetedIconController = AnimationController(
-      duration: const Duration(milliseconds: 400),
+      duration: kTabScrollDuration,
       vsync: vsync,
     );
     animetedIconTween = Tween<double>(
       begin: 0.0,
       end: 1.0,
     ).animate(animetedIconController);
+    setAnimetedIconState(autoplay || videoCtrl.value.isPlaying);
+  }
+
+  Future<void> setAnimetedIconState(bool play) async {
+    if (play) {
+      await animetedIconController.forward();
+    } else {
+      await animetedIconController.reverse();
+    }
   }
 
   AnimationController animetedIconController;
   Animation<double> animetedIconTween;
+
+  List<Widget> children;
+  List<Widget> beforeChildren;
+  List<Widget> afterChildren;
 
   @observable
   bool isPlayEnd = false;
@@ -55,19 +69,27 @@ abstract class _VideoController with Store {
   Function playEnd;
 
   /// cover
+  ///
+  /// 自动居中
   @observable
   Widget cover;
+
+  /// 是否显示默认控件 默认[true]
+  @observable
+  bool controllerWidgets;
 
   @observable
   bool isBfLoading = false;
 
   @action
-  void _setIsBfLoading() {
-    if (videoCtrl.value.buffered == null || videoCtrl.value.buffered.isEmpty)
-      return;
-
-    /// 当前播放的位置，大于了缓冲的位置，就会进入加载状态
-    isBfLoading = videoCtrl.value.position >= videoCtrl.value.buffered.last.end;
+  void setIsBfLoading() {
+    if (videoCtrl.value.buffered == null || videoCtrl.value.buffered.isEmpty) {
+      isBfLoading = false;
+    } else {
+      /// 当前播放的位置，大于了缓冲的位置，就会进入加载状态
+      isBfLoading =
+          videoCtrl.value.position >= videoCtrl.value.buffered.last.end;
+    }
   }
 
   /// set cover
@@ -162,9 +184,10 @@ abstract class _VideoController with Store {
         _showCtrlTimer?.cancel();
       } else {
         _showCtrlTimer = Timer(Duration(seconds: 2), () {
-          // 2秒后，如果为暂停状态，则不自动关闭
-          bool isClose = videoCtrl.value.isPlaying && !isBfLoading;
-          isShowVideoCtrl = !isClose;
+          // 2秒后，暂停状态不自动关闭
+          if (videoCtrl.value.isPlaying) {
+            showVideoCtrl(false);
+          }
         });
       }
     }
@@ -196,6 +219,7 @@ abstract class _VideoController with Store {
     return (videoCtrl == null) ? '' : durationString(position);
   }
 
+  /// '00:00/00:00'
   @computed
   String get videoBoxTimeText =>
       isVideoLoading ? '00:00/00:00' : "$positionText/$durationText";
@@ -223,14 +247,23 @@ abstract class _VideoController with Store {
         : volume <= 0.5 ? Icons.volume_down : Icons.volume_up;
   }
 
+  @computed
+  IconData get fullScreenIcon =>
+      !isFullScreen ? Icons.fullscreen : Icons.fullscreen_exit;
+
   /// 视频播放时的监听器
   @action
   void _videoListenner() {
     position = videoCtrl.value.position;
-    sliderBufferValue =
-        videoCtrl.value.buffered.last.end.inSeconds / duration.inSeconds;
 
-    _setIsBfLoading();
+    // 因为可能会出现空值
+    if (videoCtrl.value.buffered != null &&
+        videoCtrl.value.buffered.isNotEmpty) {
+      sliderBufferValue =
+          videoCtrl.value.buffered.last.end.inSeconds / duration.inSeconds;
+    }
+
+    setIsBfLoading();
     if (playingListenner != null) {
       playingListenner();
     }
@@ -251,6 +284,7 @@ abstract class _VideoController with Store {
 
   @action
   Future<void> setSource(VideoPlayerController videoDataSource) async {
+    assert(videoDataSource != null);
     videoCtrl?.pause();
     videoCtrl?.removeListener(_videoListenner);
     var oldCtrl = videoCtrl;
@@ -261,9 +295,9 @@ abstract class _VideoController with Store {
   /// 初始化viedo控制器
   @action
   Future<void> initVideoPlaer(VideoPlayerController videoDataSource) async {
+    assert(videoDataSource != null);
     setVideoLoading(true);
     isBfLoading = false;
-    if (videoDataSource == null) return;
     videoCtrl = videoDataSource;
     await videoCtrl.initialize();
     videoCtrl.setLooping(loop);
@@ -276,8 +310,8 @@ abstract class _VideoController with Store {
     }
     position = initPosition ?? videoCtrl.value.position;
     duration = videoCtrl.value.duration;
-    setVideoLoading(false);
     videoCtrl.addListener(_videoListenner);
+    setVideoLoading(false);
   }
 
   /// 开启声音或关闭
@@ -320,36 +354,41 @@ abstract class _VideoController with Store {
 
   /// 播放或暂停
   @action
-  void togglePlay() {
-    assert(isShowVideoCtrl == true);
-    if (!isShowVideoCtrl) return;
-
-    if (videoCtrl.value.isPlaying) {
-      pause();
+  Future<void> togglePlay() async {
+    // 等待Icon动画关闭
+    await setAnimetedIconState(!videoCtrl.value.isPlaying);
+    if (controllerWidgets == false) {
+      if (videoCtrl.value.isPlaying) {
+        await videoCtrl.pause();
+      } else {
+        await videoCtrl.play();
+      }
     } else {
-      play();
+      if (videoCtrl.value.isPlaying) {
+        await pause();
+      } else {
+        await play();
+      }
     }
   }
 
   /// 播放
   @action
-  void play() {
+  Future<void> play() async {
     // 如果视频播放结束
     // 再点击播放则重头开始播放
     if (isPlayEnd) {
-      videoCtrl.seekTo(Duration(seconds: 0));
+      await videoCtrl.seekTo(Duration(seconds: 0));
     }
-    videoCtrl.play();
+    await videoCtrl.play();
     showVideoCtrl(false);
-    animetedIconController.forward();
   }
 
   /// 暂停
   @action
-  void pause() {
-    videoCtrl.pause();
+  Future<void> pause() async {
+    await videoCtrl.pause();
     showVideoCtrl(true);
-    animetedIconController.reverse();
   }
 
   /// 控制播放时间位置
@@ -357,7 +396,7 @@ abstract class _VideoController with Store {
   Future<void> seekTo(Duration d) async {
     if (videoCtrl != null && videoCtrl.value != null) {
       videoCtrl.seekTo(d);
-      _setIsBfLoading();
+      setIsBfLoading();
     }
   }
 
@@ -394,10 +433,10 @@ abstract class _VideoController with Store {
 
   @override
   Future<void> dispose() async {
+    animetedIconController.dispose();
     videoCtrl?.removeListener(_videoListenner);
     await videoCtrl?.pause();
     await videoCtrl?.dispose();
-    animetedIconController.dispose();
     super.dispose();
   }
 

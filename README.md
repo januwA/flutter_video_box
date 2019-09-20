@@ -13,7 +13,7 @@ dependencies:
   video_box:
 ```
 
-android: AndroidManifest.xml
+android: `<project root>/android/app/src/main/AndroidManifest.xml`:
 ```
 <manifest>
     ...
@@ -23,16 +23,13 @@ android: AndroidManifest.xml
 </manifest>
 ```
 
-ios: Info.plist
+ios: `<project root>/ios/Runner/Info.plist`:
 ```
-<plist>
-    ...
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
-</plist>
+<key>NSAppTransportSecurity</key>
+<dict>
+  <key>NSAllowsArbitraryLoads</key>
+  <true/>
+</dict>
 ```
 
 ## Usage

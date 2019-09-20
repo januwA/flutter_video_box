@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'video_player_demo.dart';
 import 'videos.dart';
 import 'change_video_src.dart';
 import 'list_video.dart';
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
         '/listVideo': (BuildContext context) => ListVideo(),
         '/change_video_src': (BuildContext context) => ChangeVideoSrc(),
         '/videos': (BuildContext context) => Videos(),
+        VideoPlayerDemo.routeName: (BuildContext context) => VideoPlayerDemo(),
       },
       home: HomePage(),
     );
@@ -61,6 +63,12 @@ class _HomePageState extends State<HomePage> {
                 child: Text('videos'),
                 onPressed: () {
                   Navigator.of(context).pushNamed('/videos');
+                },
+              ),
+              RaisedButton(
+                child: Text('VideoPlayerDemo'),
+                onPressed: () {
+                  Navigator.of(context).pushNamed(VideoPlayerDemo.routeName);
                 },
               ),
             ],

@@ -10,22 +10,18 @@ class OneVideoCtrl extends StatefulWidget {
   _OneVideoCtrlState createState() => _OneVideoCtrlState();
 }
 
-class _OneVideoCtrlState extends State<OneVideoCtrl>
-    with SingleTickerProviderStateMixin {
+class _OneVideoCtrlState extends State<OneVideoCtrl> {
   VideoController vc;
+  bool get isPlay => vc.videoCtrl.value.isPlaying;
 
   @override
   void initState() {
     super.initState();
     vc = VideoController(
       source: VideoPlayerController.network(src1),
-      autoplay: true,
-      loop: true,
-      // initPosition: Duration(minutes: 20),
-      cover: Text(
-        'cover',
-        style: TextStyle(color: Colors.white),
-      ),
+      cover: Image.network('https://i.loli.net/2019/08/29/7eXVLcHAhtO9YQg.jpg'),
+      // controllerWidgets: false,
+      // cover: Text('Cover'),
     );
   }
 

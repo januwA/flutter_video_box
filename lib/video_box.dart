@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:provider/provider.dart';
-import 'package:video_box/custom_slider.dart';
 import 'package:video_box/video.controller.dart';
 import 'package:video_player/video_player.dart';
+
+import 'widgets/buffer_slider.dart';
 
 class VideoBox extends StatefulWidget {
   /// Example:
@@ -28,10 +29,21 @@ class VideoBox extends StatefulWidget {
   /// https://github.com/januwA/flutter_video_box/tree/master/example
   VideoBox({
     Key key,
-    this.controller,
+    @required this.controller,
+    this.afterChildren = const <Widget>[],
+    this.beforeChildren = const <Widget>[],
+    this.children = const <Widget>[],
   }) : super(key: key);
 
   final VideoController controller;
+
+  /// video / beforeChildren / controllerWidgets-> children / afterChildren
+  final List<Widget> afterChildren;
+
+  /// video / beforeChildren / controllerWidgets-> children / afterChildren
+  final List<Widget> beforeChildren;
+
+  final List<Widget> children;
   @override
   _VideoBoxState createState() => _VideoBoxState();
 }
@@ -43,41 +55,106 @@ class _VideoBoxState extends State<VideoBox>
   @override
   void initState() {
     super.initState();
-    controller = widget.controller..initAnimetedIconController(this);
+    controller = widget.controller
+      ..initAnimetedIconController(this)
+      ..children = widget.children
+      ..beforeChildren = widget.beforeChildren
+      ..afterChildren = widget.afterChildren;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Observer(
-      builder: (_) => controller.isVideoLoading
-          ? _VideoLoading()
-          : MultiProvider(
-              providers: [Provider<VideoController>.value(value: controller)],
-              child: GestureDetector(
-                onTap: () =>
-                    controller.showVideoCtrl(!controller.isShowVideoCtrl),
-                child: Stack(
-                  alignment: AlignmentDirectional.center,
-                  children: <Widget>[
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 300),
-                      child: controller.isShowCover
-                          ? _VideoLoading(cover: controller.cover)
-                          : Container(
-                              width: double.infinity,
-                              height: double.infinity,
-                              color: Colors.black,
-                              child: VideoPlayer(controller.videoCtrl),
-                            ),
+    return MultiProvider(
+      providers: [
+        Provider<VideoController>.value(value: controller),
+      ],
+      child: Observer(
+        builder: (context) {
+          return GestureDetector(
+            onTap: () {
+              controller.showVideoCtrl(!controller.isShowVideoCtrl);
+            },
+            child: Stack(
+              children: <Widget>[
+                if (controller.isVideoLoading) ...[
+                  // 加载中同时显示loading和海报
+                  if (controller.cover != null)
+                    Center(child: controller.cover),
+                  Center(
+                    child: _CircularProgressIndicatorBig(
+                      color: Colors.black,
                     ),
-                    _SeekToView(),
-                    _Bfloading(),
-                    _PlayButton(),
-                    _VideoBottomCtrl(),
+                  ),
+                ] else ...[
+                  // 加载完成在第一帧显示海报
+                  Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    color: Colors.transparent,
+                    child: controller.isShowCover
+                        ? Center(child: controller.cover)
+                        : VideoPlayer(controller.videoCtrl),
+                  ),
+
+                  if (controller.beforeChildren != null)
+                    for (Widget item in controller.beforeChildren) item,
+
+                  if (controller.controllerWidgets) ...[
+                    Positioned.fill(child: _SeekToView()),
+                    Center(child: _Bfloading()),
+                    Positioned.fill(
+                      child: AnimatedSwitcher(
+                        duration: kTabScrollDuration,
+                        child: controller.isShowVideoCtrl
+                            ? Container(
+                                width: double.infinity,
+                                height: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.6),
+                                ),
+                                child: Stack(
+                                  children: <Widget>[
+                                    Positioned.fill(child: _SeekToView()),
+                                    Center(
+                                      child: IconButton(
+                                        iconSize: 40,
+                                        color: Colors.white,
+                                        icon: AnimatedIcon(
+                                          icon: AnimatedIcons.play_pause,
+                                          progress:
+                                              controller.animetedIconTween,
+                                        ),
+                                        onPressed: () {
+                                          controller.togglePlay();
+                                        },
+                                      ),
+                                    ),
+                                    Positioned(
+                                      left: 0,
+                                      bottom: 0,
+                                      right: 0,
+                                      child: _VideoBottomCtrl(),
+                                    ),
+                                    if (controller.children != null)
+                                      for (Widget item in controller.children)
+                                        item,
+                                  ],
+                                ),
+                              )
+                            : SizedBox(),
+                      ),
+                    ),
                   ],
-                ),
-              ),
+
+                  // 自定义控件
+                  if (controller.afterChildren != null)
+                    for (Widget item in controller.afterChildren) item,
+                ]
+              ],
             ),
+          );
+        },
+      ),
     );
   }
 }
@@ -86,12 +163,13 @@ class _VideoBoxState extends State<VideoBox>
 class _Bfloading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<VideoController>(context);
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 300),
-      child: store.isBfLoading
-          ? _CircularProgressIndicatorBig(color: Colors.black87)
-          : SizedBox(),
+      duration: kTabScrollDuration,
+      child: Observer(
+        builder: (_) => Provider.of<VideoController>(context).isBfLoading
+            ? _CircularProgressIndicatorBig(color: Colors.white)
+            : SizedBox(),
+      ),
     );
   }
 }
@@ -100,63 +178,26 @@ class _Bfloading extends StatelessWidget {
 class _SeekToView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<VideoController>(context);
-    return Positioned(
-      left: 0,
-      top: 0,
-      right: 0,
-      bottom: 0,
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: GestureDetector(
-              onTap: () => store.showVideoCtrl(!store.isShowVideoCtrl),
-              onDoubleTap: store.rewind,
-            ),
+    final controller = Provider.of<VideoController>(context);
+    Function tap = () => controller.showVideoCtrl(!controller.isShowVideoCtrl);
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: InkWell(
+            onTap: tap,
+            onDoubleTap: controller.rewind,
+            child: Container(),
           ),
-          const SizedBox(width: 24),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => store.showVideoCtrl(!store.isShowVideoCtrl),
-              onDoubleTap: store.fastForward,
-            ),
+        ),
+        const SizedBox(width: 24),
+        Expanded(
+          child: InkWell(
+            onTap: tap,
+            onDoubleTap: controller.fastForward,
+            child: Container(),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-/// video box 中间的播放按钮
-class _PlayButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final store = Provider.of<VideoController>(context);
-    if (!store.videoCtrl.value.isPlaying) {
-      store.animetedIconController.reset();
-    } else {
-      store.animetedIconController.forward();
-    }
-    return Observer(
-      builder: (_) => AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        child: store.isShowVideoCtrl
-            ? Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  color: Colors.black,
-                  icon: AnimatedIcon(
-                    icon: AnimatedIcons.play_pause,
-                    progress: store.animetedIconTween,
-                  ),
-                  onPressed: () => store.togglePlay(),
-                ),
-              )
-            : SizedBox(),
-      ),
+        ),
+      ],
     );
   }
 }
@@ -165,103 +206,52 @@ class _PlayButton extends StatelessWidget {
 class _VideoBottomCtrl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final store = Provider.of<VideoController>(context);
+    final controller = Provider.of<VideoController>(context);
     return Observer(
-      builder: (_) => Positioned(
-        bottom: 0,
-        left: 0,
-        right: 0,
-        child: AnimatedCrossFade(
-          duration: Duration(milliseconds: 300),
-          firstChild: Container(),
-          secondChild: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment(0.0, -1.0),
-                end: Alignment(0.0, 1.0),
-                colors: [
-                  Colors.black12.withOpacity(0),
-                  Colors.black87,
-                ],
-              ),
-            ),
-            child: ListTile(
-              title: Theme(
-                data: Theme.of(context).copyWith(
-                  iconTheme: IconThemeData(color: Colors.white),
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Text(
-                        store.videoBoxTimeText,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(store.volumeIcon),
-                      onPressed: store.setOnSoundOrOff,
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        !store.isFullScreen
-                            ? Icons.fullscreen
-                            : Icons.fullscreen_exit,
-                      ),
-                      onPressed: () => store.onFullScreen(context),
-                    ),
-                  ],
-                ),
-              ),
-              subtitle: Theme(
-                data: Theme.of(context).copyWith(
-                  sliderTheme: Theme.of(context).sliderTheme.copyWith(
-                        trackHeight: 2, // line的高度
-                        overlayShape: SliderComponentShape.noOverlay,
-                        thumbShape: RoundSliderThumbShape(
-                          // 拇指的形状和大小
-                          enabledThumbRadius: 4.0,
-                        ),
-                      ),
-                ),
-                child: CustomSlider(
-                  inactiveColor: Colors.white24,
-                  bufferColor: Colors.white38,
-                  activeColor: Colors.white,
-                  value: store.sliderValue,
-                  bufferValue: store.sliderBufferValue,
-                  onChanged: store.sliderChanged,
-                ),
-              ),
-            ),
+      builder: (_) => ListTile(
+        title: Theme(
+          data: Theme.of(context).copyWith(
+            iconTheme: IconThemeData(color: Colors.white),
           ),
-          crossFadeState: store.isShowVideoCtrl
-              ? CrossFadeState.showSecond
-              : CrossFadeState.showFirst,
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                child: Text(
+                  controller.videoBoxTimeText,
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              IconButton(
+                icon: Icon(controller.volumeIcon),
+                onPressed: controller.setOnSoundOrOff,
+              ),
+              IconButton(
+                icon: Icon(controller.fullScreenIcon),
+                onPressed: () => controller.onFullScreen(context),
+              ),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-}
-
-/// 没有src的时候，显示加载中
-class _VideoLoading extends StatelessWidget {
-  const _VideoLoading({
-    Key key,
-    this.cover,
-  }) : super(key: key);
-
-  final Widget cover;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black,
-      child: Stack(
-        alignment: Alignment.center,
-        children: <Widget>[
-          cover == null ? _CircularProgressIndicatorBig() : cover,
-        ],
+        subtitle: Theme(
+          data: Theme.of(context).copyWith(
+            sliderTheme: Theme.of(context).sliderTheme.copyWith(
+                  trackHeight: 2, // line的高度
+                  overlayShape: SliderComponentShape.noOverlay,
+                  thumbShape: RoundSliderThumbShape(
+                    // 拇指的形状和大小
+                    enabledThumbRadius: 6.0,
+                  ),
+                ),
+          ),
+          child: BufferSlider(
+            inactiveColor: Colors.white24,
+            bufferColor: Colors.white38,
+            activeColor: Colors.white,
+            value: controller.sliderValue,
+            bufferValue: controller.sliderBufferValue,
+            onChanged: controller.sliderChanged,
+          ),
+        ),
       ),
     );
   }

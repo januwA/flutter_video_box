@@ -44,6 +44,12 @@ mixin _$VideoController on _VideoController, Store {
   IconData get volumeIcon =>
       (_$volumeIconComputed ??= Computed<IconData>(() => super.volumeIcon))
           .value;
+  Computed<IconData> _$fullScreenIconComputed;
+
+  @override
+  IconData get fullScreenIcon => (_$fullScreenIconComputed ??=
+          Computed<IconData>(() => super.fullScreenIcon))
+      .value;
 
   final _$isPlayEndAtom = Atom(name: '_VideoController.isPlayEnd');
 
@@ -77,6 +83,24 @@ mixin _$VideoController on _VideoController, Store {
       super.cover = value;
       _$coverAtom.reportChanged();
     }, _$coverAtom, name: '${_$coverAtom.name}_set');
+  }
+
+  final _$controllerWidgetsAtom =
+      Atom(name: '_VideoController.controllerWidgets');
+
+  @override
+  bool get controllerWidgets {
+    _$controllerWidgetsAtom.context.enforceReadPolicy(_$controllerWidgetsAtom);
+    _$controllerWidgetsAtom.reportObserved();
+    return super.controllerWidgets;
+  }
+
+  @override
+  set controllerWidgets(bool value) {
+    _$controllerWidgetsAtom.context.conditionallyRunInAction(() {
+      super.controllerWidgets = value;
+      _$controllerWidgetsAtom.reportChanged();
+    }, _$controllerWidgetsAtom, name: '${_$controllerWidgetsAtom.name}_set');
   }
 
   final _$isBfLoadingAtom = Atom(name: '_VideoController.isBfLoading');
@@ -316,6 +340,27 @@ mixin _$VideoController on _VideoController, Store {
         .run(() => super.initVideoPlaer(videoDataSource));
   }
 
+  final _$togglePlayAsyncAction = AsyncAction('togglePlay');
+
+  @override
+  Future<void> togglePlay() {
+    return _$togglePlayAsyncAction.run(() => super.togglePlay());
+  }
+
+  final _$playAsyncAction = AsyncAction('play');
+
+  @override
+  Future<void> play() {
+    return _$playAsyncAction.run(() => super.play());
+  }
+
+  final _$pauseAsyncAction = AsyncAction('pause');
+
+  @override
+  Future<void> pause() {
+    return _$pauseAsyncAction.run(() => super.pause());
+  }
+
   final _$seekToAsyncAction = AsyncAction('seekTo');
 
   @override
@@ -327,10 +372,10 @@ mixin _$VideoController on _VideoController, Store {
       ActionController(name: '_VideoController');
 
   @override
-  void _setIsBfLoading() {
+  void setIsBfLoading() {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
-      return super._setIsBfLoading();
+      return super.setIsBfLoading();
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
@@ -451,36 +496,6 @@ mixin _$VideoController on _VideoController, Store {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super._setPortrait();
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void togglePlay() {
-    final _$actionInfo = _$_VideoControllerActionController.startAction();
-    try {
-      return super.togglePlay();
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void play() {
-    final _$actionInfo = _$_VideoControllerActionController.startAction();
-    try {
-      return super.play();
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void pause() {
-    final _$actionInfo = _$_VideoControllerActionController.startAction();
-    try {
-      return super.pause();
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
