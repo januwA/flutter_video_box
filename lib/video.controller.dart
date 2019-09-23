@@ -107,11 +107,6 @@ abstract class _VideoController with Store {
         _bfLoadingTimer = Timer.periodic(Duration(seconds: 1), (_) {
           isBfLoading =
               videoCtrl.value.position > videoCtrl.value.buffered.last.end;
-
-          print(isBfLoading);
-          print(videoCtrl.value.buffered.length);
-          print(videoCtrl.value.position);
-          print(videoCtrl.value.buffered.last.end);
           // 直到缓冲完成，结束监听器
           if (isBfLoading == false) {
             _bfLoadingTimer?.cancel();
