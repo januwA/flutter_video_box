@@ -81,14 +81,43 @@ abstract class _VideoController with Store {
   @observable
   bool isBfLoading = false;
 
+  /// 当播放暂停时，跳转播放位置会触发buffer loading
+  /// 此监听器会每个1s监听缓冲是否完成
+  /// 完成时注销掉监听器
+  Timer _bfLoadingTimer;
+
   @action
-  void setIsBfLoading() {
+  void setVideoBuffer() {
     if (videoCtrl.value.buffered == null || videoCtrl.value.buffered.isEmpty) {
       isBfLoading = false;
     } else {
       /// 当前播放的位置，大于了缓冲的位置，就会进入加载状态
-      isBfLoading =
-          videoCtrl.value.position >= videoCtrl.value.buffered.last.end;
+      sliderBufferValue =
+          videoCtrl.value.buffered.last.end.inSeconds / duration.inSeconds;
+
+      print('videoCtrl.value.isPlaying: ${videoCtrl.value.isPlaying}');
+      if (videoCtrl.value.isPlaying) {
+        isBfLoading =
+            videoCtrl.value.position >= videoCtrl.value.buffered.last.end;
+      } else {
+        // 先消除旧的计时器
+        if (_bfLoadingTimer?.isActive ?? false) {
+          _bfLoadingTimer?.cancel();
+        }
+        _bfLoadingTimer = Timer.periodic(Duration(seconds: 1), (_) {
+          isBfLoading =
+              videoCtrl.value.position > videoCtrl.value.buffered.last.end;
+
+          print(isBfLoading);
+          print(videoCtrl.value.buffered.length);
+          print(videoCtrl.value.position);
+          print(videoCtrl.value.buffered.last.end);
+          // 直到缓冲完成，结束监听器
+          if (isBfLoading == false) {
+            _bfLoadingTimer?.cancel();
+          }
+        });
+      }
     }
   }
 
@@ -252,18 +281,11 @@ abstract class _VideoController with Store {
       !isFullScreen ? Icons.fullscreen : Icons.fullscreen_exit;
 
   /// 视频播放时的监听器
+  /// seek 也会触发
   @action
   void _videoListenner() {
     position = videoCtrl.value.position;
-
-    // 因为可能会出现空值
-    if (videoCtrl.value.buffered != null &&
-        videoCtrl.value.buffered.isNotEmpty) {
-      sliderBufferValue =
-          videoCtrl.value.buffered.last.end.inSeconds / duration.inSeconds;
-    }
-
-    setIsBfLoading();
+    setVideoBuffer();
     if (playingListenner != null) {
       playingListenner();
     }
@@ -394,9 +416,8 @@ abstract class _VideoController with Store {
   /// 控制播放时间位置
   @action
   Future<void> seekTo(Duration d) async {
-    if (videoCtrl != null && videoCtrl.value != null) {
-      videoCtrl.seekTo(d);
-      setIsBfLoading();
+    if (videoCtrl.value.initialized) {
+      await videoCtrl.seekTo(d);
     }
   }
 
@@ -437,6 +458,8 @@ abstract class _VideoController with Store {
     videoCtrl?.removeListener(_videoListenner);
     await videoCtrl?.pause();
     await videoCtrl?.dispose();
+    _bfLoadingTimer?.cancel();
+    _showCtrlTimer?.cancel();
     super.dispose();
   }
 

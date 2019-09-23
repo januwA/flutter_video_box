@@ -372,10 +372,10 @@ mixin _$VideoController on _VideoController, Store {
       ActionController(name: '_VideoController');
 
   @override
-  void setIsBfLoading() {
+  void setVideoBuffer() {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
-      return super.setIsBfLoading();
+      return super.setVideoBuffer();
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
