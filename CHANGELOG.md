@@ -1,3 +1,7 @@
+## 0.5.2 - 2019-10-2
+
+* 修复[children] [beforeChildren] [afterChildren] 的BUG
+
 ## 0.5.1 - 2019-9-23
 
 * 优化buffer loading的显示

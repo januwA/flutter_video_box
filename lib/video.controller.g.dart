@@ -6,7 +6,7 @@ part of 'video.controller.dart';
 // StoreGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars
+// ignore_for_file: non_constant_identifier_names, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$VideoController on _VideoController, Store {
   Computed<bool> _$isShowCoverComputed;
@@ -50,6 +50,23 @@ mixin _$VideoController on _VideoController, Store {
   IconData get fullScreenIcon => (_$fullScreenIconComputed ??=
           Computed<IconData>(() => super.fullScreenIcon))
       .value;
+
+  final _$barrierColorAtom = Atom(name: '_VideoController.barrierColor');
+
+  @override
+  Color get barrierColor {
+    _$barrierColorAtom.context.enforceReadPolicy(_$barrierColorAtom);
+    _$barrierColorAtom.reportObserved();
+    return super.barrierColor;
+  }
+
+  @override
+  set barrierColor(Color value) {
+    _$barrierColorAtom.context.conditionallyRunInAction(() {
+      super.barrierColor = value;
+      _$barrierColorAtom.reportChanged();
+    }, _$barrierColorAtom, name: '${_$barrierColorAtom.name}_set');
+  }
 
   final _$isPlayEndAtom = Atom(name: '_VideoController.isPlayEnd');
 

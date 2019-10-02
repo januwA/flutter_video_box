@@ -56,6 +56,10 @@ abstract class _VideoController with Store {
   List<Widget> beforeChildren;
   List<Widget> afterChildren;
 
+  /// 屏障颜色
+  @observable
+  Color barrierColor;
+
   @observable
   bool isPlayEnd = false;
 
@@ -95,7 +99,6 @@ abstract class _VideoController with Store {
       sliderBufferValue =
           videoCtrl.value.buffered.last.end.inSeconds / duration.inSeconds;
 
-      print('videoCtrl.value.isPlaying: ${videoCtrl.value.isPlaying}');
       if (videoCtrl.value.isPlaying) {
         isBfLoading =
             videoCtrl.value.position >= videoCtrl.value.buffered.last.end;

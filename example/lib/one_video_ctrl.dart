@@ -43,6 +43,18 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
             aspectRatio: 16 / 9,
             child: VideoBox(
               controller: vc,
+              barrierColor: Colors.green.withOpacity(0.4),
+              children: <Widget>[
+                Align(
+                  alignment: Alignment(0.5, 0),
+                  child: IconButton(
+                    iconSize: VideoBox.centerIconSize,
+                    disabledColor: Colors.white60,
+                    icon: Icon(Icons.skip_next),
+                    onPressed: () {},
+                  ),
+                ),
+              ],
             ),
           ),
           Wrap(

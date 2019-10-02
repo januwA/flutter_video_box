@@ -33,7 +33,10 @@ class VideoBox extends StatefulWidget {
     this.afterChildren = const <Widget>[],
     this.beforeChildren = const <Widget>[],
     this.children = const <Widget>[],
+    this.barrierColor,
   }) : super(key: key);
+
+  static const double centerIconSize = 40.0;
 
   final VideoController controller;
 
@@ -44,6 +47,9 @@ class VideoBox extends StatefulWidget {
   final List<Widget> beforeChildren;
 
   final List<Widget> children;
+
+  /// 屏障颜色
+  final Color barrierColor;
   @override
   _VideoBoxState createState() => _VideoBoxState();
 }
@@ -57,9 +63,10 @@ class _VideoBoxState extends State<VideoBox>
     super.initState();
     controller = widget.controller
       ..initAnimetedIconController(this)
-      ..children = widget.children
-      ..beforeChildren = widget.beforeChildren
-      ..afterChildren = widget.afterChildren;
+      ..children ??= widget.children
+      ..beforeChildren ??= widget.beforeChildren
+      ..afterChildren ??= widget.afterChildren
+      ..barrierColor ??= widget.barrierColor ?? Colors.black.withOpacity(0.6);
   }
 
   @override
@@ -74,83 +81,90 @@ class _VideoBoxState extends State<VideoBox>
             onTap: () {
               controller.showVideoCtrl(!controller.isShowVideoCtrl);
             },
-            child: Stack(
-              children: <Widget>[
-                if (controller.isVideoLoading) ...[
-                  // 加载中同时显示loading和海报
-                  if (controller.cover != null)
-                    Center(child: controller.cover),
-                  Center(
-                    child: _CircularProgressIndicatorBig(
-                      color: Colors.black,
-                    ),
-                  ),
-                ] else ...[
-                  // 加载完成在第一帧显示海报
-                  Container(
-                    width: double.infinity,
-                    height: double.infinity,
-                    color: Colors.transparent,
-                    child: controller.isShowCover
-                        ? Center(child: controller.cover)
-                        : VideoPlayer(controller.videoCtrl),
-                  ),
-
-                  if (controller.beforeChildren != null)
-                    for (Widget item in controller.beforeChildren) item,
-
-                  if (controller.controllerWidgets) ...[
-                    Positioned.fill(child: _SeekToView()),
-                    Center(child: _Bfloading()),
-                    Positioned.fill(
-                      child: AnimatedSwitcher(
-                        duration: kTabScrollDuration,
-                        child: controller.isShowVideoCtrl
-                            ? Container(
-                                width: double.infinity,
-                                height: double.infinity,
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.6),
-                                ),
-                                child: Stack(
-                                  children: <Widget>[
-                                    Positioned.fill(child: _SeekToView()),
-                                    Center(
-                                      child: IconButton(
-                                        iconSize: 40,
-                                        color: Colors.white,
-                                        icon: AnimatedIcon(
-                                          icon: AnimatedIcons.play_pause,
-                                          progress:
-                                              controller.animetedIconTween,
-                                        ),
-                                        onPressed: () {
-                                          controller.togglePlay();
-                                        },
-                                      ),
-                                    ),
-                                    Positioned(
-                                      left: 0,
-                                      bottom: 0,
-                                      right: 0,
-                                      child: _VideoBottomCtrl(),
-                                    ),
-                                    if (controller.children != null)
-                                      for (Widget item in controller.children)
-                                        item,
-                                  ],
-                                ),
-                              )
-                            : SizedBox(),
+            child: Theme(
+              data: ThemeData(
+                iconTheme: IconThemeData(
+                  // 默认为控件的所有icon为白色
+                  color: Colors.white,
+                ),
+              ),
+              child: Stack(
+                children: <Widget>[
+                  if (controller.isVideoLoading) ...[
+                    // 加载中同时显示loading和海报
+                    if (controller.cover != null)
+                      Center(child: controller.cover),
+                    Center(
+                      child: _CircularProgressIndicatorBig(
+                        color: Colors.black,
                       ),
                     ),
-                  ],
+                  ] else ...[
+                    // 加载完成在第一帧显示海报
+                    Container(
+                      width: double.infinity,
+                      height: double.infinity,
+                      color: Colors.transparent,
+                      child: controller.isShowCover
+                          ? Center(child: controller.cover)
+                          : VideoPlayer(controller.videoCtrl),
+                    ),
 
-                  // 自定义控件
-                  if (controller.afterChildren != null)
-                    for (Widget item in controller.afterChildren) item,
-                ]
-              ],
+                    if (controller.beforeChildren != null)
+                      for (Widget item in controller.beforeChildren) item,
+
+                    if (controller.controllerWidgets) ...[
+                      Positioned.fill(child: _SeekToView()),
+                      Center(child: _Bfloading()),
+                      Positioned.fill(
+                        child: AnimatedSwitcher(
+                          duration: kTabScrollDuration,
+                          child: controller.isShowVideoCtrl
+                              ? Container(
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  decoration: BoxDecoration(
+                                    color: controller.barrierColor,
+                                  ),
+                                  child: Stack(
+                                    children: <Widget>[
+                                      Positioned.fill(child: _SeekToView()),
+                                      Center(
+                                        child: IconButton(
+                                          iconSize: VideoBox.centerIconSize,
+                                          icon: AnimatedIcon(
+                                            icon: AnimatedIcons.play_pause,
+                                            progress:
+                                                controller.animetedIconTween,
+                                          ),
+                                          onPressed: () {
+                                            controller.togglePlay();
+                                          },
+                                        ),
+                                      ),
+                                      Positioned(
+                                        left: 0,
+                                        bottom: 0,
+                                        right: 0,
+                                        child: _VideoBottomCtrl(),
+                                      ),
+                                      if (controller.children != null)
+                                        for (Widget item in controller.children)
+                                          item,
+                                    ],
+                                  ),
+                                )
+                              : SizedBox(),
+                        ),
+                      ),
+                    ],
+
+                    // 自定义控件
+                    if (controller.afterChildren != null)
+                      for (Widget item in controller.afterChildren) item,
+                  ]
+                ],
+              ),
             ),
           );
         },
@@ -207,34 +221,27 @@ class _VideoBottomCtrl extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Provider.of<VideoController>(context);
+    var theme = Theme.of(context);
     return Observer(
       builder: (_) => ListTile(
-        title: Theme(
-          data: Theme.of(context).copyWith(
-            iconTheme: IconThemeData(color: Colors.white),
-          ),
-          child: Row(
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  controller.videoBoxTimeText,
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-              IconButton(
-                icon: Icon(controller.volumeIcon),
-                onPressed: controller.setOnSoundOrOff,
-              ),
-              IconButton(
-                icon: Icon(controller.fullScreenIcon),
-                onPressed: () => controller.onFullScreen(context),
-              ),
-            ],
-          ),
+        title: Row(
+          children: <Widget>[
+            Expanded(
+              child: Text(controller.videoBoxTimeText, style: TextStyle(color: Colors.white),),
+            ),
+            IconButton(
+              icon: Icon(controller.volumeIcon),
+              onPressed: controller.setOnSoundOrOff,
+            ),
+            IconButton(
+              icon: Icon(controller.fullScreenIcon),
+              onPressed: () => controller.onFullScreen(context),
+            ),
+          ],
         ),
         subtitle: Theme(
-          data: Theme.of(context).copyWith(
-            sliderTheme: Theme.of(context).sliderTheme.copyWith(
+          data: theme.copyWith(
+            sliderTheme: theme.sliderTheme.copyWith(
                   trackHeight: 2, // line的高度
                   overlayShape: SliderComponentShape.noOverlay,
                   thumbShape: RoundSliderThumbShape(
