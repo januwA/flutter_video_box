@@ -1,3 +1,8 @@
+## 0.5.3 - 2019-10-7
+
+* 增加: [改变屏幕亮度]和[媒体音量功能]
+
+
 ## 0.5.2 - 2019-10-2
 
 * 修复[children] [beforeChildren] [afterChildren] 的BUG

@@ -46,6 +46,36 @@ class VideoBox extends StatefulWidget {
   /// video / beforeChildren / controllerWidgets-> children / afterChildren
   final List<Widget> beforeChildren;
 
+  /// add your widget
+  ///
+  /// ```dart
+  /// AspectRatio(
+  ///   aspectRatio: 16 / 9,
+  ///   child: VideoBox(
+  ///     controller: controller,
+  ///     children: <Widget>[
+  ///       Align(
+  ///         alignment: Alignment(-0.5, 0),
+  ///         child: IconButton(
+  ///           iconSize: 40,
+  ///           disabledColor: Colors.white60,
+  ///           icon: Icon(Icons.skip_previous),
+  ///           onPressed: canPrev() ? prevVideo : null,
+  ///         ),
+  ///       ),
+  ///       Align(
+  ///         alignment: Alignment(0.5, 0),
+  ///         child: IconButton(
+  ///           iconSize: 40,
+  ///           disabledColor: Colors.white60,
+  ///           icon: Icon(Icons.skip_next),
+  ///           onPressed: canNext() ? nextVideo : null,
+  ///         ),
+  ///       ),
+  ///     ],
+  ///   ),
+  /// ),
+  /// ```
   final List<Widget> children;
 
   /// 屏障颜色
@@ -196,19 +226,24 @@ class _SeekToView extends StatelessWidget {
     Function tap = () => controller.showVideoCtrl(!controller.isShowVideoCtrl);
     return Row(
       children: <Widget>[
+        // 左侧模块，负责快退，调整系统亮度
         Expanded(
-          child: InkWell(
+          child: GestureDetector(
             onTap: tap,
             onDoubleTap: controller.rewind,
-            child: Container(),
+            onPanUpdate: controller.setScreenBrightness,
+            child: Container(color: Colors.transparent),
           ),
         ),
         const SizedBox(width: 24),
+
+        // 右侧模块，负责快进，调整媒体音量
         Expanded(
-          child: InkWell(
+          child: GestureDetector(
             onTap: tap,
             onDoubleTap: controller.fastForward,
-            child: Container(),
+            onPanUpdate: controller.setMediaVolume,
+            child: Container(color: Colors.transparent),
           ),
         ),
       ],
@@ -227,7 +262,10 @@ class _VideoBottomCtrl extends StatelessWidget {
         title: Row(
           children: <Widget>[
             Expanded(
-              child: Text(controller.videoBoxTimeText, style: TextStyle(color: Colors.white),),
+              child: Text(
+                controller.videoBoxTimeText,
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             IconButton(
               icon: Icon(controller.volumeIcon),
@@ -242,13 +280,13 @@ class _VideoBottomCtrl extends StatelessWidget {
         subtitle: Theme(
           data: theme.copyWith(
             sliderTheme: theme.sliderTheme.copyWith(
-                  trackHeight: 2, // line的高度
-                  overlayShape: SliderComponentShape.noOverlay,
-                  thumbShape: RoundSliderThumbShape(
-                    // 拇指的形状和大小
-                    enabledThumbRadius: 6.0,
-                  ),
-                ),
+              trackHeight: 2, // line的高度
+              overlayShape: SliderComponentShape.noOverlay,
+              thumbShape: RoundSliderThumbShape(
+                // 拇指的形状和大小
+                enabledThumbRadius: 6.0,
+              ),
+            ),
           ),
           child: BufferSlider(
             inactiveColor: Colors.white24,

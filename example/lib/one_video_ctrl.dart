@@ -13,13 +13,14 @@ class OneVideoCtrl extends StatefulWidget {
 class _OneVideoCtrlState extends State<OneVideoCtrl> {
   VideoController vc;
   bool get isPlay => vc.videoCtrl.value.isPlaying;
+  ScrollController controller = ScrollController();
 
   @override
   void initState() {
     super.initState();
     vc = VideoController(
       source: VideoPlayerController.network(src1),
-      cover: Image.network('https://i.loli.net/2019/08/29/7eXVLcHAhtO9YQg.jpg'),
+      // cover: Image.network('https://i.loli.net/2019/08/29/7eXVLcHAhtO9YQg.jpg'),
       // controllerWidgets: false,
       // cover: Text('Cover'),
     );
@@ -38,6 +39,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
         title: Text('one video ctrl'),
       ),
       body: ListView(
+        controller: controller,
         children: <Widget>[
           AspectRatio(
             aspectRatio: 16 / 9,

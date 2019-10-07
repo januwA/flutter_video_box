@@ -51,6 +51,23 @@ mixin _$VideoController on _VideoController, Store {
           Computed<IconData>(() => super.fullScreenIcon))
       .value;
 
+  final _$maxVolAtom = Atom(name: '_VideoController.maxVol');
+
+  @override
+  int get maxVol {
+    _$maxVolAtom.context.enforceReadPolicy(_$maxVolAtom);
+    _$maxVolAtom.reportObserved();
+    return super.maxVol;
+  }
+
+  @override
+  set maxVol(int value) {
+    _$maxVolAtom.context.conditionallyRunInAction(() {
+      super.maxVol = value;
+      _$maxVolAtom.reportChanged();
+    }, _$maxVolAtom, name: '${_$maxVolAtom.name}_set');
+  }
+
   final _$barrierColorAtom = Atom(name: '_VideoController.barrierColor');
 
   @override

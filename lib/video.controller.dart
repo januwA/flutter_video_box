@@ -6,6 +6,7 @@ import 'package:mobx/mobx.dart';
 import 'package:screen/screen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_box/util/duration_string.dart' show durationString;
+import 'package:volume/volume.dart';
 
 import 'video_box.dart';
 part 'video.controller.g.dart';
@@ -27,6 +28,12 @@ abstract class _VideoController with Store {
   }) {
     assert(source != null);
     initVideoPlaer(source);
+    initPlatformState();
+  }
+
+  Future<void> initPlatformState() async {
+    maxVol = await Volume.getMaxVol;
+    await Volume.controlVolume(AudioManager.STREAM_MUSIC);
   }
 
   initAnimetedIconController(TickerProvider vsync) {
@@ -48,6 +55,10 @@ abstract class _VideoController with Store {
       await animetedIconController.reverse();
     }
   }
+
+  /// maximum volume
+  @observable
+  int maxVol;
 
   AnimationController animetedIconController;
   Animation<double> animetedIconTween;
@@ -448,6 +459,32 @@ abstract class _VideoController with Store {
       Screen.keepOn(false);
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     }
+  }
+
+  // 右侧板块设置媒体音量
+  Future<void> setMediaVolume(DragUpdateDetails d) async {
+    int _currentVol = await Volume.getVol;
+    int dy = (-d.delta.dy * 0.6).toInt();
+    setVol(_currentVol + dy);
+  }
+
+  // 左侧板块设置屏幕亮度
+  Future<void> setScreenBrightness(DragUpdateDetails d) async {
+    double currentBrightness = await Screen.brightness;
+    double dy = d.delta.dy / 200;
+    double v = currentBrightness + (-dy);
+    if (v >= 1) {
+      v = 1;
+    }
+    if (v <= 0) {
+      v = 0;
+    }
+    Screen.setBrightness(v);
+  }
+
+  /// set MEDIA Volume
+  setVol(int i) async {
+    await Volume.setVol(i);
   }
 
   @override
