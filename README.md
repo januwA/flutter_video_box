@@ -51,7 +51,8 @@ class _ListVideoState extends State<ListVideo> {
   void initState() {
     super.initState();
     for (var i = 0; i < 4; i++) {
-      vcs.add(VideoController(source: VideoPlayerController.network('xxx.mp4')));
+      vcs.add(VideoController(source: VideoPlayerController.network(src1))
+        ..initialize());
     }
   }
 

@@ -14,6 +14,7 @@ part 'video.controller.g.dart';
 class VideoController = _VideoController with _$VideoController;
 
 abstract class _VideoController with Store {
+  @action
   _VideoController({
     VideoPlayerController source,
     this.skiptime = const Duration(seconds: 10),
@@ -27,16 +28,18 @@ abstract class _VideoController with Store {
     this.controllerWidgets = true,
   }) {
     assert(source != null);
-    initVideoPlaer(source);
+    videoCtrl = source;
     initPlatformState();
   }
 
+  /// 控制音量
   Future<void> initPlatformState() async {
     maxVol = await Volume.getMaxVol;
     await Volume.controlVolume(AudioManager.STREAM_MUSIC);
   }
 
-  initAnimetedIconController(TickerProvider vsync) {
+  /// 动画icon的初始化
+  void initAnimetedIconController(TickerProvider vsync) {
     animetedIconController = AnimationController(
       duration: kTabScrollDuration,
       vsync: vsync,
@@ -101,26 +104,26 @@ abstract class _VideoController with Store {
   /// 完成时注销掉监听器
   Timer _bfLoadingTimer;
 
+  /// 随时监听缓冲状态
   @action
   void setVideoBuffer() {
-    if (videoCtrl.value.buffered == null || videoCtrl.value.buffered.isEmpty) {
+    var value = videoCtrl.value;
+    if (value.buffered == null || value.buffered.isEmpty) {
       isBfLoading = false;
     } else {
       /// 当前播放的位置，大于了缓冲的位置，就会进入加载状态
       sliderBufferValue =
-          videoCtrl.value.buffered.last.end.inSeconds / duration.inSeconds;
+          value.buffered.last.end.inSeconds / duration.inSeconds;
 
-      if (videoCtrl.value.isPlaying) {
-        isBfLoading =
-            videoCtrl.value.position >= videoCtrl.value.buffered.last.end;
+      if (value.isPlaying) {
+        isBfLoading = value.position >= value.buffered.last.end;
       } else {
         // 先消除旧的计时器
         if (_bfLoadingTimer?.isActive ?? false) {
           _bfLoadingTimer?.cancel();
         }
         _bfLoadingTimer = Timer.periodic(Duration(seconds: 1), (_) {
-          isBfLoading =
-              videoCtrl.value.position > videoCtrl.value.buffered.last.end;
+          isBfLoading = value.position >= value.buffered.last.end;
           // 直到缓冲完成，结束监听器
           if (isBfLoading == false) {
             _bfLoadingTimer?.cancel();
@@ -181,15 +184,8 @@ abstract class _VideoController with Store {
   @observable
   VideoPlayerController videoCtrl;
 
-  /// loading VideoPlayerController
   @observable
-  bool isVideoLoading = true;
-
-  /// set [isVideoLoading]
-  @action
-  void setVideoLoading(bool v) {
-    isVideoLoading = v;
-  }
+  bool initialized = false;
 
   /// Initialize the play position
   @observable
@@ -260,7 +256,7 @@ abstract class _VideoController with Store {
   /// '00:00/00:00'
   @computed
   String get videoBoxTimeText =>
-      isVideoLoading ? '00:00/00:00' : "$positionText/$durationText";
+      initialized ? "$positionText/$durationText" : '00:00/00:00';
 
   @computed
   double get sliderValue {
@@ -277,9 +273,6 @@ abstract class _VideoController with Store {
   /// 返回一个符合当前音量的icon
   @computed
   IconData get volumeIcon {
-    if (isVideoLoading) {
-      return Icons.volume_up;
-    }
     return volume <= 0
         ? Icons.volume_off
         : volume <= 0.5 ? Icons.volume_down : Icons.volume_up;
@@ -313,46 +306,42 @@ abstract class _VideoController with Store {
     }
   }
 
+  /// 替换当前播放的视频资源
   @action
-  Future<void> setSource(VideoPlayerController videoDataSource) async {
-    assert(videoDataSource != null);
-    videoCtrl?.pause();
-    videoCtrl?.removeListener(_videoListenner);
+  Future<void> setSource(VideoPlayerController source) async {
+    assert(source != null);
     var oldCtrl = videoCtrl;
+    oldCtrl?.pause();
+    oldCtrl?.removeListener(_videoListenner);
     Future.delayed(Duration(seconds: 1)).then((_) => oldCtrl?.dispose());
-    await initVideoPlaer(videoDataSource);
+    videoCtrl = source;
   }
 
   /// 初始化viedo控制器
   @action
-  Future<void> initVideoPlaer(VideoPlayerController videoDataSource) async {
-    assert(videoDataSource != null);
-    setVideoLoading(true);
+  Future<void> initialize() async {
+    initialized = false;
     isBfLoading = false;
-    videoCtrl = videoDataSource;
     await videoCtrl.initialize();
     videoCtrl.setLooping(loop);
     videoCtrl.setVolume(volume);
-    if (autoplay) {
-      videoCtrl.play();
-    }
-    if (initPosition != null) {
-      seekTo(initPosition);
-    }
+    if (autoplay) videoCtrl.play();
+    if (initPosition != null) seekTo(initPosition);
     position = initPosition ?? videoCtrl.value.position;
     duration = videoCtrl.value.duration;
     videoCtrl.addListener(_videoListenner);
-    setVideoLoading(false);
+    initialized = true;
   }
 
   /// 开启声音或关闭
   @action
   void setOnSoundOrOff() {
-    if (isVideoLoading) return;
-    if (videoCtrl.value.volume > 0) {
-      setVolume(0.0);
-    } else {
-      setVolume(1.0);
+    if (videoCtrl.value != null) {
+      if (videoCtrl.value.volume > 0) {
+        setVolume(0.0);
+      } else {
+        setVolume(1.0);
+      }
     }
   }
 
@@ -411,6 +400,8 @@ abstract class _VideoController with Store {
     if (isPlayEnd) {
       await videoCtrl.seekTo(Duration(seconds: 0));
     }
+
+    await setAnimetedIconState(true);
     await videoCtrl.play();
     showVideoCtrl(false);
   }
@@ -418,6 +409,7 @@ abstract class _VideoController with Store {
   /// 暂停
   @action
   Future<void> pause() async {
+    await setAnimetedIconState(false);
     await videoCtrl.pause();
     showVideoCtrl(true);
   }
@@ -425,7 +417,7 @@ abstract class _VideoController with Store {
   /// 控制播放时间位置
   @action
   Future<void> seekTo(Duration d) async {
-    if (videoCtrl.value.initialized) {
+    if (initialized) {
       await videoCtrl.seekTo(d);
     }
   }
@@ -464,7 +456,7 @@ abstract class _VideoController with Store {
   // 右侧板块设置媒体音量
   Future<void> setMediaVolume(DragUpdateDetails d) async {
     int _currentVol = await Volume.getVol;
-    int dy = (-d.delta.dy * 0.6).toInt();
+    int dy = (-d.delta.dy * 0.2).toInt();
     setVol(_currentVol + dy);
   }
 
@@ -483,13 +475,13 @@ abstract class _VideoController with Store {
   }
 
   /// set MEDIA Volume
-  setVol(int i) async {
+  Future<void> setVol(int i) async {
     await Volume.setVol(i);
   }
 
   @override
   Future<void> dispose() async {
-    animetedIconController.dispose();
+    animetedIconController?.dispose();
     videoCtrl?.removeListener(_videoListenner);
     await videoCtrl?.pause();
     await videoCtrl?.dispose();
@@ -569,12 +561,10 @@ class _FullPageVideo extends StatelessWidget {
   const _FullPageVideo({Key key, this.controller}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        body: Center(
-          child: VideoBox(controller: controller),
-        ),
-        backgroundColor: Colors.black,
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: VideoBox(controller: controller),
       ),
     );
   }

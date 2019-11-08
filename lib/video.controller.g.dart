@@ -222,21 +222,21 @@ mixin _$VideoController on _VideoController, Store {
     }, _$videoCtrlAtom, name: '${_$videoCtrlAtom.name}_set');
   }
 
-  final _$isVideoLoadingAtom = Atom(name: '_VideoController.isVideoLoading');
+  final _$initializedAtom = Atom(name: '_VideoController.initialized');
 
   @override
-  bool get isVideoLoading {
-    _$isVideoLoadingAtom.context.enforceReadPolicy(_$isVideoLoadingAtom);
-    _$isVideoLoadingAtom.reportObserved();
-    return super.isVideoLoading;
+  bool get initialized {
+    _$initializedAtom.context.enforceReadPolicy(_$initializedAtom);
+    _$initializedAtom.reportObserved();
+    return super.initialized;
   }
 
   @override
-  set isVideoLoading(bool value) {
-    _$isVideoLoadingAtom.context.conditionallyRunInAction(() {
-      super.isVideoLoading = value;
-      _$isVideoLoadingAtom.reportChanged();
-    }, _$isVideoLoadingAtom, name: '${_$isVideoLoadingAtom.name}_set');
+  set initialized(bool value) {
+    _$initializedAtom.context.conditionallyRunInAction(() {
+      super.initialized = value;
+      _$initializedAtom.reportChanged();
+    }, _$initializedAtom, name: '${_$initializedAtom.name}_set');
   }
 
   final _$initPositionAtom = Atom(name: '_VideoController.initPosition');
@@ -362,16 +362,15 @@ mixin _$VideoController on _VideoController, Store {
   final _$setSourceAsyncAction = AsyncAction('setSource');
 
   @override
-  Future<void> setSource(VideoPlayerController videoDataSource) {
-    return _$setSourceAsyncAction.run(() => super.setSource(videoDataSource));
+  Future<void> setSource(VideoPlayerController source) {
+    return _$setSourceAsyncAction.run(() => super.setSource(source));
   }
 
-  final _$initVideoPlaerAsyncAction = AsyncAction('initVideoPlaer');
+  final _$initializeAsyncAction = AsyncAction('initialize');
 
   @override
-  Future<void> initVideoPlaer(VideoPlayerController videoDataSource) {
-    return _$initVideoPlaerAsyncAction
-        .run(() => super.initVideoPlaer(videoDataSource));
+  Future<void> initialize() {
+    return _$initializeAsyncAction.run(() => super.initialize());
   }
 
   final _$togglePlayAsyncAction = AsyncAction('togglePlay');
@@ -450,16 +449,6 @@ mixin _$VideoController on _VideoController, Store {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.setVolume(v);
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void setVideoLoading(bool v) {
-    final _$actionInfo = _$_VideoControllerActionController.startAction();
-    try {
-      return super.setVideoLoading(v);
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }

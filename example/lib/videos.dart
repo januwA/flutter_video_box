@@ -22,7 +22,7 @@ class _VideosState extends State<Videos> {
         'init cover',
         style: TextStyle(color: Colors.white),
       ),
-    );
+    )..initialize();
   }
 
   @override
@@ -33,7 +33,6 @@ class _VideosState extends State<Videos> {
 
   void _changeSource(String src) async {
     vc.pause();
-    vc.setVideoLoading(true);
     await Future.delayed(Duration(seconds: 2));
     await vc.setSource(VideoPlayerController.network(src));
     vc.setCover(Center(
@@ -41,6 +40,8 @@ class _VideosState extends State<Videos> {
       src,
       style: TextStyle(color: Colors.white),
     )));
+
+    vc.initialize();
   }
 
   @override
@@ -53,9 +54,7 @@ class _VideosState extends State<Videos> {
         children: <Widget>[
           AspectRatio(
             aspectRatio: 16 / 9,
-            child: VideoBox(
-              controller: vc,
-            ),
+            child: VideoBox(controller: vc),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,

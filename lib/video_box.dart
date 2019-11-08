@@ -10,7 +10,7 @@ class VideoBox extends StatefulWidget {
   /// Example:
   ///
   /// ```dart
-  /// VideoController vc = VideoController(source: VideoPlayerController.network('xxx.mp4'));
+  /// VideoController vc = VideoController(source: VideoPlayerController.network('xxx.mp4'))..initialize();
   ///
   /// @override
   /// void dispose() {
@@ -101,103 +101,109 @@ class _VideoBoxState extends State<VideoBox>
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        Provider<VideoController>.value(value: controller),
-      ],
-      child: Observer(
-        builder: (context) {
-          return GestureDetector(
-            onTap: () {
-              controller.showVideoCtrl(!controller.isShowVideoCtrl);
-            },
-            child: Theme(
-              data: ThemeData(
-                iconTheme: IconThemeData(
-                  // 默认为控件的所有icon为白色
-                  color: Colors.white,
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: MultiProvider(
+        providers: [
+          Provider<VideoController>.value(value: controller),
+        ],
+        child: Observer(
+          builder: (context) {
+            return GestureDetector(
+              onTap: () {
+                controller.showVideoCtrl(!controller.isShowVideoCtrl);
+              },
+              child: Theme(
+                data: ThemeData(
+                  iconTheme: IconThemeData(
+                    // 默认为控件的所有icon为白色
+                    color: Colors.white,
+                  ),
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    if (!controller.initialized) ...[
+                      // 加载中同时显示loading和海报
+                      if (controller.cover != null)
+                        Center(child: controller.cover),
+                      Center(child: _CircularProgressIndicatorBig()),
+                    ] else ...[
+                      // 加载完成在第一帧显示海报
+                      Container(
+                        width: double.infinity,
+                        height: double.infinity,
+                        color: Colors.transparent,
+                        child: controller.isShowCover
+                            ? Center(child: controller.cover)
+                            : Center(
+                                child: AspectRatio(
+                                  aspectRatio:
+                                      controller.videoCtrl.value.aspectRatio,
+                                  child: VideoPlayer(controller.videoCtrl),
+                                ),
+                              ),
+                      ),
+
+                      if (controller.beforeChildren != null)
+                        for (Widget item in controller.beforeChildren) item,
+
+                      if (controller.controllerWidgets) ...[
+                        Positioned.fill(child: _SeekToView()),
+                        Center(child: _Bfloading()),
+                        Positioned.fill(
+                          child: AnimatedSwitcher(
+                            duration: kTabScrollDuration,
+                            child: controller.isShowVideoCtrl
+                                ? Container(
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    decoration: BoxDecoration(
+                                      color: controller.barrierColor,
+                                    ),
+                                    child: Stack(
+                                      children: <Widget>[
+                                        Positioned.fill(child: _SeekToView()),
+                                        Center(
+                                          child: IconButton(
+                                            iconSize: VideoBox.centerIconSize,
+                                            icon: AnimatedIcon(
+                                              icon: AnimatedIcons.play_pause,
+                                              progress:
+                                                  controller.animetedIconTween,
+                                            ),
+                                            onPressed: () {
+                                              controller.togglePlay();
+                                            },
+                                          ),
+                                        ),
+                                        Positioned(
+                                          left: 0,
+                                          bottom: 0,
+                                          right: 0,
+                                          child: _VideoBottomCtrl(),
+                                        ),
+                                        if (controller.children != null)
+                                          for (Widget item
+                                              in controller.children)
+                                            item,
+                                      ],
+                                    ),
+                                  )
+                                : SizedBox(),
+                          ),
+                        ),
+                      ],
+
+                      // 自定义控件
+                      if (controller.afterChildren != null)
+                        for (Widget item in controller.afterChildren) item,
+                    ]
+                  ],
                 ),
               ),
-              child: Stack(
-                children: <Widget>[
-                  if (controller.isVideoLoading) ...[
-                    // 加载中同时显示loading和海报
-                    if (controller.cover != null)
-                      Center(child: controller.cover),
-                    Center(
-                      child: _CircularProgressIndicatorBig(
-                        color: Colors.black,
-                      ),
-                    ),
-                  ] else ...[
-                    // 加载完成在第一帧显示海报
-                    Container(
-                      width: double.infinity,
-                      height: double.infinity,
-                      color: Colors.transparent,
-                      child: controller.isShowCover
-                          ? Center(child: controller.cover)
-                          : VideoPlayer(controller.videoCtrl),
-                    ),
-
-                    if (controller.beforeChildren != null)
-                      for (Widget item in controller.beforeChildren) item,
-
-                    if (controller.controllerWidgets) ...[
-                      Positioned.fill(child: _SeekToView()),
-                      Center(child: _Bfloading()),
-                      Positioned.fill(
-                        child: AnimatedSwitcher(
-                          duration: kTabScrollDuration,
-                          child: controller.isShowVideoCtrl
-                              ? Container(
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: controller.barrierColor,
-                                  ),
-                                  child: Stack(
-                                    children: <Widget>[
-                                      Positioned.fill(child: _SeekToView()),
-                                      Center(
-                                        child: IconButton(
-                                          iconSize: VideoBox.centerIconSize,
-                                          icon: AnimatedIcon(
-                                            icon: AnimatedIcons.play_pause,
-                                            progress:
-                                                controller.animetedIconTween,
-                                          ),
-                                          onPressed: () {
-                                            controller.togglePlay();
-                                          },
-                                        ),
-                                      ),
-                                      Positioned(
-                                        left: 0,
-                                        bottom: 0,
-                                        right: 0,
-                                        child: _VideoBottomCtrl(),
-                                      ),
-                                      if (controller.children != null)
-                                        for (Widget item in controller.children)
-                                          item,
-                                    ],
-                                  ),
-                                )
-                              : SizedBox(),
-                        ),
-                      ),
-                    ],
-
-                    // 自定义控件
-                    if (controller.afterChildren != null)
-                      for (Widget item in controller.afterChildren) item,
-                  ]
-                ],
-              ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

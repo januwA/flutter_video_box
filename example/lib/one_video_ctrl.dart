@@ -23,7 +23,9 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
       // cover: Image.network('https://i.loli.net/2019/08/29/7eXVLcHAhtO9YQg.jpg'),
       // controllerWidgets: false,
       // cover: Text('Cover'),
-    );
+    )..initialize().then((_) {
+        // initialized
+      });
   }
 
   @override
@@ -45,7 +47,6 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
             aspectRatio: 16 / 9,
             child: VideoBox(
               controller: vc,
-              barrierColor: Colors.green.withOpacity(0.4),
               children: <Widget>[
                 Align(
                   alignment: Alignment(0.5, 0),

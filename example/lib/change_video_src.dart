@@ -22,7 +22,8 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
   @override
   void initState() {
     super.initState();
-    vc = VideoController(source: VideoPlayerController.network(src));
+    vc = VideoController(source: VideoPlayerController.network(src))
+      ..initialize();
   }
 
   @override
@@ -66,6 +67,7 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
                   vc.setAutoplay(false);
                   vc.showVideoCtrl(true);
                   vc.setSource(VideoPlayerController.network(src));
+                  vc.initialize();
                 },
               ),
               RaisedButton(
@@ -79,6 +81,7 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
                     index = newindex;
                   });
                   vc.setSource(VideoPlayerController.network(src));
+                  vc.initialize();
                 },
               ),
             ],

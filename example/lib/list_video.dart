@@ -17,7 +17,8 @@ class _ListVideoState extends State<ListVideo> {
   void initState() {
     super.initState();
     for (var i = 0; i < 4; i++) {
-      vcs.add(VideoController(source: VideoPlayerController.network(src1)));
+      vcs.add(VideoController(source: VideoPlayerController.network(src1))
+        ..initialize());
     }
   }
 
@@ -42,9 +43,7 @@ class _ListVideoState extends State<ListVideo> {
               padding: const EdgeInsets.only(top: 12.0),
               child: AspectRatio(
                 aspectRatio: 16 / 9,
-                child: VideoBox(
-                  controller: vc,
-                ),
+                child: VideoBox(controller: vc),
               ),
             ),
         ],
