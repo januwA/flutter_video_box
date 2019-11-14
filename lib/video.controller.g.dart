@@ -475,6 +475,16 @@ mixin _$VideoController on _VideoController, Store {
   }
 
   @override
+  void toggleShowVideoCtrl() {
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
+    try {
+      return super.toggleShowVideoCtrl();
+    } finally {
+      _$_VideoControllerActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void setSkiptime(Duration st) {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -227,6 +228,11 @@ abstract class _VideoController with Store {
     }
   }
 
+  @action
+  void toggleShowVideoCtrl() {
+    showVideoCtrl(!isShowVideoCtrl);
+  }
+
   /// 是否为全屏播放
   @observable
   bool isFullScreen = false;
@@ -417,19 +423,23 @@ abstract class _VideoController with Store {
   /// 控制播放时间位置
   @action
   Future<void> seekTo(Duration d) async {
-    if (initialized) {
+    if (videoCtrl.value != null) {
       await videoCtrl.seekTo(d);
     }
   }
 
   /// 快进
   void fastForward([Duration st]) {
-    seekTo(videoCtrl.value.position + (st ?? skiptime));
+    if (videoCtrl.value != null) {
+      seekTo(videoCtrl.value.position + (st ?? skiptime));
+    }
   }
 
   /// 快退
   void rewind([Duration st]) {
-    seekTo(videoCtrl.value.position - (st ?? skiptime));
+    if (videoCtrl.value != null) {
+      seekTo(videoCtrl.value.position - (st ?? skiptime));
+    }
   }
 
   /// screen  自定义全屏page
@@ -460,17 +470,18 @@ abstract class _VideoController with Store {
     setVol(_currentVol + dy);
   }
 
+  double _currentBrightness;
   // 左侧板块设置屏幕亮度
   Future<void> setScreenBrightness(DragUpdateDetails d) async {
-    double currentBrightness = await Screen.brightness;
     double dy = d.delta.dy / 200;
-    double v = currentBrightness + (-dy);
-    if (v >= 1) {
-      v = 1;
+    _currentBrightness ??= await Screen.brightness;
+    double v;
+    if (dy > 0) {
+      v = max(_currentBrightness - dy.abs(), 0);
+    } else {
+      v = min(_currentBrightness + dy.abs(), 1);
     }
-    if (v <= 0) {
-      v = 0;
-    }
+    _currentBrightness = v;
     Screen.setBrightness(v);
   }
 
@@ -561,11 +572,6 @@ class _FullPageVideo extends StatelessWidget {
   const _FullPageVideo({Key key, this.controller}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Center(
-        child: VideoBox(controller: controller),
-      ),
-    );
+    return Center(child: VideoBox(controller: controller));
   }
 }
