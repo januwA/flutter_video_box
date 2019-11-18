@@ -28,14 +28,12 @@ abstract class _VideoController with Store {
     this.playEnd,
     this.controllerWidgets = true,
   }) {
-    assert(source != null);
     videoCtrl = source;
-    initPlatformState();
+    _initPlatformState();
   }
 
-  /// 控制音量
-  Future<void> initPlatformState() async {
-    maxVol = await Volume.getMaxVol;
+  /// 控制媒体音量
+  Future<void> _initPlatformState() async {
     await Volume.controlVolume(AudioManager.STREAM_MUSIC);
   }
 
@@ -53,16 +51,13 @@ abstract class _VideoController with Store {
   }
 
   Future<void> setAnimetedIconState(bool play) async {
+    if (animetedIconController == null) return;
     if (play) {
       await animetedIconController.forward();
     } else {
       await animetedIconController.reverse();
     }
   }
-
-  /// maximum volume
-  @observable
-  int maxVol;
 
   AnimationController animetedIconController;
   Animation<double> animetedIconTween;
@@ -100,45 +95,28 @@ abstract class _VideoController with Store {
   @observable
   bool isBfLoading = false;
 
-  /// 当播放暂停时，跳转播放位置会触发buffer loading
-  /// 此监听器会每个1s监听缓冲是否完成
-  /// 完成时注销掉监听器
-  Timer _bfLoadingTimer;
-
   /// 随时监听缓冲状态
   @action
   void setVideoBuffer() {
     var value = videoCtrl.value;
-    if (value.buffered == null || value.buffered.isEmpty) {
+    if (value.buffered?.isEmpty ?? true) {
       isBfLoading = false;
     } else {
-      /// 当前播放的位置，大于了缓冲的位置，就会进入加载状态
       sliderBufferValue =
           value.buffered.last.end.inSeconds / duration.inSeconds;
 
+      /// 当前播放的位置，大于了缓冲的位置，就会进入加载状态
       if (value.isPlaying) {
         isBfLoading = value.position >= value.buffered.last.end;
       } else {
-        // 先消除旧的计时器
-        if (_bfLoadingTimer?.isActive ?? false) {
-          _bfLoadingTimer?.cancel();
-        }
-        _bfLoadingTimer = Timer.periodic(Duration(seconds: 1), (_) {
-          isBfLoading = value.position >= value.buffered.last.end;
-          // 直到缓冲完成，结束监听器
-          if (isBfLoading == false) {
-            _bfLoadingTimer?.cancel();
-          }
-        });
+        isBfLoading = value.position > value.buffered.last.end;
       }
     }
   }
 
   /// set cover
   @action
-  void setCover(Widget newCover) {
-    cover = newCover;
-  }
+  void setCover(Widget newCover) => cover = newCover;
 
   /// 是否显示封面，只有在第一次播放前显示
   @computed
@@ -157,9 +135,7 @@ abstract class _VideoController with Store {
 
   /// set [autoplay]
   @action
-  void setAutoplay(bool autoplay) {
-    autoplay = autoplay;
-  }
+  void setAutoplay(bool autoplay) => autoplay = autoplay;
 
   /// Loop [false]
   @observable
@@ -175,13 +151,6 @@ abstract class _VideoController with Store {
   @observable
   double volume;
 
-  /// set [volume]
-  @action
-  void setVolume(double v) {
-    volume = v;
-    videoCtrl?.setVolume(v);
-  }
-
   @observable
   VideoPlayerController videoCtrl;
 
@@ -194,9 +163,7 @@ abstract class _VideoController with Store {
 
   /// set [initPosition]
   @action
-  void setInitPosition(Duration p) {
-    initPosition = p;
-  }
+  void setInitPosition(Duration p) => initPosition = p;
 
   /// Current position
   @observable
@@ -228,10 +195,7 @@ abstract class _VideoController with Store {
     }
   }
 
-  @action
-  void toggleShowVideoCtrl() {
-    showVideoCtrl(!isShowVideoCtrl);
-  }
+  void toggleShowVideoCtrl() => showVideoCtrl(!isShowVideoCtrl);
 
   /// 是否为全屏播放
   @observable
@@ -249,15 +213,12 @@ abstract class _VideoController with Store {
 
   /// 25:00 or 2:00:00 总时长
   @computed
-  String get durationText {
-    return duration == null ? '' : durationString(duration);
-  }
+  String get durationText => duration == null ? '' : durationString(duration);
 
   /// 00:01 当前时间
   @computed
-  String get positionText {
-    return (videoCtrl == null) ? '' : durationString(position);
-  }
+  String get positionText =>
+      (videoCtrl == null) ? '' : durationString(position);
 
   /// '00:00/00:00'
   @computed
@@ -265,67 +226,39 @@ abstract class _VideoController with Store {
       initialized ? "$positionText/$durationText" : '00:00/00:00';
 
   @computed
-  double get sliderValue {
-    if (position?.inSeconds != null && duration?.inSeconds != null) {
-      return position.inSeconds / duration.inSeconds;
-    } else {
-      return 0.0;
-    }
-  }
+  double get sliderValue =>
+      (position?.inSeconds != null && duration?.inSeconds != null)
+          ? position.inSeconds / duration.inSeconds
+          : 0.0;
 
   @observable
   double sliderBufferValue = 0.0;
 
   /// 返回一个符合当前音量的icon
   @computed
-  IconData get volumeIcon {
-    return volume <= 0
-        ? Icons.volume_off
-        : volume <= 0.5 ? Icons.volume_down : Icons.volume_up;
-  }
+  IconData get volumeIcon => volume <= 0
+      ? Icons.volume_off
+      : volume <= 0.5 ? Icons.volume_down : Icons.volume_up;
 
   @computed
   IconData get fullScreenIcon =>
       !isFullScreen ? Icons.fullscreen : Icons.fullscreen_exit;
 
-  /// 视频播放时的监听器
-  /// seek 也会触发
-  @action
-  void _videoListenner() {
-    position = videoCtrl.value.position;
-    setVideoBuffer();
-    if (playingListenner != null) {
-      playingListenner();
-    }
-
-    /// video播放结束
-    if (position >= duration) {
-      /// 如果用户调用了播放结束的监听器
-      if (this.playEnd != null) {
-        playEnd();
-      }
-      isPlayEnd = true;
-      isBfLoading = false; // 播放结束缓冲什么的都不存在了
-      showVideoCtrl(true); // 播放结束默认弹起video的控制器
-    } else {
-      isPlayEnd = false;
-    }
-  }
-
   /// 替换当前播放的视频资源
   @action
   Future<void> setSource(VideoPlayerController source) async {
-    assert(source != null);
     var oldCtrl = videoCtrl;
     oldCtrl?.pause();
     oldCtrl?.removeListener(_videoListenner);
     Future.delayed(Duration(seconds: 1)).then((_) => oldCtrl?.dispose());
+    setAnimetedIconState(autoplay || videoCtrl.value.isPlaying);
     videoCtrl = source;
   }
 
   /// 初始化viedo控制器
   @action
   Future<void> initialize() async {
+    assert(videoCtrl != null);
     initialized = false;
     isBfLoading = false;
     await videoCtrl.initialize();
@@ -339,22 +272,108 @@ abstract class _VideoController with Store {
     initialized = true;
   }
 
-  /// 开启声音或关闭
+  /// 视频播放时的监听器
+  /// seek 也会触发
+  /// 第一帧也会触发
   @action
+  void _videoListenner() {
+    position = videoCtrl.value.position;
+    setVideoBuffer();
+    if (playingListenner != null) playingListenner();
+
+    /// video播放结束
+    if (position >= duration) {
+      setAnimetedIconState(false);
+
+      /// 如果用户调用了播放结束的监听器
+      if (this.playEnd != null) {
+        playEnd();
+      }
+      isPlayEnd = true;
+      isBfLoading = false; // 播放结束缓冲什么的都不存在了
+      showVideoCtrl(true); // 播放结束默认弹起video的控制器
+    } else {
+      isPlayEnd = false;
+    }
+  }
+
+  /// set [volume]
+  @action
+  void setVolume(double v) {
+    volume = v;
+    videoCtrl?.setVolume(v);
+  }
+
+  /// 开启声音或关闭
   void setOnSoundOrOff() {
     if (videoCtrl.value != null) {
-      if (videoCtrl.value.volume > 0) {
-        setVolume(0.0);
+      double v = videoCtrl.value.volume > 0 ? 0.0 : 1.0;
+      setVolume(v);
+    }
+  }
+
+  /// 播放或暂停
+  Future<void> togglePlay() async {
+    // 等待Icon动画关闭
+    await setAnimetedIconState(!videoCtrl.value.isPlaying);
+    if (controllerWidgets == false) {
+      if (videoCtrl.value.isPlaying) {
+        await videoCtrl.pause();
       } else {
-        setVolume(1.0);
+        await videoCtrl.play();
+      }
+    } else {
+      if (videoCtrl.value.isPlaying) {
+        await pause();
+      } else {
+        await play();
       }
     }
   }
 
-  /// 手动改变进度条
-  void sliderChanged(double v) {
-    seekTo(Duration(seconds: (v * duration.inSeconds).toInt()));
+  /// 播放
+  Future<void> play() async {
+    // 如果视频播放结束
+    // 再点击播放则重头开始播放
+    if (isPlayEnd) {
+      await videoCtrl.seekTo(Duration(seconds: 0));
+    }
+
+    await setAnimetedIconState(true);
+    await videoCtrl.play();
+    showVideoCtrl(false);
   }
+
+  /// 暂停
+  Future<void> pause() async {
+    await setAnimetedIconState(false);
+    await videoCtrl.pause();
+    showVideoCtrl(true);
+  }
+
+  /// 控制播放时间位置
+  Future<void> seekTo(Duration d) async {
+    if (videoCtrl.value != null) {
+      await videoCtrl.seekTo(d);
+    }
+  }
+
+  /// 快进
+  void fastForward([Duration st]) {
+    if (videoCtrl.value != null)
+      seekTo(videoCtrl.value.position + (st ?? skiptime));
+  }
+
+  /// 快退
+  void rewind([Duration st]) {
+    if (videoCtrl.value != null) {
+      seekTo(videoCtrl.value.position - (st ?? skiptime));
+    }
+  }
+
+  /// 手动改变进度条
+  void sliderChanged(double v) =>
+      seekTo(Duration(seconds: (v * duration.inSeconds).toInt()));
 
   /// 设置为横屏模式
   @action
@@ -378,77 +397,12 @@ abstract class _VideoController with Store {
     ]);
   }
 
-  /// 播放或暂停
-  @action
-  Future<void> togglePlay() async {
-    // 等待Icon动画关闭
-    await setAnimetedIconState(!videoCtrl.value.isPlaying);
-    if (controllerWidgets == false) {
-      if (videoCtrl.value.isPlaying) {
-        await videoCtrl.pause();
-      } else {
-        await videoCtrl.play();
-      }
-    } else {
-      if (videoCtrl.value.isPlaying) {
-        await pause();
-      } else {
-        await play();
-      }
-    }
-  }
-
-  /// 播放
-  @action
-  Future<void> play() async {
-    // 如果视频播放结束
-    // 再点击播放则重头开始播放
-    if (isPlayEnd) {
-      await videoCtrl.seekTo(Duration(seconds: 0));
-    }
-
-    await setAnimetedIconState(true);
-    await videoCtrl.play();
-    showVideoCtrl(false);
-  }
-
-  /// 暂停
-  @action
-  Future<void> pause() async {
-    await setAnimetedIconState(false);
-    await videoCtrl.pause();
-    showVideoCtrl(true);
-  }
-
-  /// 控制播放时间位置
-  @action
-  Future<void> seekTo(Duration d) async {
-    if (videoCtrl.value != null) {
-      await videoCtrl.seekTo(d);
-    }
-  }
-
-  /// 快进
-  void fastForward([Duration st]) {
-    if (videoCtrl.value != null) {
-      seekTo(videoCtrl.value.position + (st ?? skiptime));
-    }
-  }
-
-  /// 快退
-  void rewind([Duration st]) {
-    if (videoCtrl.value != null) {
-      seekTo(videoCtrl.value.position - (st ?? skiptime));
-    }
-  }
-
   /// screen  自定义全屏page
   Future<void> onFullScreen(BuildContext context, [Widget screen]) async {
     if (isFullScreen) {
-      /// 退出全屏
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(); // 退出全屏
     } else {
-      /// 开启全屏
+      // 开启全屏
       _setLandscape();
       Screen.keepOn(true);
       SystemChrome.setEnabledSystemUIOverlays([]);
@@ -465,6 +419,11 @@ abstract class _VideoController with Store {
 
   // 右侧板块设置媒体音量
   Future<void> setMediaVolume(DragUpdateDetails d) async {
+    // if (d.delta.dy < 0) {
+    //   Volume.volUp();
+    // } else if (d.delta.dy > 0) {
+    //   Volume.volDown();
+    // }
     int _currentVol = await Volume.getVol;
     int dy = (-d.delta.dy * 0.2).toInt();
     setVol(_currentVol + dy);
@@ -486,9 +445,7 @@ abstract class _VideoController with Store {
   }
 
   /// set MEDIA Volume
-  Future<void> setVol(int i) async {
-    await Volume.setVol(i);
-  }
+  Future<int> setVol(int i) => Volume.setVol(i);
 
   @override
   Future<void> dispose() async {
@@ -496,7 +453,6 @@ abstract class _VideoController with Store {
     videoCtrl?.removeListener(_videoListenner);
     await videoCtrl?.pause();
     await videoCtrl?.dispose();
-    _bfLoadingTimer?.cancel();
     _showCtrlTimer?.cancel();
     super.dispose();
   }
@@ -572,6 +528,6 @@ class _FullPageVideo extends StatelessWidget {
   const _FullPageVideo({Key key, this.controller}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Center(child: VideoBox(controller: controller));
+    return Scaffold(body: Center(child: VideoBox(controller: controller)));
   }
 }

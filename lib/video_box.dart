@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:video_box/video.controller.dart';
 import 'package:video_player/video_player.dart';
 
-import 'widgets/buffer_slider.dart';
+import 'video.controller.dart';
+import 'widgets/buffer_loading.dart';
 import 'widgets/circular_progressIndicator_big.dart';
+import 'widgets/seek_to_view.dart';
+import 'widgets/video_bottom_ctroller.dart';
 
 class VideoBox extends StatefulWidget {
   /// Example:
@@ -140,21 +142,20 @@ class _VideoBoxState extends State<VideoBox>
                       for (Widget item in controller.beforeChildren) item,
 
                     if (controller.controllerWidgets) ...[
-                      Positioned.fill(child: _seekToView()),
-                      Center(child: _bufferloading()),
+                      Positioned.fill(
+                          child: SeekToView(controller: controller)),
+                      BufferLoading(controller: controller),
                       Positioned.fill(
                         child: AnimatedSwitcher(
                           duration: kTabScrollDuration,
                           child: controller.isShowVideoCtrl
                               ? Container(
-                                  width: double.infinity,
-                                  height: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: controller.barrierColor,
-                                  ),
+                                  color: controller.barrierColor,
                                   child: Stack(
                                     children: <Widget>[
-                                      Positioned.fill(child: _seekToView()),
+                                      Positioned.fill(
+                                          child: SeekToView(
+                                              controller: controller)),
                                       Center(
                                         child: IconButton(
                                           iconSize: VideoBox.centerIconSize,
@@ -172,7 +173,8 @@ class _VideoBoxState extends State<VideoBox>
                                         left: 0,
                                         bottom: 0,
                                         right: 0,
-                                        child: _videoBottomCtrl(),
+                                        child: VideoBottomCtroller(
+                                            controller: controller),
                                       ),
                                       if (controller.children != null)
                                         for (Widget item in controller.children)
@@ -193,90 +195,6 @@ class _VideoBoxState extends State<VideoBox>
               ),
             );
           },
-        ),
-      ),
-    );
-  }
-
-  /// 视频进入缓冲状态,显示laoding
-  Widget _bufferloading() {
-    return AnimatedSwitcher(
-      duration: kTabScrollDuration,
-      child: Observer(
-        builder: (_) => controller.isBfLoading
-            ? CircularProgressIndicatorBig(color: Colors.white)
-            : SizedBox(),
-      ),
-    );
-  }
-
-  /// 快进，快退两个隐藏的板块按钮
-  Widget _seekToView() {
-    return Row(
-      children: <Widget>[
-        // 左侧模块，负责快退，调整系统亮度
-        Expanded(
-          child: GestureDetector(
-            onTap: controller.toggleShowVideoCtrl,
-            onDoubleTap: controller.rewind,
-            onPanUpdate: controller.setScreenBrightness,
-            child: Container(color: Colors.transparent),
-          ),
-        ),
-        const SizedBox(width: 24),
-
-        // 右侧模块，负责快进，调整媒体音量
-        Expanded(
-          child: GestureDetector(
-            onTap: controller.toggleShowVideoCtrl,
-            onDoubleTap: controller.fastForward,
-            onPanUpdate: controller.setMediaVolume,
-            child: Container(color: Colors.transparent),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _videoBottomCtrl() {
-    var theme = Theme.of(context);
-    return ListTile(
-      title: Row(
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              controller.videoBoxTimeText,
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-          IconButton(
-            icon: Icon(controller.volumeIcon),
-            onPressed: controller.setOnSoundOrOff,
-          ),
-          IconButton(
-            icon: Icon(controller.fullScreenIcon),
-            onPressed: () => controller.onFullScreen(context),
-          ),
-        ],
-      ),
-      subtitle: Theme(
-        data: theme.copyWith(
-          sliderTheme: theme.sliderTheme.copyWith(
-            trackHeight: 2, // line的高度
-            overlayShape: SliderComponentShape.noOverlay,
-            thumbShape: RoundSliderThumbShape(
-              // 拇指的形状和大小
-              enabledThumbRadius: 6.0,
-            ),
-          ),
-        ),
-        child: BufferSlider(
-          inactiveColor: Colors.white24,
-          bufferColor: Colors.white38,
-          activeColor: Colors.white,
-          value: controller.sliderValue,
-          bufferValue: controller.sliderBufferValue,
-          onChanged: controller.sliderChanged,
         ),
       ),
     );

@@ -51,23 +51,6 @@ mixin _$VideoController on _VideoController, Store {
           Computed<IconData>(() => super.fullScreenIcon))
       .value;
 
-  final _$maxVolAtom = Atom(name: '_VideoController.maxVol');
-
-  @override
-  int get maxVol {
-    _$maxVolAtom.context.enforceReadPolicy(_$maxVolAtom);
-    _$maxVolAtom.reportObserved();
-    return super.maxVol;
-  }
-
-  @override
-  set maxVol(int value) {
-    _$maxVolAtom.context.conditionallyRunInAction(() {
-      super.maxVol = value;
-      _$maxVolAtom.reportChanged();
-    }, _$maxVolAtom, name: '${_$maxVolAtom.name}_set');
-  }
-
   final _$barrierColorAtom = Atom(name: '_VideoController.barrierColor');
 
   @override
@@ -373,34 +356,6 @@ mixin _$VideoController on _VideoController, Store {
     return _$initializeAsyncAction.run(() => super.initialize());
   }
 
-  final _$togglePlayAsyncAction = AsyncAction('togglePlay');
-
-  @override
-  Future<void> togglePlay() {
-    return _$togglePlayAsyncAction.run(() => super.togglePlay());
-  }
-
-  final _$playAsyncAction = AsyncAction('play');
-
-  @override
-  Future<void> play() {
-    return _$playAsyncAction.run(() => super.play());
-  }
-
-  final _$pauseAsyncAction = AsyncAction('pause');
-
-  @override
-  Future<void> pause() {
-    return _$pauseAsyncAction.run(() => super.pause());
-  }
-
-  final _$seekToAsyncAction = AsyncAction('seekTo');
-
-  @override
-  Future<void> seekTo(Duration d) {
-    return _$seekToAsyncAction.run(() => super.seekTo(d));
-  }
-
   final _$_VideoControllerActionController =
       ActionController(name: '_VideoController');
 
@@ -445,16 +400,6 @@ mixin _$VideoController on _VideoController, Store {
   }
 
   @override
-  void setVolume(double v) {
-    final _$actionInfo = _$_VideoControllerActionController.startAction();
-    try {
-      return super.setVolume(v);
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void setInitPosition(Duration p) {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
@@ -469,16 +414,6 @@ mixin _$VideoController on _VideoController, Store {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.showVideoCtrl(show);
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void toggleShowVideoCtrl() {
-    final _$actionInfo = _$_VideoControllerActionController.startAction();
-    try {
-      return super.toggleShowVideoCtrl();
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
@@ -505,10 +440,10 @@ mixin _$VideoController on _VideoController, Store {
   }
 
   @override
-  void setOnSoundOrOff() {
+  void setVolume(double v) {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
-      return super.setOnSoundOrOff();
+      return super.setVolume(v);
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }

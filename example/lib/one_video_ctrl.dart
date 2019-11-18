@@ -23,6 +23,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
       // cover: Image.network('https://i.loli.net/2019/08/29/7eXVLcHAhtO9YQg.jpg'),
       // controllerWidgets: false,
       // cover: Text('Cover'),
+      // initPosition: Duration(minutes: 23, seconds: 50)
     )..initialize().then((_) {
         // initialized
       });

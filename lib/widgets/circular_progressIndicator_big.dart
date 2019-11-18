@@ -17,9 +17,8 @@ class CircularProgressIndicatorBig extends StatelessWidget {
     return SizedBox(
       height: size,
       width: size,
-      child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation(color),
-      ),
+      child:
+          CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(color)),
     );
   }
 }
