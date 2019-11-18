@@ -102,19 +102,16 @@ class _VideoBoxState extends State<VideoBox>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Observer(
-        builder: (context) {
-          return InkWell(
-            onTap: controller.toggleShowVideoCtrl,
-            child: Theme(
-              data: ThemeData(
-                iconTheme: IconThemeData(
-                  // 默认为控件的所有icon为白色
-                  color: Colors.white,
-                ),
-              ),
+    return Theme(
+      data: ThemeData(
+        iconTheme: IconThemeData(color: Colors.white),
+      ),
+      child: Container(
+        color: Colors.black,
+        child: Observer(
+          builder: (context) {
+            return InkWell(
+              onTap: controller.toggleShowVideoCtrl,
               child: Stack(
                 children: <Widget>[
                   if (!controller.initialized) ...[
@@ -194,9 +191,9 @@ class _VideoBoxState extends State<VideoBox>
                   ]
                 ],
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
