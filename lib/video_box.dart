@@ -29,14 +29,13 @@ class VideoBox extends StatefulWidget {
   /// see also:
   ///
   /// https://github.com/januwA/flutter_video_box/tree/master/example
-  VideoBox({
-    Key key,
-    @required this.controller,
-    this.afterChildren = const <Widget>[],
-    this.beforeChildren = const <Widget>[],
-    this.children = const <Widget>[],
-    this.barrierColor,
-  }) : super(key: key);
+  VideoBox(
+      {Key key,
+      @required this.controller,
+      this.afterChildren = const <Widget>[],
+      this.beforeChildren = const <Widget>[],
+      this.children = const <Widget>[]})
+      : super(key: key);
 
   static const double centerIconSize = 40.0;
 
@@ -80,8 +79,6 @@ class VideoBox extends StatefulWidget {
   /// ```
   final List<Widget> children;
 
-  /// 屏障颜色
-  final Color barrierColor;
   @override
   _VideoBoxState createState() => _VideoBoxState();
 }
@@ -98,21 +95,20 @@ class _VideoBoxState extends State<VideoBox>
       ..initAnimetedIconController(this)
       ..children ??= widget.children
       ..beforeChildren ??= widget.beforeChildren
-      ..afterChildren ??= widget.afterChildren
-      ..barrierColor ??= widget.barrierColor ?? Colors.black.withOpacity(0.6);
+      ..afterChildren ??= widget.afterChildren;
   }
 
   @override
   Widget build(BuildContext context) {
     return Theme(
       data: ThemeData(
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: controller.color),
       ),
       child: Container(
-        color: Colors.black,
+        color: controller.background,
         child: Observer(
           builder: (context) {
-            return InkWell(
+            return GestureDetector(
               onTap: controller.toggleShowVideoCtrl,
               child: Stack(
                 children: <Widget>[
@@ -120,12 +116,13 @@ class _VideoBoxState extends State<VideoBox>
                     // 加载中同时显示loading和海报
                     if (controller.cover != null)
                       Center(child: controller.cover),
-                    Center(child: CircularProgressIndicatorBig()),
+                    Center(
+                        child: CircularProgressIndicatorBig(
+                      color: controller.circularProgressIndicatorColor,
+                    )),
                   ] else ...[
                     // 加载完成在第一帧显示海报
                     Container(
-                      width: double.infinity,
-                      height: double.infinity,
                       color: Colors.transparent,
                       child: controller.isShowCover
                           ? Center(child: controller.cover)
@@ -148,7 +145,7 @@ class _VideoBoxState extends State<VideoBox>
                       Positioned.fill(
                         child: AnimatedSwitcher(
                           duration: kTabScrollDuration,
-                          child: controller.isShowVideoCtrl
+                          child: controller.controllerLayer
                               ? Container(
                                   color: controller.barrierColor,
                                   child: Stack(
@@ -177,7 +174,8 @@ class _VideoBoxState extends State<VideoBox>
                                             controller: controller),
                                       ),
                                       if (controller.children != null)
-                                        for (Widget item in controller.children) item,
+                                        for (Widget item in controller.children)
+                                          item,
                                     ],
                                   ),
                                 )

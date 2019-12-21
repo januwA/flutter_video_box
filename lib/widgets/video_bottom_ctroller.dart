@@ -15,14 +15,13 @@ class VideoBottomCtroller extends StatelessWidget {
     return ListTile(
       title: Row(
         children: <Widget>[
-          Expanded(
-            child: Observer(
-              builder: (_) => Text(
-                controller.videoBoxTimeText,
-                style: TextStyle(color: Colors.white),
-              ),
+          Observer(
+            builder: (_) => Text(
+              controller.videoBoxTimeText,
+              style: TextStyle(color: controller.color),
             ),
           ),
+          Spacer(),
           Observer(
             builder: (_) => IconButton(
               icon: Icon(controller.volumeIcon),
@@ -50,9 +49,9 @@ class VideoBottomCtroller extends StatelessWidget {
         ),
         child: Observer(
           builder: (_) => BufferSlider(
-            inactiveColor: Colors.white24,
-            bufferColor: Colors.white38,
-            activeColor: Colors.white,
+            inactiveColor: controller.inactiveColor,
+            bufferColor: controller.bufferColor,
+            activeColor: controller.color,
             value: controller.sliderValue,
             bufferValue: controller.sliderBufferValue,
             onChanged: controller.sliderChanged,

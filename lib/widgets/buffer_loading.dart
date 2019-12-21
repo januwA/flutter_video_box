@@ -16,7 +16,7 @@ class BufferLoading extends StatelessWidget {
         builder: (_) => AnimatedSwitcher(
           duration: Duration(milliseconds: 300),
           child: controller.isBfLoading
-              ? CircularProgressIndicatorBig(color: Colors.white)
+              ? CircularProgressIndicatorBig(color: controller.circularProgressIndicatorColor)
               : SizedBox(),
         ),
       ),

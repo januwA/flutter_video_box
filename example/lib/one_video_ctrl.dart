@@ -20,6 +20,14 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
     super.initState();
     vc = VideoController(
       source: VideoPlayerController.network(src1),
+      loop: true,
+      autoplay: true,
+      controllerDuration: Duration(seconds: 5),
+      color: Colors.red,
+      bufferColor: Colors.orange,
+      inactiveColor: Colors.pink,
+      background: Colors.indigo,
+      circularProgressIndicatorColor: Colors.lime,
       // cover: Image.network('https://i.loli.net/2019/08/29/7eXVLcHAhtO9YQg.jpg'),
       // controllerWidgets: false,
       // cover: Text('Cover'),
@@ -98,7 +106,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
               RaisedButton(
                 child: Text('print'),
                 onPressed: () {
-                  print(vc.toMap());
+                  print(vc);
                 },
               ),
             ],

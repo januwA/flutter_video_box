@@ -65,7 +65,7 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
                     index = newindex;
                   });
                   vc.setAutoplay(false);
-                  vc.showVideoCtrl(true);
+                  vc.setControllerLayer(show: true);
                   vc.setSource(VideoPlayerController.network(src));
                   vc.initialize();
                 },

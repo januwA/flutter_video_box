@@ -68,23 +68,6 @@ mixin _$VideoController on _VideoController, Store {
     }, _$barrierColorAtom, name: '${_$barrierColorAtom.name}_set');
   }
 
-  final _$isPlayEndAtom = Atom(name: '_VideoController.isPlayEnd');
-
-  @override
-  bool get isPlayEnd {
-    _$isPlayEndAtom.context.enforceReadPolicy(_$isPlayEndAtom);
-    _$isPlayEndAtom.reportObserved();
-    return super.isPlayEnd;
-  }
-
-  @override
-  set isPlayEnd(bool value) {
-    _$isPlayEndAtom.context.conditionallyRunInAction(() {
-      super.isPlayEnd = value;
-      _$isPlayEndAtom.reportChanged();
-    }, _$isPlayEndAtom, name: '${_$isPlayEndAtom.name}_set');
-  }
-
   final _$coverAtom = Atom(name: '_VideoController.cover');
 
   @override
@@ -273,21 +256,21 @@ mixin _$VideoController on _VideoController, Store {
     }, _$durationAtom, name: '${_$durationAtom.name}_set');
   }
 
-  final _$isShowVideoCtrlAtom = Atom(name: '_VideoController.isShowVideoCtrl');
+  final _$controllerLayerAtom = Atom(name: '_VideoController.controllerLayer');
 
   @override
-  bool get isShowVideoCtrl {
-    _$isShowVideoCtrlAtom.context.enforceReadPolicy(_$isShowVideoCtrlAtom);
-    _$isShowVideoCtrlAtom.reportObserved();
-    return super.isShowVideoCtrl;
+  bool get controllerLayer {
+    _$controllerLayerAtom.context.enforceReadPolicy(_$controllerLayerAtom);
+    _$controllerLayerAtom.reportObserved();
+    return super.controllerLayer;
   }
 
   @override
-  set isShowVideoCtrl(bool value) {
-    _$isShowVideoCtrlAtom.context.conditionallyRunInAction(() {
-      super.isShowVideoCtrl = value;
-      _$isShowVideoCtrlAtom.reportChanged();
-    }, _$isShowVideoCtrlAtom, name: '${_$isShowVideoCtrlAtom.name}_set');
+  set controllerLayer(bool value) {
+    _$controllerLayerAtom.context.conditionallyRunInAction(() {
+      super.controllerLayer = value;
+      _$controllerLayerAtom.reportChanged();
+    }, _$controllerLayerAtom, name: '${_$controllerLayerAtom.name}_set');
   }
 
   final _$isFullScreenAtom = Atom(name: '_VideoController.isFullScreen');
@@ -410,10 +393,10 @@ mixin _$VideoController on _VideoController, Store {
   }
 
   @override
-  void showVideoCtrl(bool show) {
+  void setControllerLayer({bool show}) {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
-      return super.showVideoCtrl(show);
+      return super.setControllerLayer(show: show);
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }

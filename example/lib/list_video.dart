@@ -11,6 +11,7 @@ class ListVideo extends StatefulWidget {
 }
 
 class _ListVideoState extends State<ListVideo> {
+  ScrollController controller = ScrollController();
   List<VideoController> vcs = [];
 
   @override
@@ -33,10 +34,9 @@ class _ListVideoState extends State<ListVideo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('list video'),
-      ),
+      appBar: AppBar(title: Text('list video')),
       body: ListView(
+        controller: controller,
         children: <Widget>[
           for (var vc in vcs)
             Padding(
@@ -46,18 +46,6 @@ class _ListVideoState extends State<ListVideo> {
                 child: VideoBox(controller: vc),
               ),
             ),
-          Padding(
-            padding: const EdgeInsets.only(top: 12.0),
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: VideoBox(
-                controller: VideoController(
-                    source: VideoPlayerController.network(
-                        "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
-                      ..initialize()),
-              ),
-            ),
-          ),
         ],
       ),
     );
