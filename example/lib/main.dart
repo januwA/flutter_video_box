@@ -5,6 +5,12 @@ import 'change_video_src.dart';
 import 'list_video.dart';
 import 'one_video_ctrl.dart';
 
+const oneVideoCtrl = '/one-video-ctrl';
+const listVideo = '/list-video';
+const changeVideoSrc = '/change-video-src';
+const videos = '/videos';
+const videoPlayerDemo = '/video-player-demo';
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -13,29 +19,22 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: <String, WidgetBuilder>{
-        '/oneVideoCtrl': (BuildContext context) => OneVideoCtrl(),
-        '/listVideo': (BuildContext context) => ListVideo(),
-        '/change_video_src': (BuildContext context) => ChangeVideoSrc(),
-        '/videos': (BuildContext context) => Videos(),
-        VideoPlayerDemo.routeName: (BuildContext context) => VideoPlayerDemo(),
+        oneVideoCtrl: (BuildContext context) => OneVideoCtrl(),
+        listVideo: (BuildContext context) => ListVideo(),
+        changeVideoSrc: (BuildContext context) => ChangeVideoSrc(),
+        videos: (BuildContext context) => Videos(),
+        videoPlayerDemo: (BuildContext context) => VideoPlayerDemo(),
       },
       home: HomePage(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
-  @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
+class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('video_box example'),
-      ),
+      appBar: AppBar(title: Text('video_box example')),
       body: Center(
         child: IntrinsicWidth(
           child: Column(
@@ -44,33 +43,27 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               RaisedButton(
                 child: Text('one video ctrl'),
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/oneVideoCtrl');
-                },
+                onPressed: () => Navigator.of(context).pushNamed(oneVideoCtrl),
               ),
               RaisedButton(
                 child: Text('list video'),
                 onPressed: () {
-                  Navigator.of(context).pushNamed('/listVideo');
+                  Navigator.of(context).pushNamed(listVideo);
                 },
               ),
               RaisedButton(
                 child: Text('change video src'),
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/change_video_src');
-                },
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(changeVideoSrc),
               ),
               RaisedButton(
                 child: Text('videos'),
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/videos');
-                },
+                onPressed: () => Navigator.of(context).pushNamed(videos),
               ),
               RaisedButton(
                 child: Text('VideoPlayerDemo'),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(VideoPlayerDemo.routeName);
-                },
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(videoPlayerDemo),
               ),
             ],
           ),

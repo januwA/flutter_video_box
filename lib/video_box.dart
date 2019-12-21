@@ -177,8 +177,7 @@ class _VideoBoxState extends State<VideoBox>
                                             controller: controller),
                                       ),
                                       if (controller.children != null)
-                                        for (Widget item in controller.children)
-                                          item,
+                                        for (Widget item in controller.children) item,
                                     ],
                                   ),
                                 )

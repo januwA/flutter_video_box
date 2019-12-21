@@ -46,6 +46,18 @@ class _ListVideoState extends State<ListVideo> {
                 child: VideoBox(controller: vc),
               ),
             ),
+          Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: VideoBox(
+                controller: VideoController(
+                    source: VideoPlayerController.network(
+                        "http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4")
+                      ..initialize()),
+              ),
+            ),
+          ),
         ],
       ),
     );

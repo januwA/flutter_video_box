@@ -4,7 +4,6 @@ import 'package:video_player/video_player.dart';
 import 'globals.dart';
 
 class VideoPlayerDemo extends StatefulWidget {
-  static const routeName = '/VideoPlayerDemo';
   @override
   _VideoPlayerDemoState createState() => _VideoPlayerDemoState();
 }

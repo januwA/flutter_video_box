@@ -29,9 +29,11 @@ class VideoBottomCtroller extends StatelessWidget {
               onPressed: controller.setOnSoundOrOff,
             ),
           ),
-          IconButton(
-            icon: Icon(controller.fullScreenIcon),
-            onPressed: () => controller.onFullScreen(context),
+          Observer(
+            builder: (_) => IconButton(
+              icon: Icon(controller.fullScreenIcon),
+              onPressed: () => controller.onFullScreen(context),
+            ),
           ),
         ],
       ),
@@ -46,13 +48,15 @@ class VideoBottomCtroller extends StatelessWidget {
             ),
           ),
         ),
-        child: BufferSlider(
-          inactiveColor: Colors.white24,
-          bufferColor: Colors.white38,
-          activeColor: Colors.white,
-          value: controller.sliderValue,
-          bufferValue: controller.sliderBufferValue,
-          onChanged: controller.sliderChanged,
+        child: Observer(
+          builder: (_) => BufferSlider(
+            inactiveColor: Colors.white24,
+            bufferColor: Colors.white38,
+            activeColor: Colors.white,
+            value: controller.sliderValue,
+            bufferValue: controller.sliderBufferValue,
+            onChanged: controller.sliderChanged,
+          ),
         ),
       ),
     );

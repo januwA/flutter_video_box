@@ -185,7 +185,7 @@ abstract class _VideoController with Store {
       if (_showCtrlTimer?.isActive ?? false) {
         _showCtrlTimer?.cancel();
       } else {
-        _showCtrlTimer = Timer(Duration(seconds: 2), () {
+        _showCtrlTimer = Timer(Duration(seconds: 20), () {
           // 2秒后，暂停状态不自动关闭
           if (videoCtrl.value.isPlaying) {
             showVideoCtrl(false);
