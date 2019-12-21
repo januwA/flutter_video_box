@@ -9,9 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  video_player: ^0.10.2+5
-  mobx: ^0.3.9+1
-  flutter_mobx: ^0.3.3+1
+  video_player: ^0.10.5
+  mobx: ^0.3.10
+  flutter_mobx: ^0.3.4+1
   screen: ^0.0.5
   volume: ^0.1.0
 

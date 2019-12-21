@@ -7,6 +7,10 @@ note:
 * No ios test
 * Development api may change at any time
 
+<hmtl>
+  <p style="color: red;">This library is developed on the `flutter master` branch</p>
+</html>
+
 ## Install
 ```
 dependencies:

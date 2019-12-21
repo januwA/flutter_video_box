@@ -447,15 +447,14 @@ abstract class _VideoController with Store {
   /// set MEDIA Volume
   Future<int> setVol(int i) => Volume.setVol(i);
 
-  @override
   Future<void> dispose() async {
     animetedIconController?.dispose();
     videoCtrl?.removeListener(_videoListenner);
     await videoCtrl?.pause();
     await videoCtrl?.dispose();
     _showCtrlTimer?.cancel();
-    super.dispose();
   }
+
 
   VideoState toObject() {
     return VideoState(

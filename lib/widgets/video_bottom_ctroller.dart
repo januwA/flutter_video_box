@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
@@ -17,9 +16,11 @@ class VideoBottomCtroller extends StatelessWidget {
       title: Row(
         children: <Widget>[
           Expanded(
-            child: Text(
-              controller.videoBoxTimeText,
-              style: TextStyle(color: Colors.white),
+            child: Observer(
+              builder: (_) => Text(
+                controller.videoBoxTimeText,
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ),
           Observer(
