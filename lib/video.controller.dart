@@ -78,7 +78,7 @@ abstract class _VideoController with Store {
       begin: 0.0,
       end: 1.0,
     ).animate(animetedIconController);
-    if (autoplay) setAnimetedIconState();
+    setAnimetedIconState();
   }
 
   Future<void> setAnimetedIconState() async {
