@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:math';
+// import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobx/mobx.dart';
-import 'package:screen/screen.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_box/util/duration_string.dart' show durationString;
 import 'package:volume/volume.dart';
@@ -58,6 +57,11 @@ abstract class _VideoController with Store {
   Function _playEnd;
   addPlayEndListener(void Function() listener) {
     this._playEnd = listener;
+  }
+
+  Function _fullScreenChange;
+  addFullScreenChangeListener(void Function() listener) {
+    this._fullScreenChange = listener;
   }
 
   /// 控制媒体音量
@@ -466,16 +470,18 @@ abstract class _VideoController with Store {
     } else {
       // Turn on full screen
       _setLandscape();
-      Screen.keepOn(true);
+      // Screen.keepOn(true);
       SystemChrome.setEnabledSystemUIOverlays([]);
+      if (_fullScreenChange != null) _fullScreenChange();
       await Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => customScreen ?? _FullPageVideo(controller: this),
         ),
       );
       _setPortrait();
-      Screen.keepOn(false);
+      // Screen.keepOn(false);
       SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+      if (_fullScreenChange != null) _fullScreenChange();
     }
   }
 
@@ -492,21 +498,22 @@ abstract class _VideoController with Store {
     setVol(_currentVol + dy);
   }
 
-  double _currentBrightness;
+  // double _currentBrightness;
 
   /// 左侧版块设置屏幕亮度
   /// The left section sets the screen brightness
+  /// TODO: Screen 出现错误删除此依赖，寻找其它解决方案
   Future<void> setScreenBrightness(DragUpdateDetails d) async {
-    double dy = d.delta.dy / 200;
-    _currentBrightness ??= await Screen.brightness;
-    double v;
-    if (dy > 0) {
-      v = max(_currentBrightness - dy.abs(), 0);
-    } else {
-      v = min(_currentBrightness + dy.abs(), 1);
-    }
-    _currentBrightness = v;
-    Screen.setBrightness(v);
+    // double dy = d.delta.dy / 200;
+    // _currentBrightness ??= await Screen.brightness;
+    // double v;
+    // if (dy > 0) {
+    //   v = max(_currentBrightness - dy.abs(), 0);
+    // } else {
+    //   v = min(_currentBrightness + dy.abs(), 1);
+    // }
+    // _currentBrightness = v;
+    // Screen.setBrightness(v);
   }
 
   /// set MEDIA Volume
