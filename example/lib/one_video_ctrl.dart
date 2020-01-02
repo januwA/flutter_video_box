@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:video_box/video.store.dart';
+import 'package:video_box/video.controller.dart';
 import 'package:video_box/video_box.dart';
+import 'package:video_player/video_player.dart';
 
 import 'globals.dart';
 
@@ -10,31 +11,35 @@ class OneVideoCtrl extends StatefulWidget {
 }
 
 class _OneVideoCtrlState extends State<OneVideoCtrl> {
-  Video video;
+  VideoController vc;
+  bool get isPlay => vc.videoCtrl.value.isPlaying;
+  ScrollController controller = ScrollController();
+
   @override
   void initState() {
     super.initState();
-    video = Video(
-      store: VideoStore(
-        videoDataSource: VideoDataSource.network(src1),
-        // initPosition: Duration(minutes: 20),
-        cover: Text(
-          'cover',
-          style: TextStyle(color: Colors.white),
-        ),
-        // playingListenner: () {
-        //   print(video.store.toMap());
-        // },
-        // isAutoplay: true,
-        // isLooping: true,
-        // volume: 0.0,
-      ),
-    );
+    vc = VideoController(
+      source: VideoPlayerController.network(src1),
+      loop: true,
+      autoplay: true,
+      controllerDuration: Duration(seconds: 5),
+      color: Colors.red,
+      bufferColor: Colors.orange,
+      inactiveColor: Colors.pink,
+      background: Colors.indigo,
+      circularProgressIndicatorColor: Colors.lime,
+      // cover: Image.network('https://i.loli.net/2019/08/29/7eXVLcHAhtO9YQg.jpg'),
+      // controllerWidgets: false,
+      // cover: Text('Cover'),
+      // initPosition: Duration(minutes: 23, seconds: 50)
+    )..initialize().then((_) {
+        // initialized
+      });
   }
 
   @override
   void dispose() {
-    video.dispose();
+    vc.dispose();
     super.dispose();
   }
 
@@ -45,29 +50,63 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
         title: Text('one video ctrl'),
       ),
       body: ListView(
+        controller: controller,
         children: <Widget>[
-          video.videoBox,
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+          AspectRatio(
+            aspectRatio: 16 / 9,
+            child: VideoBox(
+              controller: vc,
+              children: <Widget>[
+                Align(
+                  alignment: Alignment(0.5, 0),
+                  child: IconButton(
+                    iconSize: VideoBox.centerIconSize,
+                    disabledColor: Colors.white60,
+                    icon: Icon(Icons.skip_next),
+                    onPressed: () {},
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
             children: <Widget>[
               RaisedButton(
                 child: Text('play'),
                 onPressed: () {
-                  // video.store.videoCtrl.play();
-                  video.store.play();
+                  vc.play();
                 },
               ),
               RaisedButton(
                 child: Text('pause'),
                 onPressed: () {
-                  // video.store.videoCtrl.pause();
-                  video.store.pause();
+                  vc.pause();
                 },
               ),
               RaisedButton(
                 child: Text('full screen'),
                 onPressed: () {
-                  video.store.onFullScreen(context);
+                  vc.onFullScreen(
+                    context,
+                    SafeArea(
+                      child: Scaffold(
+                        body: Center(
+                          child: AspectRatio(
+                            aspectRatio: 16 / 9,
+                            child: VideoBox(controller: vc),
+                          ),
+                        ),
+                        backgroundColor: Colors.black,
+                      ),
+                    ),
+                  );
+                },
+              ),
+              RaisedButton(
+                child: Text('print'),
+                onPressed: () {
+                  print(vc);
                 },
               ),
             ],

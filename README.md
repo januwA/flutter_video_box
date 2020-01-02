@@ -1,19 +1,21 @@
 # video_box
 
-## 一个在flutter中播放视频的控件
+ A control that plays video in flutter, I make the control as flexible as possible, can play a single video, video list on the page.
 
-注意：
-* 只在android上面测试过
-* 没有ios测试
-* 开发中api随时可能更改
+note:
+* Only tested on android
+* No ios test
+* Development api may change at any time
 
-## 安装配置
+## This library is developed on the `flutter master` branch
+
+## Install
 ```
 dependencies:
   video_box:
 ```
 
-android: AndroidManifest.xml
+android: `<project root>/android/app/src/main/AndroidManifest.xml`:
 ```
 <manifest>
     ...
@@ -23,23 +25,21 @@ android: AndroidManifest.xml
 </manifest>
 ```
 
-ios: Info.plist
+ios: `<project root>/ios/Runner/Info.plist`:
 ```
-<plist>
-    ...
-    <key>NSAppTransportSecurity</key>
-    <dict>
-        <key>NSAllowsArbitraryLoads</key>
-        <true/>
-    </dict>
-</plist>
+<key>NSAppTransportSecurity</key>
+<dict>
+  <key>NSAllowsArbitraryLoads</key>
+  <true/>
+</dict>
 ```
 
-## 使用
+## Usage
 ```dart
 import 'package:flutter/material.dart';
-import 'package:video_box/video.store.dart';
+import 'package:video_box/video.controller.dart';
 import 'package:video_box/video_box.dart';
+import 'package:video_player/video_player.dart';
 
 class ListVideo extends StatefulWidget {
   @override
@@ -47,24 +47,21 @@ class ListVideo extends StatefulWidget {
 }
 
 class _ListVideoState extends State<ListVideo> {
-  List<Video> videos = [];
+  List<VideoController> vcs = [];
 
   @override
   void initState() {
     super.initState();
     for (var i = 0; i < 4; i++) {
-      videos.add(
-        Video(
-          store: VideoStore(videoDataSource: VideoDataSource.network(src)),
-        ),
-      );
+      vcs.add(VideoController(source: VideoPlayerController.network(src1))
+        ..initialize());
     }
   }
 
   @override
   void dispose() {
-    for (var v in videos) {
-      v.dispose();
+    for (var vc in vcs) {
+      vc.dispose();
     }
     super.dispose();
   }
@@ -77,10 +74,13 @@ class _ListVideoState extends State<ListVideo> {
       ),
       body: ListView(
         children: <Widget>[
-          for (var v in videos)
+          for (var vc in vcs)
             Padding(
               padding: const EdgeInsets.only(top: 12.0),
-              child: v.videoBox,
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: VideoBox(controller: vc),
+              ),
             ),
         ],
       ),
@@ -89,21 +89,7 @@ class _ListVideoState extends State<ListVideo> {
 }
 ```
 
-## options
-```dart
-video = Video(
-  store: VideoStore(
-    videoDataSource, // 资源 [network file asset]
-    skiptime, // 每次双击seekto的时间
-    isAutoplay, // 自动播放
-    isLooping, // 循环播放
-    volume, // 初始音量
-    initPosition, // 初始播放位置
-    playingListenner, // 播放时的回调函数
-    playEnd, // 播放结束
-    cover, // 视频第一次播放前，显示的封面
-  ),
-);
-```
+For details, see /example or source code.
 
-详情可以看下/example或则源码
+show:
+![](https://i.loli.net/2019/07/07/5d22104b8690b94290.jpg)

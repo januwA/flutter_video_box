@@ -1,296 +1,197 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
-import 'package:provider/provider.dart';
-import 'package:video_box/video.store.dart';
 import 'package:video_player/video_player.dart';
-import 'package:screen/screen.dart';
 
-/// 下面是一个简单的example，更具体使用何以看 /example下面的代码或则源码
-/// ```dart
-/// Video video = Video(store: VideoStore(videoDataSource: VideoDataSource.network('http://example.com/example.mp4')));
-///
-/// @override
-/// void dispose() {
-///   video.dispose();
-///   super.dispose();
-/// }
-///
-/// // 在ui中展示
-/// Container(child: video.videoBox),
-/// ```
-class Video {
-  Video({
-    this.store,
-  }) : videoBox = VideoBox(store: store);
-  final VideoStore store;
-  final VideoBox videoBox;
-  dispose() {
-    store.dispose();
-  }
-}
+import 'video.controller.dart';
+import 'widgets/buffer_loading.dart';
+import 'widgets/circular_progressIndicator_big.dart';
+import 'widgets/seek_to_view.dart';
+import 'widgets/video_bottom_ctroller.dart';
 
 class VideoBox extends StatefulWidget {
-  VideoBox({
-    Key key,
-    this.videoDataSource,
-    this.store,
-    this.isDispose = false,
-  }) : super(key: key);
+  /// Example:
+  ///
+  /// ```dart
+  /// VideoController vc = VideoController(source: VideoPlayerController.network('xxx.mp4'))..initialize();
+  ///
+  /// @override
+  /// void dispose() {
+  ///   vc.dispose();
+  /// }
+  ///
+  /// // display videoBox
+  /// AspectRatio(
+  ///   aspectRatio: 16 / 9,
+  ///   child: VideoBox(controller: vc),
+  /// )
+  /// ```
+  ///
+  /// see also:
+  ///
+  /// https://github.com/januwA/flutter_video_box/tree/master/example
+  VideoBox(
+      {Key key,
+      @required this.controller,
+      this.afterChildren = const <Widget>[],
+      this.beforeChildren = const <Widget>[],
+      this.children = const <Widget>[]})
+      : super(key: key);
 
-  final VideoDataSource videoDataSource;
-  final VideoStore store;
-  final isDispose;
+  static const double centerIconSize = 40.0;
+
+  final VideoController controller;
+
+  /// video / beforeChildren / controllerWidgets-> children / afterChildren
+  final List<Widget> afterChildren;
+
+  /// video / beforeChildren / controllerWidgets-> children / afterChildren
+  final List<Widget> beforeChildren;
+
+  /// add your widget
+  ///
+  /// ```dart
+  /// AspectRatio(
+  ///   aspectRatio: 16 / 9,
+  ///   child: VideoBox(
+  ///     controller: controller,
+  ///     children: <Widget>[
+  ///       Align(
+  ///         alignment: Alignment(-0.5, 0),
+  ///         child: IconButton(
+  ///           iconSize: 40,
+  ///           disabledColor: Colors.white60,
+  ///           icon: Icon(Icons.skip_previous),
+  ///           onPressed: canPrev() ? prevVideo : null,
+  ///         ),
+  ///       ),
+  ///       Align(
+  ///         alignment: Alignment(0.5, 0),
+  ///         child: IconButton(
+  ///           iconSize: 40,
+  ///           disabledColor: Colors.white60,
+  ///           icon: Icon(Icons.skip_next),
+  ///           onPressed: canNext() ? nextVideo : null,
+  ///         ),
+  ///       ),
+  ///     ],
+  ///   ),
+  /// ),
+  /// ```
+  final List<Widget> children;
+
   @override
   _VideoBoxState createState() => _VideoBoxState();
 }
 
-class _VideoBoxState extends State<VideoBox> {
-  VideoStore videoStore;
+class _VideoBoxState extends State<VideoBox>
+    with SingleTickerProviderStateMixin {
+  VideoController controller;
 
   @override
   void initState() {
     super.initState();
-    videoStore =
-        widget.store ?? VideoStore(videoDataSource: widget.videoDataSource);
-  }
 
-  @override
-  void dispose() {
-    if (widget.isDispose) {
-      videoStore.dispose();
-    }
-    super.dispose();
+    controller = widget.controller
+      ..initAnimetedIconController(this)
+      ..children ??= widget.children
+      ..beforeChildren ??= widget.beforeChildren
+      ..afterChildren ??= widget.afterChildren;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Observer(
-      builder: (_) => videoStore.isVideoLoading
-          ? _VideoLoading()
-          : MultiProvider(
-              providers: [Provider<VideoStore>.value(value: videoStore)],
-              child: GestureDetector(
-                onTap: () =>
-                    videoStore.showVideoCtrl(!videoStore.isShowVideoCtrl),
-                child: Stack(
-                  alignment: AlignmentDirectional.center,
-                  children: <Widget>[
-                    AnimatedOpacity(
-                      opacity: videoStore.isShowCover ? 1.0 : 0.0,
-                      duration: Duration(milliseconds: 300),
-                      child: _VideoLoading(
-                        cover: videoStore.cover,
-                      ),
+    return Theme(
+      data: ThemeData(
+        iconTheme: IconThemeData(color: controller.color),
+      ),
+      child: Container(
+        color: controller.background,
+        child: Observer(
+          builder: (context) {
+            return GestureDetector(
+              onTap: controller.toggleShowVideoCtrl,
+              child: Stack(
+                children: <Widget>[
+                  if (!controller.initialized) ...[
+                    // 加载中同时显示loading和海报
+                    if (controller.cover != null)
+                      Center(child: controller.cover),
+                    Center(
+                        child: CircularProgressIndicatorBig(
+                      color: controller.circularProgressIndicatorColor,
+                    )),
+                  ] else ...[
+                    // 加载完成在第一帧显示海报
+                    Container(
+                      color: Colors.transparent,
+                      child: controller.isShowCover
+                          ? Center(child: controller.cover)
+                          : Center(
+                              child: AspectRatio(
+                                aspectRatio:
+                                    controller.videoCtrl.value.aspectRatio,
+                                child: VideoPlayer(controller.videoCtrl),
+                              ),
+                            ),
                     ),
-                    AnimatedOpacity(
-                      opacity: !videoStore.isShowCover ? 1.0 : 0.0,
-                      duration: Duration(milliseconds: 300),
-                      child: Container(
-                        decoration: BoxDecoration(color: Colors.black),
-                        child: Center(
-                          child: AspectRatio(
-                            aspectRatio: videoStore.videoCtrl.value.aspectRatio,
-                            child: VideoPlayer(videoStore.videoCtrl),
-                          ),
+
+                    if (controller.beforeChildren != null)
+                      for (Widget item in controller.beforeChildren) item,
+
+                    if (controller.controllerWidgets) ...[
+                      Positioned.fill(
+                          child: SeekToView(controller: controller)),
+                      BufferLoading(controller: controller),
+                      Positioned.fill(
+                        child: AnimatedSwitcher(
+                          duration: kTabScrollDuration,
+                          child: controller.controllerLayer
+                              ? Container(
+                                  color: controller.barrierColor,
+                                  child: Stack(
+                                    children: <Widget>[
+                                      Positioned.fill(
+                                          child: SeekToView(
+                                              controller: controller)),
+                                      Center(
+                                        child: IconButton(
+                                          iconSize: VideoBox.centerIconSize,
+                                          icon: AnimatedIcon(
+                                            icon: AnimatedIcons.play_pause,
+                                            progress:
+                                                controller.animetedIconTween,
+                                          ),
+                                          onPressed: () {
+                                            controller.togglePlay();
+                                          },
+                                        ),
+                                      ),
+                                      Positioned(
+                                        left: 0,
+                                        bottom: 0,
+                                        right: 0,
+                                        child: VideoBottomCtroller(
+                                            controller: controller),
+                                      ),
+                                      if (controller.children != null)
+                                        for (Widget item in controller.children)
+                                          item,
+                                    ],
+                                  ),
+                                )
+                              : SizedBox(),
                         ),
                       ),
-                    ),
-                    _SeekToView(),
-                    _PlayButton(),
-                    _VideoBottomCtrl(),
-                  ],
-                ),
+                    ],
+
+                    // 自定义控件
+                    if (controller.afterChildren != null)
+                      for (Widget item in controller.afterChildren) item,
+                  ]
+                ],
               ),
-            ),
-    );
-  }
-}
-
-/// 快进，快退两个隐藏的板块按钮
-class _SeekToView extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final videoStore = Provider.of<VideoStore>(context);
-    return Positioned(
-      left: 0,
-      top: 0,
-      right: 0,
-      bottom: 0,
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            flex: 1,
-            child: GestureDetector(
-              onDoubleTap: videoStore.rewind,
-              child: Container(
-                decoration: BoxDecoration(),
-              ),
-            ),
-          ),
-          const SizedBox(width: 24),
-          Expanded(
-            flex: 1,
-            child: GestureDetector(
-              onDoubleTap: videoStore.fastForward,
-              child: Container(
-                decoration: BoxDecoration(),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// video 中间的播放按钮
-class _PlayButton extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final videoStore = Provider.of<VideoStore>(context);
-    return Observer(
-      builder: (_) => AnimatedCrossFade(
-        duration: const Duration(milliseconds: 300),
-        firstChild: Container(),
-        secondChild: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            shape: BoxShape.circle,
-          ),
-          child: IconButton(
-            color: Colors.black,
-            icon: Icon(
-              videoStore.videoCtrl == null ||
-                      videoStore.videoCtrl.value.isPlaying
-                  ? Icons.pause
-                  : Icons.play_arrow,
-            ),
-            onPressed: videoStore.togglePlay,
-          ),
-        ),
-        crossFadeState: videoStore.isShowVideoCtrl
-            ? CrossFadeState.showSecond
-            : CrossFadeState.showFirst,
-      ),
-    );
-  }
-}
-
-/// video 底部的控制器
-class _VideoBottomCtrl extends StatelessWidget {
-  /// 返回一个符合当前音量的icon
-  IconData _volumeIcon(double volume) {
-    return volume <= 0
-        ? Icons.volume_off
-        : volume <= 0.5 ? Icons.volume_down : Icons.volume_up;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final videoStore = Provider.of<VideoStore>(context);
-    return Observer(
-      builder: (_) => Positioned(
-        bottom: 0,
-        left: 0,
-        right: 0,
-        child: AnimatedCrossFade(
-          duration: Duration(milliseconds: 300),
-          firstChild: Container(),
-          secondChild: Container(
-            decoration: BoxDecoration(color: Colors.black12),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Theme(
-                data: Theme.of(context).copyWith(
-                  iconTheme: IconThemeData(color: Colors.white),
-                  sliderTheme: Theme.of(context).sliderTheme.copyWith(
-                        /// 进度之前的颜色
-                        activeTrackColor: Colors.white70,
-
-                        /// 进度之后的颜色
-                        inactiveTrackColor: Colors.white30,
-
-                        // 指示器的颜色
-                        thumbColor: Colors.white,
-                      ),
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Text(
-                      videoStore.isVideoLoading
-                          ? '00:00/00:00'
-                          : "${videoStore.positionText}/${videoStore.durationText}",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Expanded(
-                      child: Slider(
-                        // inactiveColor: Colors.grey[300],
-                        // activeColor: Colors.white,
-                        value: videoStore.sliderValue,
-                        onChanged: videoStore.sliderChanged,
-                      ),
-                    ),
-                    videoStore.isVideoLoading
-                        ? IconButton(
-                            icon: Icon(Icons.volume_up),
-                            onPressed: () {},
-                          )
-                        : IconButton(
-                            icon: Icon(
-                                _volumeIcon(videoStore.videoCtrl.value.volume)),
-                            onPressed: videoStore.setOnSoundOrOff,
-                          ),
-                    IconButton(
-                      icon: Icon(
-                        !videoStore.isFullScreen
-                            ? Icons.fullscreen
-                            : Icons.fullscreen_exit,
-                      ),
-                      onPressed: () => videoStore.onFullScreen(context),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          crossFadeState: videoStore.isShowVideoCtrl
-              ? CrossFadeState.showSecond
-              : CrossFadeState.showFirst,
-        ),
-      ),
-    );
-  }
-}
-
-/// 没有src的时候，显示加载中
-class _VideoLoading extends StatelessWidget {
-  const _VideoLoading({
-    Key key,
-    this.cover,
-  }) : super(key: key);
-
-  final Widget cover;
-
-  @override
-  Widget build(BuildContext context) {
-    return AspectRatio(
-      aspectRatio: 16.0 / 9.0,
-      child: Container(
-        color: Colors.black,
-        child: Stack(
-          alignment: Alignment.center,
-          children: <Widget>[
-            cover == null
-                ? SizedBox(
-                    height: 50,
-                    width: 50,
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(Colors.white),
-                    ),
-                  )
-                : cover,
-          ],
+            );
+          },
         ),
       ),
     );
