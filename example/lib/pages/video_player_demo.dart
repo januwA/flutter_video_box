@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import 'globals.dart';
+import '../globals.dart';
 
 class VideoPlayerDemo extends StatefulWidget {
   @override

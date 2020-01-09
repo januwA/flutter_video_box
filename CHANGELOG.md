@@ -1,3 +1,8 @@
+## 0.9.0 - 2020-1-9
+* VideoController增加api: `customLoadingWidget`  `customBufferedWidget`  `customFullScreen` 
+* `onFullScreen`变更为`onFullScreenSwitch`
+* 添加画中画example
+
 ## 0.8.2 - 2019-12-25
 
 * `screen`依赖在打包时出现错误，删除此库，相关功能不可用

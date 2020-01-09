@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
-import 'video_player_demo.dart';
-import 'videos.dart';
-import 'change_video_src.dart';
-import 'list_video.dart';
-import 'one_video_ctrl.dart';
+import 'pages/video_player_demo.dart';
+import 'pages/videos.dart';
+import 'pages/change_video_src.dart';
+import 'pages/list_video.dart';
+import 'pages/one_video_ctrl.dart';
+import 'pages/pip.dart';
 
 const oneVideoCtrl = '/one-video-ctrl';
 const listVideo = '/list-video';
 const changeVideoSrc = '/change-video-src';
 const videos = '/videos';
 const videoPlayerDemo = '/video-player-demo';
+const piPDemo = '/pip-demo';
 
 void main() => runApp(MyApp());
 
@@ -24,6 +26,7 @@ class MyApp extends StatelessWidget {
         changeVideoSrc: (BuildContext context) => ChangeVideoSrc(),
         videos: (BuildContext context) => Videos(),
         videoPlayerDemo: (BuildContext context) => VideoPlayerDemo(),
+        piPDemo: (BuildContext context) => PipPage(),
       },
       home: HomePage(),
     );
@@ -64,6 +67,10 @@ class HomePage extends StatelessWidget {
                 child: Text('VideoPlayerDemo'),
                 onPressed: () =>
                     Navigator.of(context).pushNamed(videoPlayerDemo),
+              ),
+              RaisedButton(
+                child: Text('PiP'),
+                onPressed: () => Navigator.of(context).pushNamed(piPDemo),
               ),
             ],
           ),

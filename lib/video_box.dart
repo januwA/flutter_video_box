@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:video_player/video_player.dart';
 
@@ -7,6 +8,16 @@ import 'widgets/buffer_loading.dart';
 import 'widgets/circular_progressIndicator_big.dart';
 import 'widgets/seek_to_view.dart';
 import 'widgets/video_bottom_ctroller.dart';
+
+abstract class CustomFullScreen {
+  /// 您需要返回一个异步事件(通常是等待页面结束的异步事件)
+  /// 请参考[VideoController.customFullScreen]的example
+  ///
+  /// You need to return an asynchronous event (usually an asynchronous event waiting for the page to end)
+  /// please refer to the example of [VideoController.customFullScreen]
+  Future<Object> open(BuildContext context, VideoController controller);
+  void close(BuildContext context, VideoController controller);
+}
 
 class VideoBox extends StatefulWidget {
   /// Example:
@@ -116,10 +127,12 @@ class _VideoBoxState extends State<VideoBox>
                     // 加载中同时显示loading和海报
                     if (controller.cover != null)
                       Center(child: controller.cover),
-                    Center(
-                        child: CircularProgressIndicatorBig(
-                      color: controller.circularProgressIndicatorColor,
-                    )),
+                    controller.customLoadingWidget ??
+                        Center(
+                          child: CircularProgressIndicatorBig(
+                            color: controller.circularProgressIndicatorColor,
+                          ),
+                        ),
                   ] else ...[
                     // 加载完成在第一帧显示海报
                     Container(
@@ -167,9 +180,9 @@ class _VideoBoxState extends State<VideoBox>
                                         ),
                                       ),
                                       Positioned(
-                                        left: 0,
-                                        bottom: 0,
-                                        right: 0,
+                                        left: controller.bottomPadding.left,
+                                        bottom: controller.bottomPadding.bottom,
+                                        right: controller.bottomPadding.right,
                                         child: VideoBottomCtroller(
                                             controller: controller),
                                       ),
@@ -193,6 +206,39 @@ class _VideoBoxState extends State<VideoBox>
             );
           },
         ),
+      ),
+    );
+  }
+}
+
+// 全屏页面
+class VideoBoxFullScreenPage extends StatefulWidget {
+  final controller;
+
+  const VideoBoxFullScreenPage({Key key, this.controller}) : super(key: key);
+  @override
+  _VideoBoxFullScreenPageState createState() => _VideoBoxFullScreenPageState();
+}
+
+class _VideoBoxFullScreenPageState extends State<VideoBoxFullScreenPage> {
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setEnabledSystemUIOverlays([]);
+    setLandscape();
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: VideoBox(controller: this.widget.controller),
       ),
     );
   }

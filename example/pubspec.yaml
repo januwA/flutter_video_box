@@ -29,6 +29,7 @@ dev_dependencies:
     sdk: flutter
   video_box:
     path: ../
+  flutter_android_pip: ^0.0.2
 
 
 # For information on the generic Dart part of this file, see the

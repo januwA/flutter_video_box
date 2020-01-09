@@ -3,7 +3,7 @@ import 'package:video_box/video.controller.dart';
 import 'package:video_box/video_box.dart';
 import 'package:video_player/video_player.dart';
 
-import 'globals.dart';
+import '../globals.dart';
 
 class ListVideo extends StatefulWidget {
   @override

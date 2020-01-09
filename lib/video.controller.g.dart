@@ -403,6 +403,16 @@ mixin _$VideoController on _VideoController, Store {
   }
 
   @override
+  void _setFullScreen({bool full}) {
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
+    try {
+      return super._setFullScreen(full: full);
+    } finally {
+      _$_VideoControllerActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void setSkiptime(Duration st) {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
@@ -427,26 +437,6 @@ mixin _$VideoController on _VideoController, Store {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super.setVolume(v);
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void _setLandscape() {
-    final _$actionInfo = _$_VideoControllerActionController.startAction();
-    try {
-      return super._setLandscape();
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void _setPortrait() {
-    final _$actionInfo = _$_VideoControllerActionController.startAction();
-    try {
-      return super._setPortrait();
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }

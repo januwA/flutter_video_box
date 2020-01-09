@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
@@ -11,14 +10,15 @@ class BufferLoading extends StatelessWidget {
   const BufferLoading({Key key, @required this.controller}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Observer(
-        builder: (_) => AnimatedSwitcher(
-          duration: Duration(milliseconds: 300),
-          child: controller.isBfLoading
-              ? CircularProgressIndicatorBig(color: controller.circularProgressIndicatorColor)
-              : SizedBox(),
-        ),
+    return Observer(
+      builder: (_) => AnimatedSwitcher(
+        duration: Duration(milliseconds: 300),
+        child: controller.isBfLoading
+            ? controller.customBufferedWidget ??
+                Center(
+                    child: CircularProgressIndicatorBig(
+                        color: controller.circularProgressIndicatorColor))
+            : SizedBox(),
       ),
     );
   }
