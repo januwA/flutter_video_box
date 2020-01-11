@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:video_player/video_player.dart';
 
@@ -23,6 +22,9 @@ class VideoBox extends StatefulWidget {
   /// Example:
   ///
   /// ```dart
+  /// import 'package:video_box/video.controller.dart';
+  /// import 'package:video_box/video_box.dart';
+  /// import 'package:video_player/video_player.dart';
   /// VideoController vc = VideoController(source: VideoPlayerController.network('xxx.mp4'))..initialize();
   ///
   /// @override
@@ -40,13 +42,13 @@ class VideoBox extends StatefulWidget {
   /// see also:
   ///
   /// https://github.com/januwA/flutter_video_box/tree/master/example
-  VideoBox(
-      {Key key,
-      @required this.controller,
-      this.afterChildren = const <Widget>[],
-      this.beforeChildren = const <Widget>[],
-      this.children = const <Widget>[]})
-      : super(key: key);
+  VideoBox({
+    Key key,
+    @required this.controller,
+    this.afterChildren = const <Widget>[],
+    this.beforeChildren = const <Widget>[],
+    this.children = const <Widget>[],
+  }) : super(key: key);
 
   static const double centerIconSize = 40.0;
 
@@ -136,7 +138,7 @@ class _VideoBoxState extends State<VideoBox>
                   ] else ...[
                     // 加载完成在第一帧显示海报
                     Container(
-                      color: Colors.transparent,
+                      // color: Colors.transparent,
                       child: controller.isShowCover
                           ? Center(child: controller.cover)
                           : Center(
@@ -157,7 +159,7 @@ class _VideoBoxState extends State<VideoBox>
                       BufferLoading(controller: controller),
                       Positioned.fill(
                         child: AnimatedSwitcher(
-                          duration: kTabScrollDuration,
+                          duration: controller.controllerLayerDuration,
                           child: controller.controllerLayer
                               ? Container(
                                   color: controller.barrierColor,
@@ -174,9 +176,7 @@ class _VideoBoxState extends State<VideoBox>
                                             progress:
                                                 controller.animetedIconTween,
                                           ),
-                                          onPressed: () {
-                                            controller.togglePlay();
-                                          },
+                                          onPressed: () => controller.togglePlay(),
                                         ),
                                       ),
                                       Positioned(
@@ -212,33 +212,17 @@ class _VideoBoxState extends State<VideoBox>
 }
 
 // 全屏页面
-class VideoBoxFullScreenPage extends StatefulWidget {
+class VideoBoxFullScreenPage extends StatelessWidget {
   final controller;
 
-  const VideoBoxFullScreenPage({Key key, this.controller}) : super(key: key);
-  @override
-  _VideoBoxFullScreenPageState createState() => _VideoBoxFullScreenPageState();
-}
-
-class _VideoBoxFullScreenPageState extends State<VideoBoxFullScreenPage> {
-  @override
-  void initState() {
-    super.initState();
-    SystemChrome.setEnabledSystemUIOverlays([]);
-    setLandscape();
-  }
-
-  @override
-  void dispose() {
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    super.dispose();
-  }
+  const VideoBoxFullScreenPage({Key key, @required this.controller})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: VideoBox(controller: this.widget.controller),
+        child: VideoBox(controller: controller),
       ),
     );
   }

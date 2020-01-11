@@ -48,7 +48,6 @@ class _OneVideoCtrlState extends State<OneVideoCtrl>
       source: VideoPlayerController.network(src1),
       loop: true,
       autoplay: true,
-      controllerDuration: Duration(seconds: 5),
       color: Colors.red,
       bufferColor: Colors.orange,
       inactiveColor: Colors.pink,

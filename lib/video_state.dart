@@ -17,22 +17,24 @@ class VideoState {
     this.positionText,
     this.durationText,
     this.sliderValue,
+    this.aspectRatio,
   });
 
-  String dataSource;
-  DataSourceType dataSourceType;
-  Size size;
-  bool autoplay;
-  bool isLooping;
-  bool isPlaying;
-  double volume;
-  Duration initPosition;
-  Duration position;
-  Duration duration;
-  Duration skiptime;
-  String positionText;
-  String durationText;
-  double sliderValue;
+  final String dataSource;
+  final DataSourceType dataSourceType;
+  final Size size;
+  final bool autoplay;
+  final bool isLooping;
+  final bool isPlaying;
+  final double volume;
+  final Duration initPosition;
+  final Duration position;
+  final Duration duration;
+  final Duration skiptime;
+  final String positionText;
+  final String durationText;
+  final double sliderValue;
+  final double aspectRatio;
 
   Map<String, dynamic> toMap() {
     return {
@@ -50,6 +52,7 @@ class VideoState {
       "positionText": positionText,
       "durationText": durationText,
       "sliderValue": sliderValue,
+      "aspectRatio": aspectRatio
     };
   }
 
@@ -71,6 +74,7 @@ class VideoState {
       "positionText": $positionText,
       "durationText": $durationText,
       "sliderValue": $sliderValue,
+      "aspectRatio": $aspectRatio
     }
     """;
   }

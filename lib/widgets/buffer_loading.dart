@@ -16,8 +16,10 @@ class BufferLoading extends StatelessWidget {
         child: controller.isBfLoading
             ? controller.customBufferedWidget ??
                 Center(
-                    child: CircularProgressIndicatorBig(
-                        color: controller.circularProgressIndicatorColor))
+                  child: CircularProgressIndicatorBig(
+                    color: controller.circularProgressIndicatorColor,
+                  ),
+                )
             : SizedBox(),
       ),
     );

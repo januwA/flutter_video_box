@@ -56,7 +56,8 @@ abstract class _VideoController with Store {
     this.initPosition = const Duration(seconds: 0),
     this.cover,
     this.controllerWidgets = true,
-    this.controllerDuration = const Duration(seconds: 2),
+    this.controllerLiveDuration = const Duration(seconds: 2),
+    this.controllerLayerDuration = kTabScrollDuration,
     this.background = Colors.black,
     this.color = Colors.white,
     this.bufferColor = Colors.white38,
@@ -74,6 +75,9 @@ abstract class _VideoController with Store {
     _initPlatformState();
   }
 
+  /// icon动画的持续时间
+  /// 
+  /// icon animation duration
   final Duration animetedIconDuration;
   final Color background;
   final Color color;
@@ -81,8 +85,13 @@ abstract class _VideoController with Store {
   final Color inactiveColor;
   final Color circularProgressIndicatorColor;
 
-  /// 底部控制器的padding
+  /// 控制器层打开和关闭动画的持续时间
   /// 
+  /// Controller layer opening and closing animation duration
+  final Duration controllerLayerDuration;
+
+  /// 底部控制器的padding
+  ///
   /// Padding of bottom controller
   final EdgeInsets bottomPadding;
 
@@ -359,7 +368,7 @@ abstract class _VideoController with Store {
       if (_controllerLayerTimer?.isActive ?? false) {
         _controllerLayerTimer?.cancel();
       } else {
-        _controllerLayerTimer = Timer(this.controllerDuration, () {
+        _controllerLayerTimer = Timer(this.controllerLiveDuration, () {
           // 暂停状态不自动关闭
           // Pause status does not close automatically
           if (videoCtrl.value.isPlaying) {
@@ -447,10 +456,10 @@ abstract class _VideoController with Store {
     videoCtrl = source;
   }
 
-  /// 控制器层存活的时间
+  /// 控制器层被打开后存活的时间
   ///
-  /// Controller layer time to live
-  final Duration controllerDuration;
+  /// Time to live after the controller layer is opened
+  final Duration controllerLiveDuration;
 
   /// 初始化viedo控制器
   ///
@@ -598,10 +607,13 @@ abstract class _VideoController with Store {
         Navigator.of(context).pop();
       } else {
         _setFullScreen(full: true);
+        SystemChrome.setEnabledSystemUIOverlays([]);
+        setLandscape();
         await Navigator.of(context).push(_defaultCustomFullScreenRoute(this));
         // 这里可以监听到系统导航栏的返回事件
-        _setFullScreen(full: false);
+        SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
         setPortrait();
+        _setFullScreen(full: false);
       }
     } else {
       if (isFullScreen) {
@@ -674,6 +686,7 @@ abstract class _VideoController with Store {
         positionText: positionText,
         durationText: durationText,
         sliderValue: sliderValue,
+        aspectRatio: videoCtrl.value.aspectRatio,
       );
 
   @override

@@ -1,6 +1,6 @@
 ## 0.9.0 - 2020-1-9
-* VideoController增加api: `customLoadingWidget`  `customBufferedWidget`  `customFullScreen` 
-* `onFullScreen`变更为`onFullScreenSwitch`
+* 增加Api: `customLoadingWidget`  `customBufferedWidget`  `customFullScreen` `controllerLayerDuration`
+* 变更API: `onFullScreen`=>`onFullScreenSwitch` `controllerDuration`=> `controllerLiveDuration`
 * 添加画中画example
 
 ## 0.8.2 - 2019-12-25

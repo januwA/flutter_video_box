@@ -39,7 +39,9 @@ class _PipPageState extends State<PipPage> with WidgetsBindingObserver {
       case AppLifecycleState.inactive:
         print('应用程序处于非活动状态，并且未接收用户输入');
         // click home
-        FlutterAndroidPip.enterPictureInPictureMode;
+        if (vc != null && vc.value.isPlaying) {
+          FlutterAndroidPip.enterPictureInPictureMode;
+        }
         break;
       case AppLifecycleState.paused:
         print('用户当前看不到应用程序，没有响应');
@@ -54,11 +56,29 @@ class _PipPageState extends State<PipPage> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(
+      body: Column(
         children: [
           AspectRatio(
             aspectRatio: 16 / 9,
             child: VideoBox(controller: vc),
+          ),
+          Expanded(
+            child: Container(
+              color: Colors.blue,
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: <Widget>[
+                  for (var i = 0; i < 20; i++)
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: 40,
+                        color: Colors.brown,
+                      ),
+                    ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
