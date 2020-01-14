@@ -15,7 +15,6 @@ class SeekToView extends StatelessWidget {
           child: GestureDetector(
             onTap: controller.toggleShowVideoCtrl,
             onDoubleTap: controller.rewind,
-            onPanUpdate: controller.setScreenBrightness,
             child: Container(color: Colors.transparent),
           ),
         ),
@@ -26,7 +25,6 @@ class SeekToView extends StatelessWidget {
           child: GestureDetector(
             onTap: controller.toggleShowVideoCtrl,
             onDoubleTap: controller.fastForward,
-            onPanUpdate: controller.setMediaVolume,
             child: Container(color: Colors.transparent),
           ),
         ),

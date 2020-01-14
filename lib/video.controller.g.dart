@@ -26,30 +26,12 @@ mixin _$VideoController on _VideoController, Store {
   String get positionText =>
       (_$positionTextComputed ??= Computed<String>(() => super.positionText))
           .value;
-  Computed<String> _$videoBoxTimeTextComputed;
-
-  @override
-  String get videoBoxTimeText => (_$videoBoxTimeTextComputed ??=
-          Computed<String>(() => super.videoBoxTimeText))
-      .value;
   Computed<double> _$sliderValueComputed;
 
   @override
   double get sliderValue =>
       (_$sliderValueComputed ??= Computed<double>(() => super.sliderValue))
           .value;
-  Computed<IconData> _$volumeIconComputed;
-
-  @override
-  IconData get volumeIcon =>
-      (_$volumeIconComputed ??= Computed<IconData>(() => super.volumeIcon))
-          .value;
-  Computed<IconData> _$fullScreenIconComputed;
-
-  @override
-  IconData get fullScreenIcon => (_$fullScreenIconComputed ??=
-          Computed<IconData>(() => super.fullScreenIcon))
-      .value;
 
   final _$barrierColorAtom = Atom(name: '_VideoController.barrierColor');
 
@@ -66,23 +48,6 @@ mixin _$VideoController on _VideoController, Store {
       super.barrierColor = value;
       _$barrierColorAtom.reportChanged();
     }, _$barrierColorAtom, name: '${_$barrierColorAtom.name}_set');
-  }
-
-  final _$coverAtom = Atom(name: '_VideoController.cover');
-
-  @override
-  Widget get cover {
-    _$coverAtom.context.enforceReadPolicy(_$coverAtom);
-    _$coverAtom.reportObserved();
-    return super.cover;
-  }
-
-  @override
-  set cover(Widget value) {
-    _$coverAtom.context.conditionallyRunInAction(() {
-      super.cover = value;
-      _$coverAtom.reportChanged();
-    }, _$coverAtom, name: '${_$coverAtom.name}_set');
   }
 
   final _$controllerWidgetsAtom =
@@ -120,38 +85,38 @@ mixin _$VideoController on _VideoController, Store {
     }, _$isBfLoadingAtom, name: '${_$isBfLoadingAtom.name}_set');
   }
 
-  final _$autoplayAtom = Atom(name: '_VideoController.autoplay');
+  final _$coverAtom = Atom(name: '_VideoController.cover');
 
   @override
-  bool get autoplay {
-    _$autoplayAtom.context.enforceReadPolicy(_$autoplayAtom);
-    _$autoplayAtom.reportObserved();
-    return super.autoplay;
+  Widget get cover {
+    _$coverAtom.context.enforceReadPolicy(_$coverAtom);
+    _$coverAtom.reportObserved();
+    return super.cover;
   }
 
   @override
-  set autoplay(bool value) {
-    _$autoplayAtom.context.conditionallyRunInAction(() {
-      super.autoplay = value;
-      _$autoplayAtom.reportChanged();
-    }, _$autoplayAtom, name: '${_$autoplayAtom.name}_set');
+  set cover(Widget value) {
+    _$coverAtom.context.conditionallyRunInAction(() {
+      super.cover = value;
+      _$coverAtom.reportChanged();
+    }, _$coverAtom, name: '${_$coverAtom.name}_set');
   }
 
-  final _$loopAtom = Atom(name: '_VideoController.loop');
+  final _$loopingAtom = Atom(name: '_VideoController.looping');
 
   @override
-  bool get loop {
-    _$loopAtom.context.enforceReadPolicy(_$loopAtom);
-    _$loopAtom.reportObserved();
-    return super.loop;
+  bool get looping {
+    _$loopingAtom.context.enforceReadPolicy(_$loopingAtom);
+    _$loopingAtom.reportObserved();
+    return super.looping;
   }
 
   @override
-  set loop(bool value) {
-    _$loopAtom.context.conditionallyRunInAction(() {
-      super.loop = value;
-      _$loopAtom.reportChanged();
-    }, _$loopAtom, name: '${_$loopAtom.name}_set');
+  set looping(bool value) {
+    _$loopingAtom.context.conditionallyRunInAction(() {
+      super.looping = value;
+      _$loopingAtom.reportChanged();
+    }, _$loopingAtom, name: '${_$loopingAtom.name}_set');
   }
 
   final _$volumeAtom = Atom(name: '_VideoController.volume');
@@ -290,23 +255,6 @@ mixin _$VideoController on _VideoController, Store {
     }, _$isFullScreenAtom, name: '${_$isFullScreenAtom.name}_set');
   }
 
-  final _$skiptimeAtom = Atom(name: '_VideoController.skiptime');
-
-  @override
-  Duration get skiptime {
-    _$skiptimeAtom.context.enforceReadPolicy(_$skiptimeAtom);
-    _$skiptimeAtom.reportObserved();
-    return super.skiptime;
-  }
-
-  @override
-  set skiptime(Duration value) {
-    _$skiptimeAtom.context.conditionallyRunInAction(() {
-      super.skiptime = value;
-      _$skiptimeAtom.reportChanged();
-    }, _$skiptimeAtom, name: '${_$skiptimeAtom.name}_set');
-  }
-
   final _$sliderBufferValueAtom =
       Atom(name: '_VideoController.sliderBufferValue');
 
@@ -343,10 +291,10 @@ mixin _$VideoController on _VideoController, Store {
       ActionController(name: '_VideoController');
 
   @override
-  void setVideoBuffer() {
+  void _setVideoBuffer() {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
-      return super.setVideoBuffer();
+      return super._setVideoBuffer();
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
@@ -363,20 +311,20 @@ mixin _$VideoController on _VideoController, Store {
   }
 
   @override
-  void setAutoplay(bool autoplay) {
+  void setLooping(bool loop) {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
-      return super.setAutoplay(autoplay);
+      return super.setLooping(loop);
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void setLoop(bool loop) {
+  void setVolume(double v) {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
-      return super.setLoop(loop);
+      return super.setVolume(v);
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
@@ -413,30 +361,10 @@ mixin _$VideoController on _VideoController, Store {
   }
 
   @override
-  void setSkiptime(Duration st) {
-    final _$actionInfo = _$_VideoControllerActionController.startAction();
-    try {
-      return super.setSkiptime(st);
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void _videoListenner() {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
       return super._videoListenner();
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void setVolume(double v) {
-    final _$actionInfo = _$_VideoControllerActionController.startAction();
-    try {
-      return super.setVolume(v);
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }

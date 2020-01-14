@@ -32,9 +32,7 @@ class _VideosState extends State<Videos> {
   }
 
   void _changeSource(String src) async {
-    vc.pause();
-    await Future.delayed(Duration(seconds: 2));
-    await vc.setSource(VideoPlayerController.network(src));
+    vc.setSource(VideoPlayerController.network(src));
     vc.setCover(Center(
         child: Text(
       src,

@@ -1,12 +1,10 @@
 import 'dart:async';
-// import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:mobx/mobx.dart';
 import 'package:video_player/video_player.dart';
-import 'package:volume/volume.dart';
 
 import 'video_box.dart' show CustomFullScreen, VideoBoxFullScreenPage;
 import 'util/duration_string.dart' show durationString;
@@ -51,7 +49,7 @@ abstract class _VideoController with Store {
     VideoPlayerController source,
     this.skiptime = const Duration(seconds: 10),
     this.autoplay = false,
-    this.loop = false,
+    this.looping = false,
     this.volume = 1.0,
     this.initPosition = const Duration(seconds: 0),
     this.cover,
@@ -72,21 +70,26 @@ abstract class _VideoController with Store {
   }) {
     videoCtrl = source;
     this.barrierColor = barrierColor ?? Colors.black.withOpacity(0.6);
-    _initPlatformState();
   }
 
   /// icon动画的持续时间
-  /// 
+  ///
   /// icon animation duration
   final Duration animetedIconDuration;
+
   final Color background;
   final Color color;
   final Color bufferColor;
   final Color inactiveColor;
   final Color circularProgressIndicatorColor;
 
+  /// 快进，快退的时间
+  ///
+  /// Fast forward and rewind time
+  final Duration skiptime;
+
   /// 控制器层打开和关闭动画的持续时间
-  /// 
+  ///
   /// Controller layer opening and closing animation duration
   final Duration controllerLayerDuration;
 
@@ -196,13 +199,6 @@ abstract class _VideoController with Store {
     _fullScreenChange = listener;
   }
 
-  /// 控制媒体音量
-  ///
-  /// Controlling media volume
-  Future<void> _initPlatformState() async {
-    await Volume.controlVolume(AudioManager.STREAM_MUSIC);
-  }
-
   /// 动画icon的初始化
   ///
   /// Initialization of the animation icon
@@ -216,10 +212,10 @@ abstract class _VideoController with Store {
       begin: 0.0,
       end: 1.0,
     ).animate(animetedIconController);
-    setAnimetedIconState();
+    _setAnimetedIconState();
   }
 
-  Future<void> setAnimetedIconState() async {
+  Future<void> _setAnimetedIconState() async {
     if (animetedIconController == null) return;
     if (videoCtrl.value.isPlaying) {
       await animetedIconController.forward();
@@ -241,19 +237,12 @@ abstract class _VideoController with Store {
   @observable
   Color barrierColor;
 
-  bool isPlayEnd = false;
+  bool get isPlayEnd => position >= duration;
 
   /// 自动关闭 Controller layer 的计时器
   ///
   /// Automatically turn off the timer of the Controller layer
   Timer _controllerLayerTimer;
-
-  /// cover
-  ///
-  /// 自动居中
-  /// Auto-center
-  @observable
-  Widget cover;
 
   /// 是否显示默认控件 默认[true]
   ///
@@ -264,7 +253,7 @@ abstract class _VideoController with Store {
   @observable
   bool isBfLoading = false;
 
-  Duration get buffered {
+  Duration get _buffered {
     var value = videoCtrl.value;
     if (value.buffered?.isEmpty ?? true) return null;
     return value.buffered.last.end;
@@ -274,22 +263,29 @@ abstract class _VideoController with Store {
   ///
   /// Listen to buffer status at any time
   @action
-  void setVideoBuffer() {
-    if (buffered == null) {
+  void _setVideoBuffer() {
+    if (_buffered == null) {
       isBfLoading = false;
     } else {
-      sliderBufferValue = buffered.inSeconds / duration.inSeconds;
+      sliderBufferValue = _buffered.inSeconds / duration.inSeconds;
 
       /// 当前播放的位置大于了缓冲的位置，就会进入加载状态
       /// The currently playing position is greater than the buffer position, and it will enter the loading state
       var value = videoCtrl.value;
       if (value.isPlaying) {
-        isBfLoading = value.position >= buffered;
+        isBfLoading = value.position >= _buffered;
       } else {
-        isBfLoading = value.position > buffered;
+        isBfLoading = value.position > _buffered;
       }
     }
   }
+
+  /// cover
+  ///
+  /// 自动居中
+  /// Auto-center
+  @observable
+  Widget cover;
 
   /// set cover
   @action
@@ -309,26 +305,28 @@ abstract class _VideoController with Store {
   }
 
   /// autoplay [false]
-  @observable
   bool autoplay;
-
-  /// set [autoplay]
-  @action
-  void setAutoplay(bool autoplay) => autoplay = autoplay;
 
   /// Loop [false]
   @observable
-  bool loop;
+  bool looping;
 
   @action
-  void setLoop(bool loop) {
-    loop = loop;
+  void setLooping(bool loop) {
+    this.looping = loop;
     videoCtrl?.setLooping(loop);
   }
 
   /// volume [1.0]
   @observable
   double volume;
+
+  /// set [volume]
+  @action
+  void setVolume(double v) {
+    volume = v;
+    videoCtrl?.setVolume(v);
+  }
 
   @observable
   VideoPlayerController videoCtrl;
@@ -393,18 +391,6 @@ abstract class _VideoController with Store {
     if (_fullScreenChange != null) _fullScreenChange(this);
   }
 
-  /// 快进，快退的时间
-  ///
-  /// Fast forward and rewind time
-  @observable
-  Duration skiptime;
-
-  /// set [skiptime]
-  @action
-  void setSkiptime(Duration st) {
-    skiptime = st;
-  }
-
   /// 25:00 or 2:00:00 总时长
   ///
   /// Total duration
@@ -418,11 +404,6 @@ abstract class _VideoController with Store {
   String get positionText =>
       (videoCtrl == null) ? '' : durationString(position);
 
-  /// '00:00/00:00'
-  @computed
-  String get videoBoxTimeText =>
-      initialized ? "$positionText/$durationText" : '00:00/00:00';
-
   @computed
   double get sliderValue =>
       (position?.inSeconds != null && duration?.inSeconds != null)
@@ -431,18 +412,6 @@ abstract class _VideoController with Store {
 
   @observable
   double sliderBufferValue = 0.0;
-
-  /// 返回一个符合当前音量的icon
-  ///
-  /// Returns an icon that matches the current volume
-  @computed
-  IconData get volumeIcon => volume <= 0
-      ? Icons.volume_off
-      : volume <= 0.5 ? Icons.volume_down : Icons.volume_up;
-
-  @computed
-  IconData get fullScreenIcon =>
-      !isFullScreen ? Icons.fullscreen : Icons.fullscreen_exit;
 
   /// 替换当前播放的视频资源
   ///
@@ -471,18 +440,18 @@ abstract class _VideoController with Store {
     isBfLoading = false;
     await videoCtrl.initialize();
     videoCtrl
-      ..setLooping(loop)
+      ..setLooping(looping)
       ..setVolume(volume);
     if (autoplay) {
       setControllerLayer(show: false);
       await videoCtrl.play();
-      setAnimetedIconState();
     }
 
     if (initPosition != null) seekTo(initPosition);
     position = initPosition ?? videoCtrl.value.position;
     duration = videoCtrl.value.duration;
     videoCtrl.addListener(_videoListenner);
+    _setAnimetedIconState();
     initialized = true;
   }
 
@@ -495,29 +464,20 @@ abstract class _VideoController with Store {
   @action
   void _videoListenner() {
     position = videoCtrl.value.position;
-    setVideoBuffer();
     if (_playingListenner != null) _playingListenner();
+    _setVideoBuffer();
 
     /// video播放结束
     /// video playback ends
-    if (position >= duration) {
-      isPlayEnd = true;
+    /// 如果loop: true则不会走到这一步
+    if (isPlayEnd) {
       isBfLoading = false;
-      setAnimetedIconState();
 
       /// 如果用户调用了播放结束的监听器
       if (this._playEnd != null) _playEnd();
       setControllerLayer(show: true);
-    } else {
-      isPlayEnd = false;
+      _setAnimetedIconState();
     }
-  }
-
-  /// set [volume]
-  @action
-  void setVolume(double v) {
-    volume = v;
-    videoCtrl?.setVolume(v);
   }
 
   /// 开启声音或关闭
@@ -549,7 +509,7 @@ abstract class _VideoController with Store {
         await play();
       }
     }
-    setAnimetedIconState();
+    _setAnimetedIconState();
   }
 
   /// 播放
@@ -558,16 +518,20 @@ abstract class _VideoController with Store {
       await videoCtrl.seekTo(Duration(seconds: 0));
     }
 
-    await videoCtrl.play();
-    setAnimetedIconState();
-    setControllerLayer(show: false);
+    if (!videoCtrl.value.isPlaying) {
+      await videoCtrl.play();
+      _setAnimetedIconState();
+      setControllerLayer(show: false);
+    }
   }
 
   /// 暂停
   Future<void> pause() async {
-    await videoCtrl.pause();
-    setAnimetedIconState();
-    setControllerLayer(show: true);
+    if (videoCtrl.value.isPlaying) {
+      await videoCtrl.pause();
+      _setAnimetedIconState();
+      setControllerLayer(show: true);
+    }
   }
 
   /// 控制播放时间位置
@@ -591,12 +555,6 @@ abstract class _VideoController with Store {
       seekTo(videoCtrl.value.position - (st ?? skiptime));
     }
   }
-
-  /// 进度条被改变
-  ///
-  /// The progress bar is changed
-  void sliderChanged(double v) =>
-      seekTo(Duration(seconds: (v * duration.inSeconds).toInt()));
 
   /// 打开或关闭全屏
   ///
@@ -625,43 +583,6 @@ abstract class _VideoController with Store {
       }
     }
   }
-
-  /// 右侧版块设置媒体音量
-  ///
-  /// Set the media volume on the right side
-  Future<void> setMediaVolume(DragUpdateDetails d) async {
-    // if (d.delta.dy < 0) {
-    //   Volume.volUp();
-    // } else if (d.delta.dy > 0) {
-    //   Volume.volDown();
-    // }
-    int _currentVol = await Volume.getVol;
-    int dy = (-d.delta.dy * 0.2).toInt();
-    setVol(_currentVol + dy);
-  }
-
-  // double _currentBrightness;
-
-  /// 左侧版块设置屏幕亮度
-  ///
-  /// The left section sets the screen brightness
-  /// ! [screen 0.0.5]出现错误，删除此依赖，寻找其它解决方案
-  /// https://pub.dev/packages/screen
-  Future<void> setScreenBrightness(DragUpdateDetails d) async {
-    // double dy = d.delta.dy / 200;
-    // _currentBrightness ??= await Screen.brightness;
-    // double v;
-    // if (dy > 0) {
-    //   v = max(_currentBrightness - dy.abs(), 0);
-    // } else {
-    //   v = min(_currentBrightness + dy.abs(), 1);
-    // }
-    // _currentBrightness = v;
-    // Screen.setBrightness(v);
-  }
-
-  /// set MEDIA Volume
-  Future<int> setVol(int i) => Volume.setVol(i);
 
   Future<void> dispose() async {
     animetedIconController?.dispose();

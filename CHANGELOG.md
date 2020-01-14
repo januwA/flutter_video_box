@@ -1,3 +1,10 @@
+## 0.9.1 - 2020-1-14
+
+* 删除平台差异 [#14](https://github.com/januwA/flutter_video_box/issues/14)
+* 删除部分作用不大方法和减少对外部暴露无用的方法。
+* 变更: `setLoop`=>`setLooping`，`loop`=>`looping`
+* 检查example的每个示例
+
 ## 0.9.0 - 2020-1-9
 * 增加Api: `customLoadingWidget`  `customBufferedWidget`  `customFullScreen` `controllerLayerDuration`
 * 变更API: `onFullScreen`=>`onFullScreenSwitch` `controllerDuration`=> `controllerLiveDuration`

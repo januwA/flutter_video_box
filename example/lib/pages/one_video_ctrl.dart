@@ -35,18 +35,17 @@ class OneVideoCtrl extends StatefulWidget {
   _OneVideoCtrlState createState() => _OneVideoCtrlState();
 }
 
-class _OneVideoCtrlState extends State<OneVideoCtrl>
-    {
+class _OneVideoCtrlState extends State<OneVideoCtrl> {
   VideoController vc;
   ScrollController controller = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    
+
     vc = VideoController(
       source: VideoPlayerController.network(src1),
-      loop: true,
+      looping: true,
       autoplay: true,
       color: Colors.red,
       bufferColor: Colors.orange,
@@ -99,7 +98,6 @@ class _OneVideoCtrlState extends State<OneVideoCtrl>
     vc.dispose();
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {

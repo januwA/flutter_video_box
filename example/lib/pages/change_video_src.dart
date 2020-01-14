@@ -12,17 +12,34 @@ class ChangeVideoSrc extends StatefulWidget {
 
 class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
   List<String> source = [src1, src2, src3];
-
-  int index = 0;
-
-  String get src => source[index];
-
   VideoController vc;
+
+  int _index = 0;
+
+  int get index => _index;
+
+  set index(int nv) {
+    if (nv > _index) {
+      // +
+      nv = nv % source.length;
+      vc.autoplay = true;
+      vc.setSource(VideoPlayerController.network(source[nv]));
+      vc.initialize();
+    } else {
+      // -
+      nv = (nv + source.length) % source.length;
+      vc.autoplay = false;
+      vc.setControllerLayer(show: true);
+      vc.setSource(VideoPlayerController.network(source[nv]));
+      vc.initialize();
+    }
+    _index = nv;
+  }
 
   @override
   void initState() {
     super.initState();
-    vc = VideoController(source: VideoPlayerController.network(src))
+    vc = VideoController(source: VideoPlayerController.network(source[index]))
       ..initialize();
   }
 
@@ -57,31 +74,17 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
               RaisedButton(
                 child: Text('Prev'),
                 onPressed: () {
-                  var newindex = index - 1;
-                  if (newindex < 0) {
-                    newindex = source.length - 1;
-                  }
                   setState(() {
-                    index = newindex;
+                    index--;
                   });
-                  vc.setAutoplay(false);
-                  vc.setControllerLayer(show: true);
-                  vc.setSource(VideoPlayerController.network(src));
-                  vc.initialize();
                 },
               ),
               RaisedButton(
                 child: Text('Next'),
                 onPressed: () {
-                  var newindex = index + 1;
-                  if (newindex >= source.length) {
-                    newindex = 0;
-                  }
                   setState(() {
-                    index = newindex;
+                    index++;
                   });
-                  vc.setSource(VideoPlayerController.network(src));
-                  vc.initialize();
                 },
               ),
             ],

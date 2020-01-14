@@ -17,20 +17,30 @@ class VideoBottomCtroller extends StatelessWidget {
         children: <Widget>[
           Observer(
             builder: (_) => Text(
-              controller.videoBoxTimeText,
+              controller.initialized
+                  ? "${controller.positionText}/${controller.durationText}"
+                  : '00:00/00:00',
               style: TextStyle(color: controller.color),
             ),
           ),
           Spacer(),
           Observer(
             builder: (_) => IconButton(
-              icon: Icon(controller.volumeIcon),
+              icon: Icon(
+                controller.volume <= 0
+                    ? Icons.volume_off
+                    : controller.volume <= 0.5
+                        ? Icons.volume_down
+                        : Icons.volume_up,
+              ),
               onPressed: controller.setOnSoundOrOff,
             ),
           ),
           Observer(
             builder: (_) => IconButton(
-              icon: Icon(controller.fullScreenIcon),
+              icon: Icon(controller.isFullScreen
+                  ? Icons.fullscreen_exit
+                  : Icons.fullscreen),
               onPressed: () => controller.onFullScreenSwitch(context),
             ),
           ),
@@ -54,7 +64,8 @@ class VideoBottomCtroller extends StatelessWidget {
             activeColor: controller.color,
             value: controller.sliderValue,
             bufferValue: controller.sliderBufferValue,
-            onChanged: controller.sliderChanged,
+            onChanged: (double v) => controller.seekTo(
+                Duration(seconds: (v * controller.duration.inSeconds).toInt())),
           ),
         ),
       ),
