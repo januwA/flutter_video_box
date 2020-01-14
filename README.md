@@ -7,8 +7,6 @@ note:
 * No ios test
 * Development api may change at any time
 
-## This library is developed on the `flutter master` branch
-
 ## Install
 ```
 dependencies:
