@@ -1,10 +1,10 @@
-import 'dart:async';
+import 'dart:async' show Timer;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:mobx/mobx.dart';
-import 'package:video_player/video_player.dart';
+import 'package:video_player/video_player.dart' show VideoPlayerController;
 
 import 'video_box.dart' show CustomFullScreen, VideoBoxFullScreenPage;
 import 'util/duration_string.dart' show durationString;
@@ -13,6 +13,8 @@ import 'video_state.dart';
 part 'video.controller.g.dart';
 
 typedef FullScreenChange = Function(VideoController controller);
+typedef BottomViewBuilder = Widget Function(
+    BuildContext context, VideoController controller);
 
 Route<T> _defaultCustomFullScreenRoute<T>(VideoController controller) {
   return MaterialPageRoute<T>(
@@ -67,10 +69,90 @@ abstract class _VideoController with Store {
     this.customBufferedWidget,
     this.customFullScreen,
     this.bottomPadding = EdgeInsets.zero,
+    this.bottomViewBuilder,
+    this.options,
   }) {
     videoCtrl = source;
     this.barrierColor = barrierColor ?? Colors.black.withOpacity(0.6);
   }
+
+  /// 您可以传递一个[options]，但[options]并不会在内部使用，但您可以在各个回调中访问[options]:
+  /// 
+  /// You can pass an [options], but [options] is not used internally, but you can access [options] in various callbacks:
+  /// 
+  /// ```dart
+  /// VideoController(
+  ///   options: { "name": "Ajanuw" },
+  ///   bottomViewBuilder: (context, c) {
+  ///     c.options
+  ///   }),
+  /// );
+  /// ```
+  /// 
+  final dynamic options;
+
+  /// 如果您想自定义底部控制器视图，那么可以使用这个api来实施
+  ///
+  /// 当然，您可能会编写更多的代码，具体的实施可以参考源码的默认实现，或则看下面的Example
+  ///
+  /// ---
+  ///
+  /// If you want to customize the bottom controller view, you can use this api to implement
+  ///
+  /// Of course, you may write more code, the specific implementation can refer to the default implementation of the source code, or see the following Example
+  ///
+  /// ## bottomViewBuilder Example
+  /// ```dart
+  /// import 'package:video_player/video_player.dart';
+  /// import 'package:video_box/video_box.dart';
+  /// import 'package:video_box/video.controller.dart';
+  /// import 'package:video_box/widgets/buffer_slider.dart';
+  ///
+  /// vc = VideoController(
+  ///   source: VideoPlayerController.network(src1),
+  ///   bottomViewBuilder: (context, c) {
+  ///     var theme = Theme.of(context);
+  ///     return Positioned(
+  ///       left: c.bottomPadding.left,
+  ///       bottom: c.bottomPadding.bottom,
+  ///       right: c.bottomPadding.right,
+  ///       child: Column(
+  ///         children: <Widget>[
+  ///           Row(
+  ///             children: <Widget>[
+  ///               Text(
+  ///                 c.initialized
+  ///                     ? "${c.positionText}/${c.durationText}"
+  ///                     : '00:00/00:00',
+  ///                 style: TextStyle(color: Colors.white),
+  ///               )
+  ///             ],
+  ///           ),
+  ///           Theme(
+  ///             data: theme.copyWith(
+  ///               sliderTheme: theme.sliderTheme.copyWith(
+  ///                 trackHeight: 6, // line的高度
+  ///                 overlayShape: SliderComponentShape.noThumb,
+  ///               ),
+  ///             ),
+  ///             child: Padding(
+  ///               padding: const EdgeInsets.all(8.0),
+  ///               child: BufferSlider(
+  ///                 pointWidget: null,
+  ///                 value: c.sliderValue,
+  ///                 bufferValue: c.sliderBufferValue,
+  ///                 onChanged: (double v) => c.seekTo(
+  ///                     Duration(seconds: (v * c.duration.inSeconds).toInt())),
+  ///               ),
+  ///             ),
+  ///           ),
+  ///         ],
+  ///       ),
+  ///     );
+  ///   },
+  /// );
+  /// ```
+  final BottomViewBuilder bottomViewBuilder;
 
   /// icon动画的持续时间
   ///

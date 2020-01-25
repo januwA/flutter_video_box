@@ -1,3 +1,9 @@
+## 0.10.0 - 2020-1-25
+
+- 增加API: 
+  - `options` 可以设置自定义参数
+  - `bottomViewBuilder` 用于自定义VideoBox底部视图
+
 ## 0.9.1 - 2020-1-14
 
 * 删除平台差异 [#14](https://github.com/januwA/flutter_video_box/issues/14)

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import '../util/map.dart';
 
 typedef ValueChanged<T> = void Function(T value);
 
@@ -52,7 +53,7 @@ class BufferSlider extends StatelessWidget {
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
+    ThemeData theme = Theme.of(context);
     SliderThemeData sliderTheme = SliderTheme.of(context);
 
     sliderTheme = sliderTheme.copyWith(
@@ -97,7 +98,7 @@ class BufferSlider extends StatelessWidget {
       showValueIndicator:
           sliderTheme.showValueIndicator ?? _defaultShowValueIndicator,
       valueIndicatorTextStyle: sliderTheme.valueIndicatorTextStyle ??
-          theme.textTheme.body2.copyWith(
+          theme.textTheme.bodyText1.copyWith(
             color: theme.colorScheme.onPrimary,
           ),
     );
@@ -200,23 +201,22 @@ class BufferSlider extends StatelessWidget {
                         ),
                       ),
 
-                      Positioned(
-                        left: _currentVlaue - pointSize.width / 2,
-                        child: Align(
-                          alignment: Alignment.center,
-                          child: SizedBox(
-                            width: pointSize.width,
-                            height: pointSize.height,
-                            child: pointWidget ??
-                                Container(
+                      pointWidget != null
+                          ? Positioned(
+                              left: _currentVlaue - pointSize.width / 2,
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Container(
+                                  width: pointSize.width,
+                                  height: pointSize.height,
                                   decoration: BoxDecoration(
                                     color: sliderTheme.thumbColor,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
-                          ),
-                        ),
-                      )
+                              ),
+                            )
+                          : SizedBox()
                     ],
                   ),
                 ),
@@ -226,9 +226,5 @@ class BufferSlider extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  static double map(v, start1, stop1, start2, stop2) {
-    return (v - start1) / (stop1 - start1) * (stop2 - start2) + start2;
   }
 }
