@@ -1,5 +1,6 @@
-import 'dart:async' show Timer;
+import 'dart:async' show Timer, StreamSubscription;
 
+import 'package:sensors/sensors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -74,12 +75,29 @@ abstract class _VideoController with Store {
   }) {
     videoCtrl = source;
     this.barrierColor = barrierColor ?? Colors.black.withOpacity(0.6);
+
+    _streamSubscriptions ??=
+        accelerometerEvents.listen(_streamSubscriptionsCallback);
+  }
+
+  /// 监听页面旋转流
+  StreamSubscription<dynamic> _streamSubscriptions;
+  void _streamSubscriptionsCallback(AccelerometerEvent event) {
+    if (isFullScreen && event.x.abs() > event.y.abs()) {
+      if (event.x > 1) {
+        SystemChrome.setPreferredOrientations(
+            [DeviceOrientation.landscapeLeft]);
+      } else if (event.x < -1) {
+        SystemChrome.setPreferredOrientations(
+            [DeviceOrientation.landscapeRight]);
+      }
+    }
   }
 
   /// 您可以传递一个[options]，但[options]并不会在内部使用，但您可以在各个回调中访问[options]:
-  /// 
+  ///
   /// You can pass an [options], but [options] is not used internally, but you can access [options] in various callbacks:
-  /// 
+  ///
   /// ```dart
   /// VideoController(
   ///   options: { "name": "Ajanuw" },
@@ -88,7 +106,7 @@ abstract class _VideoController with Store {
   ///   }),
   /// );
   /// ```
-  /// 
+  ///
   final dynamic options;
 
   /// 如果您想自定义底部控制器视图，那么可以使用这个api来实施
@@ -138,7 +156,7 @@ abstract class _VideoController with Store {
   ///             child: Padding(
   ///               padding: const EdgeInsets.all(8.0),
   ///               child: BufferSlider(
-  ///                 pointWidget: null,
+  ///                 pointWidget: const SizedBox(),
   ///                 value: c.sliderValue,
   ///                 bufferValue: c.sliderBufferValue,
   ///                 onChanged: (double v) => c.seekTo(
@@ -672,6 +690,7 @@ abstract class _VideoController with Store {
     await videoCtrl?.pause();
     await videoCtrl?.dispose();
     _controllerLayerTimer?.cancel();
+    _streamSubscriptions?.cancel();
   }
 
   VideoState get value => VideoState(

@@ -18,7 +18,7 @@ abstract class CustomFullScreen {
   void close(BuildContext context, VideoController controller);
 }
 
-class VideoBox extends StatefulWidget {
+class VideoBox extends StatefulObserverWidget {
   /// Example:
   ///
   /// ```dart
@@ -119,94 +119,85 @@ class _VideoBoxState extends State<VideoBox>
         color: controller.background,
         child: GestureDetector(
           onTap: controller.toggleShowVideoCtrl,
-          child: Observer(
-            builder: (_) => Stack(
-              children: <Widget>[
-                if (!controller.initialized) ...[
-                  // 加载中同时显示loading和海报
-                  if (controller.cover != null)
-                    Center(child: controller.cover),
-                  controller.customLoadingWidget ??
-                      Center(
-                        child: CircularProgressIndicatorBig(
-                          color: controller.circularProgressIndicatorColor,
-                        ),
-                      ),
-                ] else ...[
-                  // 加载完成在第一帧显示海报
-                  Container(
-                    child: controller.isShowCover
-                        ? Center(child: controller.cover)
-                        : Center(
-                            child: AspectRatio(
-                              aspectRatio:
-                                  controller.videoCtrl.value.aspectRatio,
-                              child: VideoPlayer(controller.videoCtrl),
-                            ),
-                          ),
-                  ),
-
-                  if (controller.beforeChildren != null)
-                    for (Widget item in controller.beforeChildren) item,
-
-                  if (controller.controllerWidgets) ...[
-                    Positioned.fill(child: SeekToView(controller: controller)),
-                    BufferLoading(controller: controller),
-                    Positioned.fill(
-                      child: AnimatedSwitcher(
-                        duration: controller.controllerLayerDuration,
-                        child: controller.controllerLayer
-                            ? Container(
-                                color: controller.barrierColor,
-                                child: Stack(
-                                  children: <Widget>[
-                                    Positioned.fill(
-                                        child:
-                                            SeekToView(controller: controller)),
-                                    Center(
-                                      child: IconButton(
-                                        iconSize: VideoBox.centerIconSize,
-                                        icon: AnimatedIcon(
-                                          icon: AnimatedIcons.play_pause,
-                                          progress:
-                                              controller.animetedIconTween,
-                                        ),
-                                        onPressed: () =>
-                                            controller.togglePlay(),
-                                      ),
-                                    ),
-                                    controller.bottomViewBuilder != null
-                                        ? Observer(
-                                            builder: (context) =>
-                                                controller.bottomViewBuilder(
-                                                    context, controller))
-                                        : Positioned(
-                                            left: controller.bottomPadding.left,
-                                            bottom:
-                                                controller.bottomPadding.bottom,
-                                            right:
-                                                controller.bottomPadding.right,
-                                            child: VideoBottomView(
-                                              controller: controller,
-                                            ),
-                                          ),
-                                    if (controller.children != null)
-                                      for (Widget item in controller.children)
-                                        item,
-                                  ],
-                                ),
-                              )
-                            : SizedBox(),
+          child: Stack(
+            children: <Widget>[
+              if (!controller.initialized) ...[
+                // 加载中同时显示loading和海报
+                if (controller.cover != null)
+                  Center(child: controller.cover),
+                controller.customLoadingWidget ??
+                    Center(
+                      child: CircularProgressIndicatorBig(
+                        color: controller.circularProgressIndicatorColor,
                       ),
                     ),
-                  ],
+              ] else ...[
+                // 加载完成在第一帧显示海报
+                Container(
+                  child: controller.isShowCover
+                      ? Center(child: controller.cover)
+                      : Center(
+                          child: AspectRatio(
+                            aspectRatio: controller.videoCtrl.value.aspectRatio,
+                            child: VideoPlayer(controller.videoCtrl),
+                          ),
+                        ),
+                ),
 
-                  // 自定义控件
-                  if (controller.afterChildren != null)
-                    for (Widget item in controller.afterChildren) item,
-                ]
-              ],
-            ),
+                if (controller.beforeChildren != null)
+                  for (Widget item in controller.beforeChildren) item,
+
+                if (controller.controllerWidgets) ...[
+                  Positioned.fill(child: SeekToView(controller: controller)),
+                  BufferLoading(controller: controller),
+                  Positioned.fill(
+                    child: AnimatedSwitcher(
+                      duration: controller.controllerLayerDuration,
+                      child: controller.controllerLayer
+                          ? Container(
+                              color: controller.barrierColor,
+                              child: Stack(
+                                children: <Widget>[
+                                  Positioned.fill(
+                                      child:
+                                          SeekToView(controller: controller)),
+                                  Center(
+                                    child: IconButton(
+                                      iconSize: VideoBox.centerIconSize,
+                                      icon: AnimatedIcon(
+                                        icon: AnimatedIcons.play_pause,
+                                        progress: controller.animetedIconTween,
+                                      ),
+                                      onPressed: controller.togglePlay,
+                                    ),
+                                  ),
+                                  controller.bottomViewBuilder != null
+                                      ? controller.bottomViewBuilder(
+                                          context, controller)
+                                      : Positioned(
+                                          left: controller.bottomPadding.left,
+                                          bottom:
+                                              controller.bottomPadding.bottom,
+                                          right: controller.bottomPadding.right,
+                                          child: VideoBottomView(
+                                              controller: controller),
+                                        ),
+                                  if (controller.children != null)
+                                    for (Widget item in controller.children)
+                                      item,
+                                ],
+                              ),
+                            )
+                          : SizedBox(),
+                    ),
+                  ),
+                ],
+
+                // 自定义控件
+                if (controller.afterChildren != null)
+                  for (Widget item in controller.afterChildren) item,
+              ]
+            ],
           ),
         ),
       ),

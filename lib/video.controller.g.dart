@@ -369,4 +369,11 @@ mixin _$VideoController on _VideoController, Store {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
+
+  @override
+  String toString() {
+    final string =
+        'barrierColor: ${barrierColor.toString()},controllerWidgets: ${controllerWidgets.toString()},isBfLoading: ${isBfLoading.toString()},cover: ${cover.toString()},looping: ${looping.toString()},volume: ${volume.toString()},videoCtrl: ${videoCtrl.toString()},initialized: ${initialized.toString()},initPosition: ${initPosition.toString()},position: ${position.toString()},duration: ${duration.toString()},controllerLayer: ${controllerLayer.toString()},isFullScreen: ${isFullScreen.toString()},sliderBufferValue: ${sliderBufferValue.toString()},isShowCover: ${isShowCover.toString()},durationText: ${durationText.toString()},positionText: ${positionText.toString()},sliderValue: ${sliderValue.toString()}';
+    return '{$string}';
+  }
 }

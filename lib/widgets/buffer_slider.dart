@@ -201,22 +201,21 @@ class BufferSlider extends StatelessWidget {
                         ),
                       ),
 
-                      pointWidget != null
-                          ? Positioned(
-                              left: _currentVlaue - pointSize.width / 2,
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: Container(
-                                  width: pointSize.width,
-                                  height: pointSize.height,
-                                  decoration: BoxDecoration(
-                                    color: sliderTheme.thumbColor,
-                                    shape: BoxShape.circle,
-                                  ),
+                      pointWidget ??
+                          Positioned(
+                            left: _currentVlaue - pointSize.width / 2,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Container(
+                                width: pointSize.width,
+                                height: pointSize.height,
+                                decoration: BoxDecoration(
+                                  color: sliderTheme.thumbColor,
+                                  shape: BoxShape.circle,
                                 ),
                               ),
-                            )
-                          : SizedBox()
+                            ),
+                          )
                     ],
                   ),
                 ),

@@ -117,7 +117,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
                       ),
                     ),
                     child: BufferSlider(
-                      pointWidget: null,
+                      pointWidget: const SizedBox(),
                       value: c.sliderValue,
                       bufferValue: c.sliderBufferValue,
                       onChanged: (double v) => c.seekTo(Duration(
