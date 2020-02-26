@@ -48,7 +48,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
           });
         },
         child: Icon(
-          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow
         ),
       ),
     );

@@ -1,5 +1,6 @@
 import 'dart:async' show Timer, StreamSubscription;
 
+import 'package:connectivity/connectivity.dart';
 import 'package:sensors/sensors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -78,6 +79,9 @@ abstract class _VideoController with Store {
 
     _streamSubscriptions ??=
         accelerometerEvents.listen(_streamSubscriptionsCallback);
+    _connectivityChanged$ ??= Connectivity()
+        .onConnectivityChanged
+        .listen(_connectivityChangedCallBack);
   }
 
   /// 监听页面旋转流
@@ -94,6 +98,30 @@ abstract class _VideoController with Store {
     }
   }
 
+  /// 监听网络连接
+  ConnectivityResult _connectivityStatus;
+  StreamSubscription<ConnectivityResult> _connectivityChanged$;
+  void _connectivityChangedCallBack(ConnectivityResult result) {
+    if (_connectivityChangedListener != null)
+      _connectivityChangedListener(result);
+    if (_connectivityStatus == ConnectivityResult.none &&
+        result != ConnectivityResult.none &&
+        isBfLoading) {
+      // 从断网中恢复过来
+      // 重新链接解码器
+      videoCtrl.initialize().then((_) async {
+        // 有些设置需要重新设置
+        videoCtrl
+          ..seekTo(position) // 跳到上一次断开的位置
+          ..setLooping(looping)
+          ..setVolume(volume);
+        play();
+      });
+    }
+
+    _connectivityStatus = result;
+  }
+
   /// 您可以传递一个[options]，但[options]并不会在内部使用，但您可以在各个回调中访问[options]:
   ///
   /// You can pass an [options], but [options] is not used internally, but you can access [options] in various callbacks:
@@ -108,6 +136,9 @@ abstract class _VideoController with Store {
   /// ```
   ///
   final dynamic options;
+
+  @observable
+  double aspectRatio;
 
   /// 如果您想自定义底部控制器视图，那么可以使用这个api来实施
   ///
@@ -280,6 +311,12 @@ abstract class _VideoController with Store {
   Function _playingListenner;
   addListener(void Function() listener) {
     _playingListenner = listener;
+  }
+
+  void Function(ConnectivityResult result) _connectivityChangedListener;
+  addConnectivityChangedListener(
+      void Function(ConnectivityResult result) listener) {
+    _connectivityChangedListener = listener;
   }
 
   /// 监听视频播放结束回调
@@ -539,6 +576,7 @@ abstract class _VideoController with Store {
     initialized = false;
     isBfLoading = false;
     await videoCtrl.initialize();
+    aspectRatio = videoCtrl.value.aspectRatio;
     videoCtrl
       ..setLooping(looping)
       ..setVolume(volume);
@@ -563,7 +601,15 @@ abstract class _VideoController with Store {
   /// 第一帧也会触发
   @action
   void _videoListenner() {
-    position = videoCtrl.value.position;
+    if (videoCtrl.value.position == Duration.zero &&
+        _buffered == null &&
+        _connectivityStatus == ConnectivityResult.none) {
+      // 播放途中解码器被关闭（断网）
+      isBfLoading = true;
+      return;
+    }
+    if (videoCtrl.value.position != Duration.zero)
+      position = videoCtrl.value.position;
     if (_playingListenner != null) _playingListenner();
     _setVideoBuffer();
 
@@ -691,6 +737,7 @@ abstract class _VideoController with Store {
     await videoCtrl?.dispose();
     _controllerLayerTimer?.cancel();
     _streamSubscriptions?.cancel();
+    _connectivityChanged$?.cancel();
   }
 
   VideoState get value => VideoState(

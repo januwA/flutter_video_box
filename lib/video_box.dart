@@ -138,7 +138,7 @@ class _VideoBoxState extends State<VideoBox>
                       ? Center(child: controller.cover)
                       : Center(
                           child: AspectRatio(
-                            aspectRatio: controller.videoCtrl.value.aspectRatio,
+                            aspectRatio: controller.aspectRatio,
                             child: VideoPlayer(controller.videoCtrl),
                           ),
                         ),
