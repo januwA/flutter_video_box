@@ -1,3 +1,7 @@
+## 0.11.1
+
+* Prepare for 1.0.0 version of sensors and package_info. ([dart_lsc](http://github.com/amirh/dart_lsc))
+
 ## 0.11.0 - 2020-2-26
 
 * 对网络的断开和重连进行了简单的优化
