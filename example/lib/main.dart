@@ -11,7 +11,7 @@ const listVideo = '/list-video';
 const changeVideoSrc = '/change-video-src';
 const videos = '/videos';
 const videoPlayerDemo = '/video-player-demo';
-const piPDemo = '/pip-demo';
+const pipDemo = '/pip-demo';
 
 void main() => runApp(MyApp());
 
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         changeVideoSrc: (BuildContext context) => ChangeVideoSrc(),
         videos: (BuildContext context) => Videos(),
         videoPlayerDemo: (BuildContext context) => VideoPlayerDemo(),
-        piPDemo: (BuildContext context) => PipPage(),
+        pipDemo: (BuildContext context) => PipPage(),
       },
       home: HomePage(),
     );
@@ -34,8 +34,12 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
+    void _push(String url) {
+      Navigator.of(context).pushNamed(url);
+    }
     return Scaffold(
       appBar: AppBar(title: Text('video_box example')),
       body: Center(
@@ -46,31 +50,29 @@ class HomePage extends StatelessWidget {
             children: <Widget>[
               RaisedButton(
                 child: Text('one video ctrl'),
-                onPressed: () => Navigator.of(context).pushNamed(oneVideoCtrl),
+                onPressed: () => _push(oneVideoCtrl),
               ),
               RaisedButton(
                 child: Text('list video'),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(listVideo);
-                },
+                onPressed: () => _push(listVideo),
               ),
               RaisedButton(
                 child: Text('change video src'),
                 onPressed: () =>
-                    Navigator.of(context).pushNamed(changeVideoSrc),
+                    _push(changeVideoSrc),
               ),
               RaisedButton(
                 child: Text('videos'),
-                onPressed: () => Navigator.of(context).pushNamed(videos),
+                onPressed: () => _push(videos),
               ),
               RaisedButton(
                 child: Text('VideoPlayerDemo'),
                 onPressed: () =>
-                    Navigator.of(context).pushNamed(videoPlayerDemo),
+                    _push(videoPlayerDemo),
               ),
               RaisedButton(
                 child: Text('PiP'),
-                onPressed: () => Navigator.of(context).pushNamed(piPDemo),
+                onPressed: () => _push(pipDemo),
               ),
             ],
           ),

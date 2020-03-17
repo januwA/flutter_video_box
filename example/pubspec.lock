@@ -93,10 +93,12 @@ packages:
   flutter_android_pip:
     dependency: "direct main"
     description:
-      name: flutter_android_pip
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.0.2"
+      path: "."
+      ref: master
+      resolved-ref: b8e0db761b8b9dc97bc8f5d6e5227b62d6f1634f
+      url: "https://github.com/januwA/flutter_android_pip"
+    source: git
+    version: "0.1.0"
   flutter_mobx:
     dependency: transitive
     description:
@@ -223,7 +225,7 @@ packages:
       name: test_api
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.2.14"
+    version: "0.2.15"
   typed_data:
     dependency: transitive
     description:
@@ -244,7 +246,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.11.0"
+    version: "0.11.1"
   video_player:
     dependency: transitive
     description:

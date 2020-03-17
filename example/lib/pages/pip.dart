@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:video_box/video.controller.dart';
 import 'package:video_box/video_box.dart';
 import 'package:video_player/video_player.dart';
-// import 'package:flutter_android_pip/flutter_android_pip.dart';
+import 'package:flutter_android_pip/flutter_android_pip.dart';
 
 import '../globals.dart';
 
@@ -40,7 +40,7 @@ class _PipPageState extends State<PipPage> with WidgetsBindingObserver {
         print('应用程序处于非活动状态，并且未接收用户输入');
         // click home
         if (vc != null && vc.value.isPlaying) {
-          // FlutterAndroidPip.enterPictureInPictureMode;
+          FlutterAndroidPip.pip();
         }
         break;
       case AppLifecycleState.paused:
