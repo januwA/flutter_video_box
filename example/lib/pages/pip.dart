@@ -40,7 +40,7 @@ class _PipPageState extends State<PipPage> with WidgetsBindingObserver {
         print('应用程序处于非活动状态，并且未接收用户输入');
         // click home
         if (vc != null && vc.value.isPlaying) {
-          FlutterAndroidPip.pip();
+          FlutterAndroidPip.pip(aspectRatio: PipRational(16, 9));
         }
         break;
       case AppLifecycleState.paused:

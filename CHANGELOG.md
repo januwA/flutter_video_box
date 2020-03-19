@@ -1,6 +1,7 @@
-## 0.11.1
+## 0.11.1 2020-3-19
 
 * Prepare for 1.0.0 version of sensors and package_info. ([dart_lsc](http://github.com/amirh/dart_lsc))
+* 优化部分代码，并无API变动.
 
 ## 0.11.0 - 2020-2-26
 
