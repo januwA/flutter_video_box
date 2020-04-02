@@ -336,10 +336,22 @@ abstract class _VideoController with Store {
     _fullScreenChange = listener;
   }
 
+  Duration _arrowIconDuration = Duration(milliseconds: 800);
+
   /// 动画icon的初始化
   ///
   /// Initialization of the animation icon
   void initAnimetedIconController(TickerProvider vsync) {
+    arrowIconLtRController = AnimationController(
+      duration: _arrowIconDuration,
+      vsync: vsync,
+    );
+
+    arrowIconRtLController = AnimationController(
+      duration: _arrowIconDuration,
+      vsync: vsync,
+    );
+
     animetedIconController = AnimationController(
       duration: animetedIconDuration,
       vsync: vsync,
@@ -363,6 +375,8 @@ abstract class _VideoController with Store {
 
   AnimationController animetedIconController;
   Animation<double> animetedIconTween;
+  AnimationController arrowIconLtRController;
+  AnimationController arrowIconRtLController;
 
   List<Widget> children;
   List<Widget> beforeChildren;
@@ -691,13 +705,16 @@ abstract class _VideoController with Store {
 
   /// 快进
   void fastForward([Duration st]) {
-    if (videoCtrl.value != null)
+    if (videoCtrl.value != null) {
+      arrowIconLtRController?.forward();
       seekTo(videoCtrl.value.position + (st ?? skiptime));
+    }
   }
 
   /// 快退
   void rewind([Duration st]) {
     if (videoCtrl.value != null) {
+      arrowIconRtLController?.forward();
       seekTo(videoCtrl.value.position - (st ?? skiptime));
     }
   }
@@ -738,6 +755,8 @@ abstract class _VideoController with Store {
     _controllerLayerTimer?.cancel();
     _streamSubscriptions?.cancel();
     _connectivityChanged$?.cancel();
+    arrowIconRtLController?.dispose();
+    arrowIconLtRController?.dispose();
   }
 
   VideoState get value => VideoState(

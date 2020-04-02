@@ -33,6 +33,23 @@ mixin _$VideoController on _VideoController, Store {
       (_$sliderValueComputed ??= Computed<double>(() => super.sliderValue))
           .value;
 
+  final _$aspectRatioAtom = Atom(name: '_VideoController.aspectRatio');
+
+  @override
+  double get aspectRatio {
+    _$aspectRatioAtom.context.enforceReadPolicy(_$aspectRatioAtom);
+    _$aspectRatioAtom.reportObserved();
+    return super.aspectRatio;
+  }
+
+  @override
+  set aspectRatio(double value) {
+    _$aspectRatioAtom.context.conditionallyRunInAction(() {
+      super.aspectRatio = value;
+      _$aspectRatioAtom.reportChanged();
+    }, _$aspectRatioAtom, name: '${_$aspectRatioAtom.name}_set');
+  }
+
   final _$barrierColorAtom = Atom(name: '_VideoController.barrierColor');
 
   @override
@@ -373,7 +390,7 @@ mixin _$VideoController on _VideoController, Store {
   @override
   String toString() {
     final string =
-        'barrierColor: ${barrierColor.toString()},controllerWidgets: ${controllerWidgets.toString()},isBfLoading: ${isBfLoading.toString()},cover: ${cover.toString()},looping: ${looping.toString()},volume: ${volume.toString()},videoCtrl: ${videoCtrl.toString()},initialized: ${initialized.toString()},initPosition: ${initPosition.toString()},position: ${position.toString()},duration: ${duration.toString()},controllerLayer: ${controllerLayer.toString()},isFullScreen: ${isFullScreen.toString()},sliderBufferValue: ${sliderBufferValue.toString()},isShowCover: ${isShowCover.toString()},durationText: ${durationText.toString()},positionText: ${positionText.toString()},sliderValue: ${sliderValue.toString()}';
+        'aspectRatio: ${aspectRatio.toString()},barrierColor: ${barrierColor.toString()},controllerWidgets: ${controllerWidgets.toString()},isBfLoading: ${isBfLoading.toString()},cover: ${cover.toString()},looping: ${looping.toString()},volume: ${volume.toString()},videoCtrl: ${videoCtrl.toString()},initialized: ${initialized.toString()},initPosition: ${initPosition.toString()},position: ${position.toString()},duration: ${duration.toString()},controllerLayer: ${controllerLayer.toString()},isFullScreen: ${isFullScreen.toString()},sliderBufferValue: ${sliderBufferValue.toString()},isShowCover: ${isShowCover.toString()},durationText: ${durationText.toString()},positionText: ${positionText.toString()},sliderValue: ${sliderValue.toString()}';
     return '{$string}';
   }
 }

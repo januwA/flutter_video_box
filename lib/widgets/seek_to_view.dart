@@ -1,6 +1,9 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:video_box/video_box.dart';
 
 import '../video.controller.dart';
+import 'animated_arrow_icon.dart';
 
 class SeekToView extends StatelessWidget {
   final VideoController controller;
@@ -15,7 +18,21 @@ class SeekToView extends StatelessWidget {
           child: GestureDetector(
             onTap: controller.toggleShowVideoCtrl,
             onDoubleTap: controller.rewind,
-            child: Container(color: Colors.transparent),
+            child: Container(
+              color: Colors.transparent,
+              child: Center(
+                child: controller.arrowIconRtLController != null
+                    ? Transform.rotate(
+                        angle: math.pi / 180 * 180,
+                        child: AnimatedArrowIcon(
+                          iconSize: VideoBox.centerIconSize,
+                          controller: controller.arrowIconRtLController,
+                          color: controller.color,
+                        ),
+                      )
+                    : SizedBox(),
+              ),
+            ),
           ),
         ),
         const SizedBox(width: 24),
@@ -25,7 +42,18 @@ class SeekToView extends StatelessWidget {
           child: GestureDetector(
             onTap: controller.toggleShowVideoCtrl,
             onDoubleTap: controller.fastForward,
-            child: Container(color: Colors.transparent),
+            child: Container(
+              color: Colors.transparent,
+              child: Center(
+                child: controller.arrowIconLtRController != null
+                    ? AnimatedArrowIcon(
+                      iconSize: VideoBox.centerIconSize,
+                        controller: controller.arrowIconLtRController,
+                        color: controller.color,
+                      )
+                    : SizedBox(),
+              ),
+            ),
           ),
         ),
       ],

@@ -96,8 +96,7 @@ class VideoBox extends StatefulObserverWidget {
   _VideoBoxState createState() => _VideoBoxState();
 }
 
-class _VideoBoxState extends State<VideoBox>
-    with SingleTickerProviderStateMixin {
+class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
   VideoController controller;
 
   @override

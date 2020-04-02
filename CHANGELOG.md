@@ -1,3 +1,8 @@
+## 0.11.2 2020-4-1
+
+* 更新mobx依赖版本号
+* 为快进和快退动作增加了icon动画
+
 ## 0.11.1 2020-3-19
 
 * Prepare for 1.0.0 version of sensors and package_info. ([dart_lsc](http://github.com/amirh/dart_lsc))
