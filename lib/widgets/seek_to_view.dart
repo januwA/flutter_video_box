@@ -47,7 +47,7 @@ class SeekToView extends StatelessWidget {
               child: Center(
                 child: controller.arrowIconLtRController != null
                     ? AnimatedArrowIcon(
-                      iconSize: VideoBox.centerIconSize,
+                        iconSize: VideoBox.centerIconSize,
                         controller: controller.arrowIconLtRController,
                         color: controller.color,
                       )

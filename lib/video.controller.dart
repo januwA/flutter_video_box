@@ -84,6 +84,8 @@ abstract class _VideoController with Store {
         .listen(_connectivityChangedCallBack);
   }
 
+  bool _isDispose = false;
+
   /// 监听页面旋转流
   StreamSubscription<dynamic> _streamSubscriptions;
   void _streamSubscriptionsCallback(AccelerometerEvent event) {
@@ -587,6 +589,7 @@ abstract class _VideoController with Store {
   @action
   Future<void> initialize() async {
     assert(videoCtrl != null);
+    if (_isDispose) return; // 尽可能避免调用[dispose]还继续初始化的情况
     initialized = false;
     isBfLoading = false;
     await videoCtrl.initialize();
@@ -748,6 +751,7 @@ abstract class _VideoController with Store {
   }
 
   Future<void> dispose() async {
+    _isDispose = true;
     animetedIconController?.dispose();
     videoCtrl?.removeListener(_videoListenner);
     await videoCtrl?.pause();
