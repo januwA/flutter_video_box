@@ -1,3 +1,8 @@
+## 0.11.4 2020-4-6
+
+* 当断网进入buffer loading状态时，隐藏play/pause按钮，网络恢复时在显示
+* 修改buffer laoding视图和mask的叠加层顺序 (应该不会造成BUG 🦄)
+
 ## 0.11.3 2020-4-3
 
 * 无api变更

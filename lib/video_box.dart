@@ -147,8 +147,10 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
                   for (Widget item in controller.beforeChildren) item,
 
                 if (controller.controllerWidgets) ...[
+                  // 快进快退
                   Positioned.fill(child: SeekToView(controller: controller)),
-                  BufferLoading(controller: controller),
+
+                  // mask
                   Positioned.fill(
                     child: AnimatedSwitcher(
                       duration: controller.controllerLayerDuration,
@@ -160,16 +162,19 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
                                   Positioned.fill(
                                       child:
                                           SeekToView(controller: controller)),
-                                  Center(
-                                    child: IconButton(
-                                      iconSize: VideoBox.centerIconSize,
-                                      icon: AnimatedIcon(
-                                        icon: AnimatedIcons.play_pause,
-                                        progress: controller.animetedIconTween,
-                                      ),
-                                      onPressed: controller.togglePlay,
-                                    ),
-                                  ),
+                                  controller.isBfLoading
+                                      ? SizedBox()
+                                      : Center(
+                                          child: IconButton(
+                                            iconSize: VideoBox.centerIconSize,
+                                            icon: AnimatedIcon(
+                                              icon: AnimatedIcons.play_pause,
+                                              progress:
+                                                  controller.animetedIconTween,
+                                            ),
+                                            onPressed: controller.togglePlay,
+                                          ),
+                                        ),
                                   controller.bottomViewBuilder != null
                                       ? controller.bottomViewBuilder(
                                           context, controller)
@@ -190,6 +195,9 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
                           : SizedBox(),
                     ),
                   ),
+
+                  // buffer loading
+                  BufferLoading(controller: controller),
                 ],
 
                 // 自定义控件
