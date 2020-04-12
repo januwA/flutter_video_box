@@ -14,56 +14,75 @@ class VideoBottomView extends StatefulObserverWidget {
 }
 
 class _VideoBottomViewState extends State<VideoBottomView> {
+
+  void _onTap(){}
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
-    return ListTile(
-      title: Row(
-        children: <Widget>[
-          Text(
-            widget.controller.initialized
-                ? "${widget.controller.positionText}/${widget.controller.durationText}"
-                : '00:00/00:00',
-            style: TextStyle(color: widget.controller.color),
+    var _top = Row(
+      children: <Widget>[
+        Text(
+          widget.controller.initialized
+              ? "${widget.controller.positionText}/${widget.controller.durationText}"
+              : '00:00/00:00',
+          style: TextStyle(color: widget.controller.color),
+        ),
+        Spacer(),
+        IconButton(
+          icon: Icon(
+            widget.controller.volume <= 0
+                ? Icons.volume_off
+                : widget.controller.volume <= 0.5
+                    ? Icons.volume_down
+                    : Icons.volume_up,
           ),
-          Spacer(),
-          IconButton(
-            icon: Icon(
-              widget.controller.volume <= 0
-                  ? Icons.volume_off
-                  : widget.controller.volume <= 0.5
-                      ? Icons.volume_down
-                      : Icons.volume_up,
-            ),
-            onPressed: widget.controller.setOnSoundOrOff,
-          ),
-          IconButton(
-            icon: Icon(widget.controller.isFullScreen
-                ? Icons.fullscreen_exit
-                : Icons.fullscreen),
-            onPressed: () => widget.controller.onFullScreenSwitch(context),
-          ),
-        ],
-      ),
-      subtitle: Theme(
-        data: theme.copyWith(
-          sliderTheme: theme.sliderTheme.copyWith(
-            trackHeight: 2, // line的高度
-            overlayShape: SliderComponentShape.noOverlay,
-            thumbShape: RoundSliderThumbShape(
-              // 拇指的形状和大小
-              enabledThumbRadius: 6.0,
-            ),
+          onPressed: widget.controller.setOnSoundOrOff,
+        ),
+        IconButton(
+          icon: Icon(widget.controller.isFullScreen
+              ? Icons.fullscreen_exit
+              : Icons.fullscreen),
+          onPressed: () => widget.controller.onFullScreenSwitch(context),
+        ),
+      ],
+    );
+
+    var _bottom = Theme(
+      data: theme.copyWith(
+        sliderTheme: theme.sliderTheme.copyWith(
+          trackHeight: 2, // line的高度
+          overlayShape: SliderComponentShape.noOverlay,
+          thumbShape: RoundSliderThumbShape(
+            // 拇指的形状和大小
+            enabledThumbRadius: 6.0,
           ),
         ),
-        child: BufferSlider(
-          inactiveColor: widget.controller.inactiveColor,
-          bufferColor: widget.controller.bufferColor,
-          activeColor: widget.controller.color,
-          value: widget.controller.sliderValue,
-          bufferValue: widget.controller.sliderBufferValue,
-          onChanged: (double v) => widget.controller.seekTo(Duration(
-              seconds: (v * widget.controller.duration.inSeconds).toInt())),
+      ),
+      child: BufferSlider(
+        inactiveColor: widget.controller.inactiveColor,
+        bufferColor: widget.controller.bufferColor,
+        activeColor: widget.controller.color,
+        value: widget.controller.sliderValue,
+        bufferValue: widget.controller.sliderBufferValue,
+        onChanged: (double v) => widget.controller.seekTo(Duration(
+            seconds: (v * widget.controller.duration.inSeconds).toInt())),
+      ),
+    );
+
+    // return ListTile(
+    //   title: _top,
+    //   subtitle: _bottom,
+    // );
+
+    return GestureDetector(
+      // onTap: _onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          children: <Widget>[
+            _top,
+            _bottom,
+          ],
         ),
       ),
     );

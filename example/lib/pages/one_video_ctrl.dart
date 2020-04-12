@@ -8,6 +8,7 @@ import 'package:video_player/video_player.dart';
 import '../globals.dart';
 
 class MyFullScreen implements CustomFullScreen {
+  const MyFullScreen();
   @override
   void close(BuildContext context, VideoController controller) {
     Navigator.of(context).pop(controller.value.positionText);
@@ -79,11 +80,11 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
       // inactiveColor: Colors.pink,
       // background: Colors.indigo,
       // circularProgressIndicatorColor: Colors.lime,
-      bottomPadding: EdgeInsets.only(bottom: 10),
+      // bottomPadding: EdgeInsets.only(bottom: 10),
       // customLoadingWidget: const CustomLoading("Loading..."),
       // customBufferedWidget: const CustomLoading("please wait.."),
-      customFullScreen: MyFullScreen(),
-      controllerLiveDuration: Duration(seconds: 10),
+      // customFullScreen: const MyFullScreen(),
+      // controllerLiveDuration: Duration(seconds: 10),
       // bottomViewBuilder: (context, c) {
       //   var theme = Theme.of(context);
       //   return Positioned(

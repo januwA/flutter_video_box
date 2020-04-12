@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:video_player/video_player.dart';
@@ -9,13 +11,15 @@ import 'widgets/seek_to_view.dart';
 import 'widgets/video_bottom_ctroller.dart';
 
 abstract class CustomFullScreen {
+  const CustomFullScreen();
+
   /// 您需要返回一个异步事件(通常是等待页面结束的异步事件)
   /// 请参考[VideoController.customFullScreen]的example
   ///
   /// You need to return an asynchronous event (usually an asynchronous event waiting for the page to end)
   /// please refer to the example of [VideoController.customFullScreen]
   Future<Object> open(BuildContext context, VideoController controller);
-  void close(BuildContext context, VideoController controller);
+  FutureOr<void> close(BuildContext context, VideoController controller);
 }
 
 class VideoBox extends StatefulObserverWidget {

@@ -16,11 +16,32 @@ part 'video.controller.g.dart';
 
 typedef FullScreenChange = Function(VideoController controller);
 typedef BottomViewBuilder = Widget Function(
-    BuildContext context, VideoController controller);
+  BuildContext context,
+  VideoController controller,
+);
 
-Route<T> _defaultCustomFullScreenRoute<T>(VideoController controller) {
-  return MaterialPageRoute<T>(
-      builder: (_) => VideoBoxFullScreenPage(controller: controller));
+class KCustomFullScreen extends CustomFullScreen {
+  const KCustomFullScreen();
+  @override
+  void close(BuildContext context, VideoController controller) {
+    Navigator.of(context).pop();
+  }
+
+  Route<T> _route<T>(VideoController controller) {
+    return MaterialPageRoute<T>(
+      builder: (_) => VideoBoxFullScreenPage(controller: controller),
+    );
+  }
+
+  @override
+  Future<Object> open(BuildContext context, VideoController controller) async {
+    SystemChrome.setEnabledSystemUIOverlays([]);
+    setLandscape();
+    await Navigator.of(context).push(_route(controller));
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    setPortrait();
+    return null;
+  }
 }
 
 /// 设置为正常模式
@@ -69,7 +90,7 @@ abstract class _VideoController with Store {
     Color barrierColor,
     this.customLoadingWidget,
     this.customBufferedWidget,
-    this.customFullScreen,
+    this.customFullScreen = const KCustomFullScreen(),
     this.bottomPadding = EdgeInsets.zero,
     this.bottomViewBuilder,
     this.options,
@@ -406,9 +427,14 @@ abstract class _VideoController with Store {
   @observable
   bool isBfLoading = false;
 
+  // 获取video的缓冲时间
   Duration get _buffered {
     var value = videoCtrl.value;
     if (value.buffered?.isEmpty ?? true) return null;
+    // 经过我的测试发现这个buffered数组的length，总是为1
+    // print('buffered length: ' + value.buffered.length.toString());
+
+    // range的start也总是 0
     return value.buffered.last.end;
   }
 
@@ -420,16 +446,17 @@ abstract class _VideoController with Store {
     if (_buffered == null) {
       isBfLoading = false;
     } else {
-      sliderBufferValue = _buffered.inSeconds / duration.inSeconds;
+      _setSliderBufferValue();
 
       /// 当前播放的位置大于了缓冲的位置，就会进入加载状态
       /// The currently playing position is greater than the buffer position, and it will enter the loading state
       var value = videoCtrl.value;
-      if (value.isPlaying) {
-        isBfLoading = value.position >= _buffered;
-      } else {
-        isBfLoading = value.position > _buffered;
-      }
+
+      // 这里判断了下，是否在播放状态
+      // 如果在暂停途中改变了进度条，那么position是和_buffered相等的
+      isBfLoading = value.isPlaying
+          ? value.position >= _buffered
+          : value.position > _buffered;
     }
   }
 
@@ -484,6 +511,8 @@ abstract class _VideoController with Store {
   @observable
   VideoPlayerController videoCtrl;
 
+  bool get _hasCtrlValue => videoCtrl.value != null;
+
   @observable
   bool initialized = false;
 
@@ -515,19 +544,17 @@ abstract class _VideoController with Store {
   @action
   void setControllerLayer({bool show}) {
     controllerLayer = show;
-    if (show) {
-      if (_controllerLayerTimer?.isActive ?? false) {
-        _controllerLayerTimer?.cancel();
-      } else {
-        _controllerLayerTimer = Timer(this.controllerLiveDuration, () {
-          // 暂停状态不自动关闭
-          // Pause status does not close automatically
-          if (videoCtrl.value.isPlaying) {
-            setControllerLayer(show: false);
-          }
-        });
-      }
+    if (!show) return;
+
+    if (_controllerLayerTimer?.isActive ?? false) {
+      return _controllerLayerTimer?.cancel();
     }
+
+    _controllerLayerTimer = Timer(this.controllerLiveDuration, () {
+      // 暂停状态不自动关闭
+      // Pause status does not close automatically
+      if (videoCtrl.value.isPlaying) setControllerLayer(show: false);
+    });
   }
 
   void toggleShowVideoCtrl() => setControllerLayer(show: !controllerLayer);
@@ -565,6 +592,12 @@ abstract class _VideoController with Store {
 
   @observable
   double sliderBufferValue = 0.0;
+
+  @action
+  void _setSliderBufferValue() {
+    if (_buffered == null) return;
+    sliderBufferValue = _buffered.inSeconds / duration.inSeconds;
+  }
 
   /// 替换当前播放的视频资源
   ///
@@ -610,18 +643,22 @@ abstract class _VideoController with Store {
     initialized = true;
   }
 
+  /// 播放途中解码器被关闭（断网）
+  bool get _isNetDisconnect =>
+      videoCtrl.value.position == Duration.zero &&
+      _buffered == null &&
+      _connectivityStatus == ConnectivityResult.none;
+
   /// 视频播放时的监听器
   ///
   /// Listener during video playback
   ///
   /// seek 也会触发
   /// 第一帧也会触发
+  /// 网络断开时，不会触发
   @action
   void _videoListenner() {
-    if (videoCtrl.value.position == Duration.zero &&
-        _buffered == null &&
-        _connectivityStatus == ConnectivityResult.none) {
-      // 播放途中解码器被关闭（断网）
+    if (_isNetDisconnect) {
       isBfLoading = true;
       return;
     }
@@ -637,7 +674,7 @@ abstract class _VideoController with Store {
       isBfLoading = false;
 
       /// 如果用户调用了播放结束的监听器
-      if (this._playEnd != null) _playEnd();
+      if (_playEnd != null) _playEnd();
       setControllerLayer(show: true);
       _setAnimetedIconState();
     }
@@ -657,96 +694,68 @@ abstract class _VideoController with Store {
   ///
   /// Play or pause
   Future<void> togglePlay() async {
+    var __play = controllerWidgets ? play : videoCtrl.play;
+    var __pause = controllerWidgets ? pause : videoCtrl.pause;
+
     // 等待Icon动画关闭
     // Wait for Icon animation to close
-    if (controllerWidgets == false) {
-      if (videoCtrl.value.isPlaying) {
-        await videoCtrl.pause();
-      } else {
-        await videoCtrl.play();
-      }
+    if (videoCtrl.value.isPlaying) {
+      await __pause();
     } else {
-      if (videoCtrl.value.isPlaying) {
-        await pause();
-      } else {
-        await play();
-      }
+      await __play();
     }
-    _setAnimetedIconState();
   }
 
   /// 播放
   Future<void> play() async {
     if (isPlayEnd) {
-      await videoCtrl.seekTo(Duration(seconds: 0));
+      await seekTo(Duration(seconds: 0));
     }
 
-    if (!videoCtrl.value.isPlaying) {
-      await videoCtrl.play();
-      _setAnimetedIconState();
-      setControllerLayer(show: false);
-    }
+    await videoCtrl.play();
+    _setAnimetedIconState();
+    setControllerLayer(show: false);
   }
 
   /// 暂停
   Future<void> pause() async {
-    if (videoCtrl.value.isPlaying) {
-      await videoCtrl.pause();
-      _setAnimetedIconState();
-      setControllerLayer(show: true);
-    }
+    await videoCtrl.pause();
+    _setAnimetedIconState();
+    setControllerLayer(show: true);
   }
 
   /// 控制播放时间位置
   ///
   /// Controlling playback time position
   Future<void> seekTo(Duration d) async {
-    if (videoCtrl.value != null) {
-      await videoCtrl.seekTo(d);
-    }
+    if (!_hasCtrlValue) return;
+    videoCtrl.seekTo(d);
   }
 
   /// 快进
   void fastForward([Duration st]) {
-    if (videoCtrl.value != null) {
-      arrowIconLtRController?.forward();
-      seekTo(videoCtrl.value.position + (st ?? skiptime));
-    }
+    if (!_hasCtrlValue) return;
+    arrowIconLtRController?.forward();
+    seekTo(videoCtrl.value.position + (st ?? skiptime));
   }
 
   /// 快退
   void rewind([Duration st]) {
-    if (videoCtrl.value != null) {
-      arrowIconRtLController?.forward();
-      seekTo(videoCtrl.value.position - (st ?? skiptime));
-    }
+    if (!_hasCtrlValue) return;
+    arrowIconRtLController?.forward();
+    seekTo(videoCtrl.value.position - (st ?? skiptime));
   }
 
   /// 打开或关闭全屏
   ///
   /// Turn full screen on or off
   Future<void> onFullScreenSwitch(BuildContext context) async {
-    if (customFullScreen == null) {
-      if (isFullScreen) {
-        Navigator.of(context).pop();
-      } else {
-        _setFullScreen(full: true);
-        SystemChrome.setEnabledSystemUIOverlays([]);
-        setLandscape();
-        await Navigator.of(context).push(_defaultCustomFullScreenRoute(this));
-        // 这里可以监听到系统导航栏的返回事件
-        SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-        setPortrait();
-        _setFullScreen(full: false);
-      }
+    if (isFullScreen) {
+      customFullScreen.close(context, this);
     } else {
-      if (isFullScreen) {
-        customFullScreen.close(context, this);
-      } else {
-        _setFullScreen(full: true);
-        await customFullScreen.open(context, this);
-        _setFullScreen(full: false);
-      }
+      _setFullScreen(full: true);
+      await customFullScreen.open(context, this);
+      _setFullScreen(full: false);
     }
   }
 
