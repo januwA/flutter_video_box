@@ -4,7 +4,7 @@ import 'pages/videos.dart';
 import 'pages/change_video_src.dart';
 import 'pages/list_video.dart';
 import 'pages/one_video_ctrl.dart';
-import 'pages/pip.dart';
+// import 'pages/pip.dart';
 
 const oneVideoCtrl = '/one-video-ctrl';
 const listVideo = '/list-video';
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         changeVideoSrc: (BuildContext context) => ChangeVideoSrc(),
         videos: (BuildContext context) => Videos(),
         videoPlayerDemo: (BuildContext context) => VideoPlayerDemo(),
-        pipDemo: (BuildContext context) => PipPage(),
+        // pipDemo: (BuildContext context) => PipPage(),
       },
       home: HomePage(),
     );

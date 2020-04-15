@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:video_player/video_player.dart';
 
@@ -10,17 +11,8 @@ import 'widgets/circular_progressIndicator_big.dart';
 import 'widgets/seek_to_view.dart';
 import 'widgets/video_bottom_ctroller.dart';
 
-abstract class CustomFullScreen {
-  const CustomFullScreen();
-
-  /// 您需要返回一个异步事件(通常是等待页面结束的异步事件)
-  /// 请参考[VideoController.customFullScreen]的example
-  ///
-  /// You need to return an asynchronous event (usually an asynchronous event waiting for the page to end)
-  /// please refer to the example of [VideoController.customFullScreen]
-  Future<Object> open(BuildContext context, VideoController controller);
-  FutureOr<void> close(BuildContext context, VideoController controller);
-}
+export 'video.controller.dart';
+export 'package:video_player/video_player.dart';
 
 class VideoBox extends StatefulObserverWidget {
   /// Example:
@@ -216,11 +208,73 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
   }
 }
 
-// 全屏页面
-class VideoBoxFullScreenPage extends StatelessWidget {
+abstract class CustomFullScreen {
+  const CustomFullScreen();
+
+  /// 您需要返回一个异步事件(通常是等待页面结束的异步事件)
+  /// 请参考[VideoController.customFullScreen]的example
+  ///
+  /// You need to return an asynchronous event (usually an asynchronous event waiting for the page to end)
+  /// please refer to the example of [VideoController.customFullScreen]
+  Future<Object> open(BuildContext context, VideoController controller);
+
+  /// 用户点击视图上的icon按钮时，将调用此方法
+  ///
+  /// 但，如果用户使用的是系统导航栏的返回按钮，此方法将不会被调用
+  FutureOr<void> close(BuildContext context, VideoController controller);
+}
+
+class KCustomFullScreen extends CustomFullScreen {
+  const KCustomFullScreen();
+
+  /// 设置为横屏模式
+  ///
+  /// Set to landscape mode
+  void _setLandscape() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
+  }
+
+  /// 设置为正常模式
+  ///
+  /// Set to normal mode
+  void _setPortrait() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+  }
+
+  @override
+  void close(BuildContext context, VideoController controller) {
+    Navigator.of(context).pop();
+  }
+
+  Route<T> _route<T>(VideoController controller) {
+    return MaterialPageRoute<T>(
+      builder: (_) => KVideoBoxFullScreenPage(controller: controller),
+    );
+  }
+
+  @override
+  Future<Object> open(BuildContext context, VideoController controller) async {
+    SystemChrome.setEnabledSystemUIOverlays([]);
+    _setLandscape();
+    await Navigator.of(context).push(_route(controller));
+    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+    _setPortrait();
+    return null;
+  }
+}
+
+class KVideoBoxFullScreenPage extends StatelessWidget {
   final controller;
 
-  const VideoBoxFullScreenPage({Key key, @required this.controller})
+  const KVideoBoxFullScreenPage({Key key, @required this.controller})
       : super(key: key);
 
   @override

@@ -75,7 +75,7 @@ class _VideoBottomViewState extends State<VideoBottomView> {
     // );
 
     return GestureDetector(
-      // onTap: _onTap,
+      onTap: _onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(

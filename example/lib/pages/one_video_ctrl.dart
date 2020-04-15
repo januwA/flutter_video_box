@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:video_box/video.controller.dart';
 import 'package:video_box/video_box.dart';
 // import 'package:video_box/widgets/buffer_slider.dart';
-import 'package:video_player/video_player.dart';
 
 import '../globals.dart';
 
@@ -11,12 +9,16 @@ class MyFullScreen implements CustomFullScreen {
   const MyFullScreen();
   @override
   void close(BuildContext context, VideoController controller) {
+    print('pop...');
     Navigator.of(context).pop(controller.value.positionText);
   }
 
   @override
   Future open(BuildContext context, VideoController controller) async {
-    setLandscape();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+    ]);
     SystemChrome.setEnabledSystemUIOverlays([]);
     await Navigator.of(context).push<String>(
       MaterialPageRoute(
@@ -27,7 +29,12 @@ class MyFullScreen implements CustomFullScreen {
         },
       ),
     ).then(print);
-    setPortrait();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
   }
 }
@@ -38,6 +45,7 @@ class CustomLoading extends StatelessWidget {
   const CustomLoading(this.text, {Key key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    
     return Center(
       child: Container(
         color: Colors.pink,
@@ -70,20 +78,20 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
 
     vc = VideoController(
       source: VideoPlayerController.network(src1),
-      // options: {
-      //   "name": "Ajanuw",
-      // },
       looping: true,
       autoplay: true,
-      // color: Colors.red,
+      color: Colors.red,
       // bufferColor: Colors.orange,
       // inactiveColor: Colors.pink,
       // background: Colors.indigo,
       // circularProgressIndicatorColor: Colors.lime,
-      // bottomPadding: EdgeInsets.only(bottom: 10),
-      // customLoadingWidget: const CustomLoading("Loading..."),
-      // customBufferedWidget: const CustomLoading("please wait.."),
-      // customFullScreen: const MyFullScreen(),
+      bottomPadding: EdgeInsets.only(bottom: 10),
+      customLoadingWidget: const CustomLoading("Loading..."),
+      customBufferedWidget: const CustomLoading("please wait.."),
+      // options: {
+      //   "name": "Ajanuw",
+      // },
+      customFullScreen: const MyFullScreen(),
       // controllerLiveDuration: Duration(seconds: 10),
       // bottomViewBuilder: (context, c) {
       //   var theme = Theme.of(context);
@@ -135,8 +143,11 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
       // cover: Text('Cover'),
       // initPosition: Duration(minutes: 23, seconds: 50)
     )
-      ..addFullScreenChangeListener((c) async {})
-      ..addPlayEndListener(() {
+      ..addListener((c) {
+        // print(c.value.positionText);
+      })
+      ..addFullScreenChangeListener((c, isFullScreen) async {})
+      ..addPlayEndListener((c) {
         /*play end*/
       })
       ..initialize().then((_) {
@@ -193,9 +204,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
               ),
               RaisedButton(
                 child: Text('full screen'),
-                onPressed: () {
-                  vc.onFullScreenSwitch(context);
-                },
+                onPressed: () => vc.onFullScreenSwitch(context),
               ),
               RaisedButton(
                 child: Text('print'),

@@ -29,7 +29,7 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
       // -
       nv = (nv + source.length) % source.length;
       vc.autoplay = false;
-      vc.setControllerLayer(show: true);
+      vc.setControllerLayer(true);
       vc.setSource(VideoPlayerController.network(source[nv]));
       vc.initialize();
     }
@@ -73,19 +73,11 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
             children: <Widget>[
               RaisedButton(
                 child: Text('Prev'),
-                onPressed: () {
-                  setState(() {
-                    index--;
-                  });
-                },
+                onPressed: () => setState(() => index--),
               ),
               RaisedButton(
                 child: Text('Next'),
-                onPressed: () {
-                  setState(() {
-                    index++;
-                  });
-                },
+                onPressed: () => setState(() => index++),
               ),
             ],
           ),

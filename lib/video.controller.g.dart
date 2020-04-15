@@ -119,23 +119,6 @@ mixin _$VideoController on _VideoController, Store {
     }, _$coverAtom, name: '${_$coverAtom.name}_set');
   }
 
-  final _$loopingAtom = Atom(name: '_VideoController.looping');
-
-  @override
-  bool get looping {
-    _$loopingAtom.context.enforceReadPolicy(_$loopingAtom);
-    _$loopingAtom.reportObserved();
-    return super.looping;
-  }
-
-  @override
-  set looping(bool value) {
-    _$loopingAtom.context.conditionallyRunInAction(() {
-      super.looping = value;
-      _$loopingAtom.reportChanged();
-    }, _$loopingAtom, name: '${_$loopingAtom.name}_set');
-  }
-
   final _$volumeAtom = Atom(name: '_VideoController.volume');
 
   @override
@@ -153,23 +136,6 @@ mixin _$VideoController on _VideoController, Store {
     }, _$volumeAtom, name: '${_$volumeAtom.name}_set');
   }
 
-  final _$videoCtrlAtom = Atom(name: '_VideoController.videoCtrl');
-
-  @override
-  VideoPlayerController get videoCtrl {
-    _$videoCtrlAtom.context.enforceReadPolicy(_$videoCtrlAtom);
-    _$videoCtrlAtom.reportObserved();
-    return super.videoCtrl;
-  }
-
-  @override
-  set videoCtrl(VideoPlayerController value) {
-    _$videoCtrlAtom.context.conditionallyRunInAction(() {
-      super.videoCtrl = value;
-      _$videoCtrlAtom.reportChanged();
-    }, _$videoCtrlAtom, name: '${_$videoCtrlAtom.name}_set');
-  }
-
   final _$initializedAtom = Atom(name: '_VideoController.initialized');
 
   @override
@@ -185,23 +151,6 @@ mixin _$VideoController on _VideoController, Store {
       super.initialized = value;
       _$initializedAtom.reportChanged();
     }, _$initializedAtom, name: '${_$initializedAtom.name}_set');
-  }
-
-  final _$initPositionAtom = Atom(name: '_VideoController.initPosition');
-
-  @override
-  Duration get initPosition {
-    _$initPositionAtom.context.enforceReadPolicy(_$initPositionAtom);
-    _$initPositionAtom.reportObserved();
-    return super.initPosition;
-  }
-
-  @override
-  set initPosition(Duration value) {
-    _$initPositionAtom.context.conditionallyRunInAction(() {
-      super.initPosition = value;
-      _$initPositionAtom.reportChanged();
-    }, _$initPositionAtom, name: '${_$initPositionAtom.name}_set');
   }
 
   final _$positionAtom = Atom(name: '_VideoController.position');
@@ -255,23 +204,6 @@ mixin _$VideoController on _VideoController, Store {
     }, _$controllerLayerAtom, name: '${_$controllerLayerAtom.name}_set');
   }
 
-  final _$isFullScreenAtom = Atom(name: '_VideoController.isFullScreen');
-
-  @override
-  bool get isFullScreen {
-    _$isFullScreenAtom.context.enforceReadPolicy(_$isFullScreenAtom);
-    _$isFullScreenAtom.reportObserved();
-    return super.isFullScreen;
-  }
-
-  @override
-  set isFullScreen(bool value) {
-    _$isFullScreenAtom.context.conditionallyRunInAction(() {
-      super.isFullScreen = value;
-      _$isFullScreenAtom.reportChanged();
-    }, _$isFullScreenAtom, name: '${_$isFullScreenAtom.name}_set');
-  }
-
   final _$sliderBufferValueAtom =
       Atom(name: '_VideoController.sliderBufferValue');
 
@@ -290,11 +222,21 @@ mixin _$VideoController on _VideoController, Store {
     }, _$sliderBufferValueAtom, name: '${_$sliderBufferValueAtom.name}_set');
   }
 
-  final _$setSourceAsyncAction = AsyncAction('setSource');
+  final _$isFullScreenAtom = Atom(name: '_VideoController.isFullScreen');
 
   @override
-  Future<void> setSource(VideoPlayerController source) {
-    return _$setSourceAsyncAction.run(() => super.setSource(source));
+  bool get isFullScreen {
+    _$isFullScreenAtom.context.enforceReadPolicy(_$isFullScreenAtom);
+    _$isFullScreenAtom.reportObserved();
+    return super.isFullScreen;
+  }
+
+  @override
+  set isFullScreen(bool value) {
+    _$isFullScreenAtom.context.conditionallyRunInAction(() {
+      super.isFullScreen = value;
+      _$isFullScreenAtom.reportChanged();
+    }, _$isFullScreenAtom, name: '${_$isFullScreenAtom.name}_set');
   }
 
   final _$initializeAsyncAction = AsyncAction('initialize');
@@ -308,6 +250,46 @@ mixin _$VideoController on _VideoController, Store {
       ActionController(name: '_VideoController');
 
   @override
+  void setAspectRatio(double v) {
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
+    try {
+      return super.setAspectRatio(v);
+    } finally {
+      _$_VideoControllerActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setBarrierColor(Color v) {
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
+    try {
+      return super.setBarrierColor(v);
+    } finally {
+      _$_VideoControllerActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setControllerWidgets(bool v) {
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
+    try {
+      return super.setControllerWidgets(v);
+    } finally {
+      _$_VideoControllerActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void setIsBfLoading(bool v) {
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
+    try {
+      return super.setIsBfLoading(v);
+    } finally {
+      _$_VideoControllerActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void _setVideoBuffer() {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
@@ -318,20 +300,10 @@ mixin _$VideoController on _VideoController, Store {
   }
 
   @override
-  void setCover(Widget newCover) {
+  void setCover(Widget v) {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
-      return super.setCover(newCover);
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void setLooping(bool loop) {
-    final _$actionInfo = _$_VideoControllerActionController.startAction();
-    try {
-      return super.setLooping(loop);
+      return super.setCover(v);
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
@@ -348,30 +320,30 @@ mixin _$VideoController on _VideoController, Store {
   }
 
   @override
-  void setInitPosition(Duration p) {
+  void setControllerLayer(bool v) {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
-      return super.setInitPosition(p);
+      return super.setControllerLayer(v);
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void setControllerLayer({bool show}) {
+  void _setSliderBufferValue() {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
-      return super.setControllerLayer(show: show);
+      return super._setSliderBufferValue();
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void _setFullScreen({bool full}) {
+  void setSource(VideoPlayerController source) {
     final _$actionInfo = _$_VideoControllerActionController.startAction();
     try {
-      return super._setFullScreen(full: full);
+      return super.setSource(source);
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
@@ -388,9 +360,19 @@ mixin _$VideoController on _VideoController, Store {
   }
 
   @override
+  void _setFullScreen(bool v) {
+    final _$actionInfo = _$_VideoControllerActionController.startAction();
+    try {
+      return super._setFullScreen(v);
+    } finally {
+      _$_VideoControllerActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     final string =
-        'aspectRatio: ${aspectRatio.toString()},barrierColor: ${barrierColor.toString()},controllerWidgets: ${controllerWidgets.toString()},isBfLoading: ${isBfLoading.toString()},cover: ${cover.toString()},looping: ${looping.toString()},volume: ${volume.toString()},videoCtrl: ${videoCtrl.toString()},initialized: ${initialized.toString()},initPosition: ${initPosition.toString()},position: ${position.toString()},duration: ${duration.toString()},controllerLayer: ${controllerLayer.toString()},isFullScreen: ${isFullScreen.toString()},sliderBufferValue: ${sliderBufferValue.toString()},isShowCover: ${isShowCover.toString()},durationText: ${durationText.toString()},positionText: ${positionText.toString()},sliderValue: ${sliderValue.toString()}';
+        'aspectRatio: ${aspectRatio.toString()},barrierColor: ${barrierColor.toString()},controllerWidgets: ${controllerWidgets.toString()},isBfLoading: ${isBfLoading.toString()},cover: ${cover.toString()},volume: ${volume.toString()},initialized: ${initialized.toString()},position: ${position.toString()},duration: ${duration.toString()},controllerLayer: ${controllerLayer.toString()},sliderBufferValue: ${sliderBufferValue.toString()},isFullScreen: ${isFullScreen.toString()},isShowCover: ${isShowCover.toString()},durationText: ${durationText.toString()},positionText: ${positionText.toString()},sliderValue: ${sliderValue.toString()}';
     return '{$string}';
   }
 }
