@@ -1,3 +1,8 @@
+## 0.13.0 2020-6-14
+
+* 增加`addAccelerometerEventsListenner`钩子，可以监听屏幕的旋转，然后自定义事件 [#28](https://github.com/januwA/flutter_video_box/issues/28)
+* 就增加了一个api，其它无任何变更
+
 ## 0.12.0 2020-4-15
 
 * 少量api变更

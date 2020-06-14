@@ -100,7 +100,7 @@ class BufferSlider extends StatelessWidget {
           sliderTheme.showValueIndicator ?? _defaultShowValueIndicator,
       valueIndicatorTextStyle:
           sliderTheme.valueIndicatorTextStyle ?? /* 在稳定分支会出现错误 */
-              theme.textTheme.body2.copyWith(
+              theme.textTheme.bodyText1.copyWith(
                 color: theme.colorScheme.onPrimary,
               ),
     );

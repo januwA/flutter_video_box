@@ -41,6 +41,20 @@ extension VideoPlayerControllerExtensions on VideoPlayerController {
 
 class VideoController = _VideoController with _$VideoController;
 
+void kAccelerometerEventsListenner(
+  VideoController controller,
+  AccelerometerEvent event,
+) {
+  if (!controller.isFullScreen) return;
+  bool isHorizontal = event.x.abs() > event.y.abs(); // 横屏模式
+  if (!isHorizontal) return;
+  if (event.x > 1) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+  } else if (event.x < -1) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight]);
+  }
+}
+
 class BaseVideoController {
   VideoPlayerController videoCtrl;
   Duration animetedIconDuration;
@@ -87,7 +101,8 @@ abstract class _VideoController extends BaseVideoController
     this.circularProgressIndicatorColor =
         circularProgressIndicatorColor ?? Colors.white;
     this.bottomPadding = bottomPadding ?? EdgeInsets.zero;
-
+    if (this.accelerometerEventsListenner == null)
+      addAccelerometerEventsListenner(kAccelerometerEventsListenner);
     _initStreams();
   }
 
@@ -107,16 +122,8 @@ abstract class _VideoController extends BaseVideoController
 
   /// 监听页面旋转流
   StreamSubscription<dynamic> _streamSubscriptions$;
-  void _streamSubscriptionsCallback(AccelerometerEvent event) {
-    if (!isFullScreen) return;
-    bool isHorizontal = event.x.abs() > event.y.abs(); // 横屏模式
-    if (!isHorizontal) return;
-    if (event.x > 1) {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
-    } else if (event.x < -1) {
-      SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight]);
-    }
-  }
+  void _streamSubscriptionsCallback(AccelerometerEvent event) =>
+      accelerometerEventsListenner(this, event);
 
   /// 监听网络连接
   ConnectivityResult _connectivityStatus;

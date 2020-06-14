@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_box/video_box.dart';
@@ -45,7 +47,6 @@ class CustomLoading extends StatelessWidget {
   const CustomLoading(this.text, {Key key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    
     return Center(
       child: Container(
         color: Colors.pink,
@@ -149,6 +150,29 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
       ..addFullScreenChangeListener((c, isFullScreen) async {})
       ..addPlayEndListener((c) {
         /*play end*/
+      })
+      ..addAccelerometerEventsListenner((controller, event) {
+        if (!controller.isFullScreen) return;
+        bool isHorizontal = event.x.abs() > event.y.abs();
+        if (!isHorizontal) return;
+
+        if (Platform.isIOS) {
+          if (event.x > 1) {
+            SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.landscapeRight]);
+          } else if (event.x < -1) {
+            SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.landscapeLeft]);
+          }
+        } else {
+          if (event.x > 1) {
+            SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.landscapeLeft]);
+          } else if (event.x < -1) {
+            SystemChrome.setPreferredOrientations(
+                [DeviceOrientation.landscapeRight]);
+          }
+        }
       })
       ..initialize().then((_) {
         // initialized
