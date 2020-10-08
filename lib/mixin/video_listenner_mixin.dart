@@ -35,11 +35,15 @@ mixin VideoListennerMixin on BaseVideoController {
   addFullScreenChangeListener(TFullScreenChangeListenner listener) =>
       fullScreenChangeListenner = listener;
 
-  addListener(TPlayingListenner listener) {
-    videoCtrl?.addListener(() => listener(this));
-  }
-
   addAccelerometerEventsListenner(TAccelerometerEventsListenner listener) {
     accelerometerEventsListenner = listener;
+  }
+
+  void addListener(void Function() listener) {
+    videoCtrl.addListener(listener);
+  }
+
+  void removeListener(void Function() listener) {
+    videoCtrl.removeListener(listener);
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart' show DataSourceType;
 
 class VideoState {
-  VideoState({
+  const VideoState({
     this.dataSource,
     this.dataSourceType,
     this.size,
@@ -18,6 +18,7 @@ class VideoState {
     this.durationText,
     this.sliderValue,
     this.aspectRatio,
+    this.playbackSpeed,
   });
 
   final String dataSource;
@@ -35,6 +36,7 @@ class VideoState {
   final String durationText;
   final double sliderValue;
   final double aspectRatio;
+  final double playbackSpeed;
 
   Map<String, dynamic> toMap() {
     return {
@@ -52,30 +54,13 @@ class VideoState {
       "positionText": positionText,
       "durationText": durationText,
       "sliderValue": sliderValue,
-      "aspectRatio": aspectRatio
+      "aspectRatio": aspectRatio,
+      "playbackSpeed": playbackSpeed,
     };
   }
 
   @override
   String toString() {
-    return """
-    {
-      "dataSource": $dataSource,
-      "dataSourceType": $dataSourceType,
-      "size": $size,
-      "autoplay": $autoplay,
-      "isLooping": $isLooping,
-      "isPlaying": $isPlaying,
-      "volume": $volume,
-      "initPosition": $initPosition,
-      "position": $position,
-      "duration": $duration,
-      "skiptime": $skiptime,
-      "positionText": $positionText,
-      "durationText": $durationText,
-      "sliderValue": $sliderValue,
-      "aspectRatio": $aspectRatio
-    }
-    """;
+    return toMap().toString();
   }
 }

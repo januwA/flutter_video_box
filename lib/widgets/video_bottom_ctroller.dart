@@ -36,7 +36,7 @@ class _VideoBottomViewState extends State<VideoBottomView> {
                     ? Icons.volume_down
                     : Icons.volume_up,
           ),
-          onPressed: widget.controller.setOnSoundOrOff,
+          onPressed: widget.controller.volumeToggle,
         ),
         IconButton(
           icon: Icon(widget.controller.isFullScreen

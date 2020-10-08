@@ -80,18 +80,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
     vc = VideoController(
       source: VideoPlayerController.network(src1),
       looping: true,
-      autoplay: true,
-      color: Colors.red,
-      // bufferColor: Colors.orange,
-      // inactiveColor: Colors.pink,
-      // background: Colors.indigo,
-      // circularProgressIndicatorColor: Colors.lime,
       bottomPadding: EdgeInsets.only(bottom: 10),
-      customLoadingWidget: const CustomLoading("Loading..."),
-      customBufferedWidget: const CustomLoading("please wait.."),
-      // options: {
-      //   "name": "Ajanuw",
-      // },
       customFullScreen: const MyFullScreen(),
       // controllerLiveDuration: Duration(seconds: 10),
       // bottomViewBuilder: (context, c) {
@@ -139,13 +128,9 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
       //     ),
       //   );
       // }
-      // cover: Image.network('https://i.loli.net/2019/08/29/7eXVLcHAhtO9YQg.jpg'),
-      // controllerWidgets: false,
-      // cover: Text('Cover'),
-      // initPosition: Duration(minutes: 23, seconds: 50)
     )
-      ..addListener((c) {
-        // print(c.value.positionText);
+      ..addListener(() {
+        //
       })
       ..addFullScreenChangeListener((c, isFullScreen) async {})
       ..addPlayEndListener((c) {
@@ -176,7 +161,8 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
       })
       ..initialize().then((_) {
         // initialized
-      });
+      })
+      ..setPlaybackSpeed(1.25);
   }
 
   @override
@@ -188,9 +174,6 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('one video ctrl'),
-      ),
       body: ListView(
         controller: controller,
         children: <Widget>[
@@ -199,6 +182,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
             child: VideoBox(
               controller: vc,
               children: <Widget>[
+                VideoBar(vc: vc),
                 Align(
                   alignment: Alignment(0.5, 0),
                   child: IconButton(
@@ -237,6 +221,82 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
                 },
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class VideoBar extends StatelessWidget {
+  final VideoController vc;
+
+  const VideoBar({Key key, @required this.vc}) : super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      left: 0,
+      top: 0,
+      right: 0,
+      child: AppBar(
+        backgroundColor: Colors.transparent,
+        title: Text('test'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.more_vert),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        leading: Icon(Icons.slow_motion_video),
+                        title: Text('play speed'),
+                        onTap: () {
+                          showModalBottomSheet<double>(
+                            context: context,
+                            builder: (context) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ListTile(
+                                    title: Text('0.5'),
+                                    onTap: () => Navigator.of(context).pop(0.5),
+                                  ),
+                                  ListTile(
+                                    title: Text('0.75'),
+                                    onTap: () =>
+                                        Navigator.of(context).pop(0.75),
+                                  ),
+                                  ListTile(
+                                    title: Text('1.0'),
+                                    onTap: () => Navigator.of(context).pop(1.0),
+                                  ),
+                                  ListTile(
+                                    title: Text('1.25'),
+                                    onTap: () =>
+                                        Navigator.of(context).pop(1.25),
+                                  ),
+                                  ListTile(
+                                    title: Text('1.5'),
+                                    onTap: () => Navigator.of(context).pop(1.5),
+                                  ),
+                                ],
+                              );
+                            },
+                          ).then((value) {
+                            if (value != null) vc.setPlaybackSpeed(value);
+                            Navigator.of(context).pop();
+                          });
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
           ),
         ],
       ),

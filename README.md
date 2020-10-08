@@ -17,8 +17,7 @@ android: `<project root>/android/app/src/main/AndroidManifest.xml`:
 ```
 <manifest>
     ...
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.INTERNET" />
     ...
 </manifest>
 ```
