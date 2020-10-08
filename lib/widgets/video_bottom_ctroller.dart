@@ -14,8 +14,12 @@ class VideoBottomView extends StatefulObserverWidget {
 }
 
 class _VideoBottomViewState extends State<VideoBottomView> {
+  void _onTap() {}
+  void changed(double v) {
+    widget.controller.seekTo(
+        Duration(seconds: (v * widget.controller.duration.inSeconds).toInt()));
+  }
 
-  void _onTap(){}
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
@@ -64,15 +68,9 @@ class _VideoBottomViewState extends State<VideoBottomView> {
         activeColor: widget.controller.color,
         value: widget.controller.sliderValue,
         bufferValue: widget.controller.sliderBufferValue,
-        onChanged: (double v) => widget.controller.seekTo(Duration(
-            seconds: (v * widget.controller.duration.inSeconds).toInt())),
+        onChanged: changed,
       ),
     );
-
-    // return ListTile(
-    //   title: _top,
-    //   subtitle: _bottom,
-    // );
 
     return GestureDetector(
       onTap: _onTap,

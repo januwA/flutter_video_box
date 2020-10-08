@@ -79,7 +79,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
 
     vc = VideoController(
       source: VideoPlayerController.network(src1),
-      looping: true,
+      autoplay: true,
       bottomPadding: EdgeInsets.only(bottom: 10),
       customFullScreen: const MyFullScreen(),
       // controllerLiveDuration: Duration(seconds: 10),
@@ -241,6 +241,7 @@ class VideoBar extends StatelessWidget {
       child: AppBar(
         backgroundColor: Colors.transparent,
         title: Text('test'),
+        elevation: 0,
         actions: [
           IconButton(
             icon: Icon(Icons.more_vert),
@@ -258,8 +259,7 @@ class VideoBar extends StatelessWidget {
                           showModalBottomSheet<double>(
                             context: context,
                             builder: (context) {
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
+                              return ListView(
                                 children: [
                                   ListTile(
                                     title: Text('0.5'),

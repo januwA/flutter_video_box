@@ -313,13 +313,17 @@ abstract class _VideoController extends BaseVideoController
       (videoCtrl == null) ? '' : durationString(position);
 
   @computed
-  double get sliderValue =>
-      (position?.inSeconds != null && duration?.inSeconds != null)
-          ? position.inSeconds / duration.inSeconds
-          : 0.0;
+  double get sliderValue {
+    if (position == null || duration == null) return 0;
+    var r = position.inSeconds / duration.inSeconds;
+    return r.isNaN ? 0 : r;
+  }
 
   @computed
-  double get sliderBufferValue => _buffered.inSeconds / duration.inSeconds;
+  double get sliderBufferValue {
+    var r = _buffered.inSeconds / duration.inSeconds;
+    return r.isNaN ? 0 : r;
+  }
 
   /// 替换当前播放的视频资源
   ///

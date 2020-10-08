@@ -13,7 +13,7 @@ import 'widgets/video_bottom_ctroller.dart';
 export 'video.controller.dart';
 export 'package:video_player/video_player.dart';
 
-class VideoBox extends StatefulWidget {
+class VideoBox extends StatefulObserverWidget {
   /// Example:
   ///
   /// ```dart
@@ -109,123 +109,106 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     var _seekToView =
         Positioned.fill(child: SeekToView(controller: controller));
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints size) {
-        return Observer(
-          builder: (BuildContext context) => Theme(
-            data: ThemeData(iconTheme: IconThemeData(color: controller.color)),
-            child: GestureDetector(
-              onTap: controller.toggleShowVideoCtrl,
-              child: Stack(
-                children: <Widget>[
-                  // background widget
+    return Theme(
+      data: ThemeData(iconTheme: IconThemeData(color: controller.color)),
+      child: GestureDetector(
+        onTap: controller.toggleShowVideoCtrl,
+        child: Stack(
+          children: <Widget>[
+
+             // background widget
                   Container(
-                    width: size.maxWidth,
-                    height: size.maxHeight,
                     color: controller.background,
                   ),
-
-                  if (!controller.initialized) ...[
-                    // 加载中同时显示loading和海报
-                    if (controller.cover != null)
-                      Center(child: controller.cover),
-                    controller.customLoadingWidget ??
-                        Center(
-                          child: CircularProgressIndicatorBig(
-                            color: controller.circularProgressIndicatorColor,
-                          ),
-                        ),
-                  ] else ...[
-                    // 加载完成在第一帧显示海报
-                    Container(
-                      child: controller.isShowCover
-                          ? Center(child: controller.cover)
-                          : Center(
-                              child: AspectRatio(
-                                aspectRatio: controller.aspectRatio,
-                                child: VideoPlayer(controller.videoCtrl),
-                              ),
-                            ),
+            if (!controller.initialized) ...[
+              // 加载中同时显示loading和海报
+              if (controller.cover != null) Center(child: controller.cover),
+              controller.customLoadingWidget ??
+                  Center(
+                    child: CircularProgressIndicatorBig(
+                      color: controller.circularProgressIndicatorColor,
+                    ),
+                  ),
+            ] else ...[
+              // 加载完成在第一帧显示海报
+              controller.isShowCover
+                  ? Center(child: controller.cover)
+                  : Center(
+                      child: AspectRatio(
+                        aspectRatio: controller.aspectRatio,
+                        child: VideoPlayer(controller.videoCtrl),
+                      ),
                     ),
 
-                    if (controller.beforeChildren != null)
-                      ...controller.beforeChildren,
+              if (controller.beforeChildren != null)
+                ...controller.beforeChildren,
 
-                    if (controller.controllerWidgets) ...[
-                      // 快进快退
-                      _seekToView,
+              if (controller.controllerWidgets) ...[
+                // 快进快退
+                _seekToView,
 
-                      // controller layer
-                      Positioned.fill(
-                        child: AnimatedSwitcher(
-                          duration: controller.controllerLayerDuration,
-                          child: controller.controllerLayer
-                              ? Container(
-                                  width: size.maxWidth,
-                                  height: size.maxHeight,
-                                  color: controller.barrierColor,
-                                  child: Stack(
-                                    children: <Widget>[
-                                      _seekToView,
-                                      controller.isBfLoading
-                                          ? SizedBox()
-                                          : Center(
-                                              child: IconButton(
-                                                iconSize:
-                                                    VideoBox.centerIconSize,
-                                                icon: AnimatedIcon(
-                                                  icon:
-                                                      AnimatedIcons.play_pause,
-                                                  progress: controller
-                                                      .animetedIconTween,
-                                                ),
-                                                onPressed:
-                                                    controller.togglePlay,
-                                              ),
-                                            ),
-                                      controller.bottomViewBuilder != null
-                                          ? controller.bottomViewBuilder(
-                                              context, controller)
-                                          : Positioned(
-                                              left:
-                                                  controller.bottomPadding.left,
-                                              bottom: controller
-                                                  .bottomPadding.bottom,
-                                              right: controller
-                                                  .bottomPadding.right,
-                                              child: VideoBottomView(
-                                                  controller: controller),
-                                            ),
-                                      if (controller.children != null)
-                                        ...controller.children,
-                                    ],
-                                  ),
-                                )
-                              : SizedBox(),
-                        ),
-                      ),
+                // controller layer
+                Positioned.fill(
+                  child: AnimatedSwitcher(
+                    duration: controller.controllerLayerDuration,
+                    child: controller.controllerLayer
+                        ? Container(
+                            color: controller.barrierColor,
+                            child: Stack(
+                              children: <Widget>[
+                                _seekToView,
+                                controller.isBfLoading
+                                    ? SizedBox()
+                                    : Center(
+                                        child: IconButton(
+                                          iconSize: VideoBox.centerIconSize,
+                                          icon: AnimatedIcon(
+                                            icon: AnimatedIcons.play_pause,
+                                            progress:
+                                                controller.animetedIconTween,
+                                          ),
+                                          onPressed: controller.togglePlay,
+                                        ),
+                                      ),
+                                controller.bottomViewBuilder != null
+                                    ? controller.bottomViewBuilder(
+                                        context, controller)
+                                    : Positioned(
+                                        left: controller.bottomPadding.left,
+                                        bottom: controller.bottomPadding.bottom,
+                                        right: controller.bottomPadding.right,
+                                        child: VideoBottomView(
+                                            controller: controller),
+                                      ),
+                                if (controller.children != null)
+                                  ...controller.children,
+                              ],
+                            ),
+                          )
+                        : SizedBox(),
+                  ),
+                ),
 
-                      // buffer loading
-                      controller.isBfLoading
-                          ? controller.customBufferedWidget ??
-                              Center(
-                                child: CircularProgressIndicatorBig(
-                                    color: controller
-                                        .circularProgressIndicatorColor),
-                              )
-                          : SizedBox(),
-                    ],
+                // buffer loading
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 400),
+                  child: controller.isBfLoading
+                      ? controller.customBufferedWidget ??
+                          Center(
+                            child: CircularProgressIndicatorBig(
+                                color:
+                                    controller.circularProgressIndicatorColor),
+                          )
+                      : SizedBox(),
+                ),
+              ],
 
-                    // 自定义控件
-                    if (controller.afterChildren != null)
-                      ...controller.afterChildren,
-                  ]
-                ],
-              ),
-            ),
-          ),
-        );
-      },
+              // 自定义控件
+              if (controller.afterChildren != null) ...controller.afterChildren,
+            ]
+          ],
+        ),
+      ),
     );
   }
 }
