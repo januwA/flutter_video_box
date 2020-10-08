@@ -9,7 +9,7 @@ import 'package:mobx/mobx.dart';
 import 'package:video_player/video_player.dart'
     show DataSourceType, VideoPlayerController, VideoPlayerValue;
 
-import 'util.dart';
+import '_util.dart';
 import 'mixin/animation_icon_mixin.dart';
 import 'mixin/custom_view_mixin.dart';
 import 'mixin/video_listenner_mixin.dart';
@@ -293,7 +293,7 @@ abstract class _VideoController extends BaseVideoController
     _controllerLayerTimer = Timer(this.controllerLiveDuration, () {
       // 暂停状态不自动关闭
       // Pause status does not close automatically
-      if (_value.isPlaying) setControllerLayer(false);
+      if (_value.isPlaying && controllerLayer) setControllerLayer(false);
     });
   }
 

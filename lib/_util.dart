@@ -1,3 +1,5 @@
+import 'dart:async';
+
 /// Duration => durationString => 00:01
 String durationString(Duration d) {
   return d
@@ -12,4 +14,12 @@ String durationString(Duration d) {
 
 double map(v, start1, stop1, start2, stop2) {
   return (v - start1) / (stop1 - start1) * (stop2 - start2) + start2;
+}
+
+Function debounce(Function fn) {
+  Timer _debounce;
+  return () {
+    if (_debounce?.isActive ?? false) _debounce.cancel();
+    _debounce = Timer(const Duration(milliseconds: 5), () => fn());
+  };
 }

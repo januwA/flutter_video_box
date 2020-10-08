@@ -50,7 +50,11 @@ class _AnimatedArrowIconState extends State<AnimatedArrowIcon> {
   double get _threeValue =>
       _edge(_lerp(widget._threeIconOpacityAnimation.value));
 
-  double _edge(double v) => v > 1.0 ? 1.0 : v < 0 ? 0 : v;
+  double _edge(double v) => v > 1.0
+      ? 1.0
+      : v < 0
+          ? 0
+          : v;
   double _lerp(double v) => v >= 1 ? (v - AnimatedArrowIcon._end).abs() : v;
 
   @override

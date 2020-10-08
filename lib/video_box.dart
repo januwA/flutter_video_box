@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:video_player/video_player.dart';
 
+import '_util.dart';
 import 'video.controller.dart';
 import 'widgets/circular_progressIndicator_big.dart';
 import 'widgets/seek_to_view.dart';
@@ -112,14 +113,13 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
     return Theme(
       data: ThemeData(iconTheme: IconThemeData(color: controller.color)),
       child: GestureDetector(
-        onTap: controller.toggleShowVideoCtrl,
+        onTap: debounce(controller.toggleShowVideoCtrl),
         child: Stack(
           children: <Widget>[
-
-             // background widget
-                  Container(
-                    color: controller.background,
-                  ),
+            // background widget
+            Container(
+              color: controller.background,
+            ),
             if (!controller.initialized) ...[
               // 加载中同时显示loading和海报
               if (controller.cover != null) Center(child: controller.cover),
@@ -148,45 +148,43 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
                 _seekToView,
 
                 // controller layer
-                Positioned.fill(
-                  child: AnimatedSwitcher(
-                    duration: controller.controllerLayerDuration,
-                    child: controller.controllerLayer
-                        ? Container(
-                            color: controller.barrierColor,
-                            child: Stack(
-                              children: <Widget>[
-                                _seekToView,
-                                controller.isBfLoading
-                                    ? SizedBox()
-                                    : Center(
-                                        child: IconButton(
-                                          iconSize: VideoBox.centerIconSize,
-                                          icon: AnimatedIcon(
-                                            icon: AnimatedIcons.play_pause,
-                                            progress:
-                                                controller.animetedIconTween,
-                                          ),
-                                          onPressed: controller.togglePlay,
+                AnimatedSwitcher(
+                  duration: controller.controllerLayerDuration,
+                  child: controller.controllerLayer
+                      ? Container(
+                          color: controller.barrierColor,
+                          child: Stack(
+                            children: <Widget>[
+                              _seekToView,
+                              controller.isBfLoading
+                                  ? SizedBox()
+                                  : Center(
+                                      child: IconButton(
+                                        iconSize: VideoBox.centerIconSize,
+                                        icon: AnimatedIcon(
+                                          icon: AnimatedIcons.play_pause,
+                                          progress:
+                                              controller.animetedIconTween,
                                         ),
+                                        onPressed: controller.togglePlay,
                                       ),
-                                controller.bottomViewBuilder != null
-                                    ? controller.bottomViewBuilder(
-                                        context, controller)
-                                    : Positioned(
-                                        left: controller.bottomPadding.left,
-                                        bottom: controller.bottomPadding.bottom,
-                                        right: controller.bottomPadding.right,
-                                        child: VideoBottomView(
-                                            controller: controller),
-                                      ),
-                                if (controller.children != null)
-                                  ...controller.children,
-                              ],
-                            ),
-                          )
-                        : SizedBox(),
-                  ),
+                                    ),
+                              controller.bottomViewBuilder != null
+                                  ? controller.bottomViewBuilder(
+                                      context, controller)
+                                  : Positioned(
+                                      left: controller.bottomPadding.left,
+                                      bottom: controller.bottomPadding.bottom,
+                                      right: controller.bottomPadding.right,
+                                      child: VideoBottomView(
+                                          controller: controller),
+                                    ),
+                              if (controller.children != null)
+                                ...controller.children,
+                            ],
+                          ),
+                        )
+                      : SizedBox(),
                 ),
 
                 // buffer loading

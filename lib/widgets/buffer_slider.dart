@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-import '../util.dart';
+import '../_util.dart';
 
 typedef ValueChanged<T> = void Function(T value);
 

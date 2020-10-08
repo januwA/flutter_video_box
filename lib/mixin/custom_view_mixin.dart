@@ -156,7 +156,7 @@ mixin CustomViewMixin {
 
   /// icons和文字的颜色
   Color color;
-  
+
   Color bufferColor;
   Color inactiveColor;
   Color circularProgressIndicatorColor;

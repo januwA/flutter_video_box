@@ -1,3 +1,7 @@
+## 0.14.2 2020-10-8
+
+* 修复可能出现的`setState() or markNeedsBuild() called when widget tree was locked.`错误
+
 ## 0.14.1 2020-10-8
 
 - 修复BoxConstraints的错误
