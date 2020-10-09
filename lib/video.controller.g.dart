@@ -60,21 +60,6 @@ mixin _$VideoController on _VideoController, Store {
     });
   }
 
-  final _$barrierColorAtom = Atom(name: '_VideoController.barrierColor');
-
-  @override
-  Color get barrierColor {
-    _$barrierColorAtom.reportRead();
-    return super.barrierColor;
-  }
-
-  @override
-  set barrierColor(Color value) {
-    _$barrierColorAtom.reportWrite(value, super.barrierColor, () {
-      super.barrierColor = value;
-    });
-  }
-
   final _$controllerWidgetsAtom =
       Atom(name: '_VideoController.controllerWidgets');
 
@@ -103,21 +88,6 @@ mixin _$VideoController on _VideoController, Store {
   set isBfLoading(bool value) {
     _$isBfLoadingAtom.reportWrite(value, super.isBfLoading, () {
       super.isBfLoading = value;
-    });
-  }
-
-  final _$coverAtom = Atom(name: '_VideoController.cover');
-
-  @override
-  Widget get cover {
-    _$coverAtom.reportRead();
-    return super.cover;
-  }
-
-  @override
-  set cover(Widget value) {
-    _$coverAtom.reportWrite(value, super.cover, () {
-      super.cover = value;
     });
   }
 
@@ -214,8 +184,8 @@ mixin _$VideoController on _VideoController, Store {
   final _$initializeAsyncAction = AsyncAction('_VideoController.initialize');
 
   @override
-  Future<void> initialize() {
-    return _$initializeAsyncAction.run(() => super.initialize());
+  Future<dynamic> initialize([bool isReconnect = false]) {
+    return _$initializeAsyncAction.run(() => super.initialize(isReconnect));
   }
 
   final _$_VideoControllerActionController =
@@ -227,17 +197,6 @@ mixin _$VideoController on _VideoController, Store {
         name: '_VideoController.setAspectRatio');
     try {
       return super.setAspectRatio(v);
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void setBarrierColor(Color v) {
-    final _$actionInfo = _$_VideoControllerActionController.startAction(
-        name: '_VideoController.setBarrierColor');
-    try {
-      return super.setBarrierColor(v);
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
@@ -260,17 +219,6 @@ mixin _$VideoController on _VideoController, Store {
         name: '_VideoController.setIsBfLoading');
     try {
       return super.setIsBfLoading(v);
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
-  void setCover(Widget v) {
-    final _$actionInfo = _$_VideoControllerActionController.startAction(
-        name: '_VideoController.setCover');
-    try {
-      return super.setCover(v);
     } finally {
       _$_VideoControllerActionController.endAction(_$actionInfo);
     }
@@ -335,10 +283,8 @@ mixin _$VideoController on _VideoController, Store {
   String toString() {
     return '''
 aspectRatio: ${aspectRatio},
-barrierColor: ${barrierColor},
 controllerWidgets: ${controllerWidgets},
 isBfLoading: ${isBfLoading},
-cover: ${cover},
 volume: ${volume},
 initialized: ${initialized},
 position: ${position},

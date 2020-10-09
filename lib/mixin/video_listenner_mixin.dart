@@ -13,6 +13,8 @@ typedef TConnectivityChangedListenner = void Function(
 typedef TAccelerometerEventsListenner = void Function(
     VideoController controller, AccelerometerEvent event);
 
+typedef TLnitializeErrorEventsListenner = void Function(dynamic error);
+
 /// 各种监听事件
 mixin VideoListennerMixin on BaseVideoController {
   /// 监听video播放结束事件
@@ -37,6 +39,12 @@ mixin VideoListennerMixin on BaseVideoController {
 
   addAccelerometerEventsListenner(TAccelerometerEventsListenner listener) {
     accelerometerEventsListenner = listener;
+  }
+
+  /// initialize 初始化错误时
+  TLnitializeErrorEventsListenner initializeErrorEventsListenner;
+  addInitializeErrorListenner(TLnitializeErrorEventsListenner listener) {
+    initializeErrorEventsListenner = listener;
   }
 
   void addListener(void Function() listener) {

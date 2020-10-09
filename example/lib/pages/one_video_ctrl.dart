@@ -1,9 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_box/video_box.dart';
-// import 'package:video_box/widgets/buffer_slider.dart';
 
 import '../globals.dart';
 
@@ -76,93 +73,19 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
   @override
   void initState() {
     super.initState();
+    _init();
+  }
 
+  void _init() async {
     vc = VideoController(
       source: VideoPlayerController.network(src1),
-      autoplay: true,
-      bottomPadding: EdgeInsets.only(bottom: 10),
-      customFullScreen: const MyFullScreen(),
-      // controllerLiveDuration: Duration(seconds: 10),
-      // bottomViewBuilder: (context, c) {
-      //   var theme = Theme.of(context);
-      //   return Positioned(
-      //     left: c.bottomPadding.left,
-      //     bottom: 0,
-      //     right: 0,
-      //     child: Padding(
-      //       padding: const EdgeInsets.all(8.0),
-      //       child: Column(
-      //         children: <Widget>[
-      //           Row(
-      //             children: <Widget>[
-      //               Text(
-      //                 c.initialized
-      //                     ? "${c.positionText}/${c.durationText}"
-      //                     : '00:00/00:00',
-      //                 style: TextStyle(color: Colors.white),
-      //               ),
-      //               Spacer(),
-      //               Text(
-      //                 c.options["name"].toString(),
-      //                 style: TextStyle(color: Colors.white),
-      //               ),
-      //             ],
-      //           ),
-      //           Theme(
-      //             data: theme.copyWith(
-      //               sliderTheme: theme.sliderTheme.copyWith(
-      //                 trackHeight: 6, // line的高度
-      //                 overlayShape: SliderComponentShape.noThumb,
-      //               ),
-      //             ),
-      //             child: BufferSlider(
-      //               pointWidget: const SizedBox(),
-      //               value: c.sliderValue,
-      //               bufferValue: c.sliderBufferValue,
-      //               onChanged: (double v) => c.seekTo(Duration(
-      //                   seconds: (v * c.duration.inSeconds).toInt())),
-      //             ),
-      //           ),
-      //         ],
-      //       ),
-      //     ),
-      //   );
-      // }
-    )
-      ..addListener(() {
-        //
-      })
-      ..addFullScreenChangeListener((c, isFullScreen) async {})
-      ..addPlayEndListener((c) {
-        /*play end*/
-      })
-      ..addAccelerometerEventsListenner((controller, event) {
-        if (!controller.isFullScreen) return;
-        bool isHorizontal = event.x.abs() > event.y.abs();
-        if (!isHorizontal) return;
-
-        if (Platform.isIOS) {
-          if (event.x > 1) {
-            SystemChrome.setPreferredOrientations(
-                [DeviceOrientation.landscapeRight]);
-          } else if (event.x < -1) {
-            SystemChrome.setPreferredOrientations(
-                [DeviceOrientation.landscapeLeft]);
-          }
+    )..initialize().then((e) {
+        if (e != null) {
+          print('[video box init] error: ' + e.message);
         } else {
-          if (event.x > 1) {
-            SystemChrome.setPreferredOrientations(
-                [DeviceOrientation.landscapeLeft]);
-          } else if (event.x < -1) {
-            SystemChrome.setPreferredOrientations(
-                [DeviceOrientation.landscapeRight]);
-          }
+          print('[video box init] success');
         }
-      })
-      ..initialize().then((_) {
-        // initialized
-      })
-      ..setPlaybackSpeed(1.25);
+      });
   }
 
   @override
@@ -218,6 +141,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
                 child: Text('print'),
                 onPressed: () {
                   print(vc);
+                  print(vc.value);
                 },
               ),
             ],
@@ -230,8 +154,13 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
 
 class VideoBar extends StatelessWidget {
   final VideoController vc;
+  final List<double> speeds;
 
-  const VideoBar({Key key, @required this.vc}) : super(key: key);
+  const VideoBar({
+    Key key,
+    @required this.vc,
+    this.speeds = const [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0],
+  }) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Positioned(
@@ -260,30 +189,13 @@ class VideoBar extends StatelessWidget {
                             context: context,
                             builder: (context) {
                               return ListView(
-                                children: [
-                                  ListTile(
-                                    title: Text('0.5'),
-                                    onTap: () => Navigator.of(context).pop(0.5),
-                                  ),
-                                  ListTile(
-                                    title: Text('0.75'),
-                                    onTap: () =>
-                                        Navigator.of(context).pop(0.75),
-                                  ),
-                                  ListTile(
-                                    title: Text('1.0'),
-                                    onTap: () => Navigator.of(context).pop(1.0),
-                                  ),
-                                  ListTile(
-                                    title: Text('1.25'),
-                                    onTap: () =>
-                                        Navigator.of(context).pop(1.25),
-                                  ),
-                                  ListTile(
-                                    title: Text('1.5'),
-                                    onTap: () => Navigator.of(context).pop(1.5),
-                                  ),
-                                ],
+                                children: speeds
+                                    .map((e) => ListTile(
+                                          title: Text(e.toString()),
+                                          onTap: () =>
+                                              Navigator.of(context).pop(e),
+                                        ))
+                                    .toList(),
                               );
                             },
                           ).then((value) {

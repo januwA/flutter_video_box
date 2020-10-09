@@ -11,6 +11,7 @@ class SeekToView extends StatelessWidget {
   const SeekToView({Key key, @required this.controller}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+    var theme = Theme.of(context);
     return Row(
       children: <Widget>[
         // 左侧模块，负责快退，调整系统亮度
@@ -26,7 +27,7 @@ class SeekToView extends StatelessWidget {
                         child: AnimatedArrowIcon(
                           iconSize: VideoBox.centerIconSize,
                           controller: controller.arrowIconRtLController,
-                          color: controller.color,
+                          color: theme.iconTheme.color,
                         ),
                       )
                     : SizedBox(),
@@ -47,7 +48,7 @@ class SeekToView extends StatelessWidget {
                     ? AnimatedArrowIcon(
                         iconSize: VideoBox.centerIconSize,
                         controller: controller.arrowIconLtRController,
-                        color: controller.color,
+                        color: theme.iconTheme.color,
                       )
                     : SizedBox(),
               ),

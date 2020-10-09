@@ -4,22 +4,11 @@
 
 note:
 * Only tested on android
-* No ios test
 * Development api may change at any time
-
-## Install
-```
-dependencies:
-  video_box:
-```
 
 android: `<project root>/android/app/src/main/AndroidManifest.xml`:
 ```
-<manifest>
-    ...
-    <uses-permission android:name="android.permission.INTERNET" />
-    ...
-</manifest>
+<uses-permission android:name="android.permission.INTERNET" />
 ```
 
 ios: `<project root>/ios/Runner/Info.plist`:
@@ -84,6 +73,23 @@ class _ListVideoState extends State<ListVideo> {
     );
   }
 }
+```
+
+Catch the error during initialize
+```dart
+  vc = VideoController(
+    source: VideoPlayerController.network('https://examole.com/a.mp4'),
+  )
+    ..addInitializeErrorListenner((e) {
+      print('[video box init] error: ' + e.message);
+    })
+    ..initialize().then((e) {
+      if (e != null) {
+        print('[video box init] error: ' + e.message);
+      } else {
+        print('[video box init] success');
+      }
+    });
 ```
 
 For details, see /example or source code.

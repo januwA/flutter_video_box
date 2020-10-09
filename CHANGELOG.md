@@ -1,3 +1,11 @@
+## 0.15.0 2020-10-9
+
+- API 重大变更
+- 将大量VideoController的参数迁移到VideoBox上
+- 删除大量无用的属性
+- 优化了在极差网络下播放视频，导致解码器自动关闭，需要切换网络后才能继续播放
+- 更多详情可以看源码和example
+
 ## 0.14.2 2020-10-8
 
 * 修复可能出现的`setState() or markNeedsBuild() called when widget tree was locked.`错误

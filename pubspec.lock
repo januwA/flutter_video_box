@@ -190,13 +190,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.16.2"
-  dart_printf:
-    dependency: "direct main"
-    description:
-      name: dart_printf
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.2.0"
   dart_style:
     dependency: transitive
     description:

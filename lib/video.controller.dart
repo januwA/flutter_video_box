@@ -1,43 +1,22 @@
 import 'dart:async' show StreamSubscription, Timer;
 
 import 'package:connectivity/connectivity.dart';
+// import 'package:dart_printf/dart_printf.dart';
 import 'package:sensors/sensors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:mobx/mobx.dart';
 import 'package:video_player/video_player.dart'
-    show DataSourceType, VideoPlayerController, VideoPlayerValue;
+    show VideoPlayerController, VideoPlayerValue;
 
 import '_util.dart';
 import 'mixin/animation_icon_mixin.dart';
 import 'mixin/custom_view_mixin.dart';
 import 'mixin/video_listenner_mixin.dart';
-import 'video_box.dart' show CustomFullScreen, KCustomFullScreen;
 import 'video_state.dart';
 
 part 'video.controller.g.dart';
-
-extension VideoPlayerControllerExtensions on VideoPlayerController {
-  VideoPlayerController copyWith() {
-    switch (dataSourceType) {
-      case DataSourceType.network:
-        return VideoPlayerController.network(
-          dataSource,
-          formatHint: formatHint,
-          closedCaptionFile: closedCaptionFile,
-        );
-      case DataSourceType.asset:
-        return VideoPlayerController.asset(
-          dataSource,
-          package: package,
-          closedCaptionFile: closedCaptionFile,
-        );
-      default:
-        throw '其他不支持!!';
-    }
-  }
-}
 
 class VideoController = _VideoController with _$VideoController;
 
@@ -55,103 +34,17 @@ void kAccelerometerEventsListenner(
   }
 }
 
-class BaseVideoController {
+abstract class BaseVideoController {
   VideoPlayerController videoCtrl;
   Duration animetedIconDuration;
 }
 
 abstract class _VideoController extends BaseVideoController
     with Store, VideoListennerMixin, CustomViewMixin, AnimationIconMixin {
-  @action
-  _VideoController({
-    VideoPlayerController source,
-    this.skiptime = const Duration(seconds: 10),
-    this.autoplay = false,
-    this.looping = false,
-    this.volume = 1.0,
-    this.initPosition = const Duration(seconds: 0),
-    this.cover,
-    this.controllerWidgets = true,
-    this.controllerLiveDuration = const Duration(seconds: 2),
-    this.controllerLayerDuration = kTabScrollDuration,
-    this.animetedIconDuration = kTabScrollDuration,
-    this.options,
-    EdgeInsets bottomPadding,
-    Color background,
-    Color color,
-    Color bufferColor,
-    Color inactiveColor,
-    Color circularProgressIndicatorColor,
-    Color barrierColor,
-    Widget customLoadingWidget,
-    Widget customBufferedWidget,
-    CustomFullScreen customFullScreen,
-    BottomViewBuilder bottomViewBuilder,
-  }) {
-    videoCtrl = source;
-    this.barrierColor = barrierColor ?? Colors.black.withOpacity(0.6);
-    this.customLoadingWidget = customLoadingWidget;
-    this.customBufferedWidget = customBufferedWidget;
-    this.customFullScreen = customFullScreen ?? const KCustomFullScreen();
-    this.bottomViewBuilder = bottomViewBuilder;
-    this.background = background ?? Colors.black;
-    this.color = color ?? Colors.white;
-    this.bufferColor = bufferColor ?? Colors.white38;
-    this.inactiveColor = inactiveColor ?? Colors.white24;
-    this.circularProgressIndicatorColor =
-        circularProgressIndicatorColor ?? Colors.white;
-    this.bottomPadding = bottomPadding ?? EdgeInsets.zero;
-    if (this.accelerometerEventsListenner == null)
-      addAccelerometerEventsListenner(kAccelerometerEventsListenner);
-    _initStreams();
-  }
-
-  @override
-  VideoPlayerController videoCtrl;
-  VideoPlayerValue get _value => videoCtrl.value;
-
-  bool _isDispose = false;
-
-  /// 初始化所有需要的流
-  _initStreams() {
-    _streamSubscriptions$ ??=
-        accelerometerEvents.listen(_streamSubscriptionsCallback);
-    _connectivityChanged$ ??= Connectivity()
-        .onConnectivityChanged
-        .listen(_connectivityChangedCallBack);
-  }
-
-  /// 监听页面旋转流
-  StreamSubscription<dynamic> _streamSubscriptions$;
-  void _streamSubscriptionsCallback(AccelerometerEvent event) =>
-      accelerometerEventsListenner(this, event);
-
-  /// 监听网络连接
-  ConnectivityResult _connectivityStatus;
-  StreamSubscription<ConnectivityResult> _connectivityChanged$;
-  void _connectivityChangedCallBack(ConnectivityResult result) {
-    // 如果我关闭wifi，那么网络变化将是 none -> mobile
-    // 当重新开启wifi，将会打印两次wifi
-    // print(result);
-
-    if (connectivityChangedListenner != null)
-      connectivityChangedListenner(this, result);
-
-    bool isReconnection = _connectivityStatus == ConnectivityResult.none &&
-        result != ConnectivityResult.none &&
-        isBfLoading &&
-        _value.buffered.isEmpty;
-    if (isReconnection) {
-      // 从断网中恢复过来, 重新连接解码器
-      // 可能出现BUG，没经过严格测试
-
-      videoCtrl.removeListener(_videoListenner);
-      var p = position ?? Duration.zero;
-      initialize().then((_) => seekTo(p)).then((_) => play());
-    }
-
-    _connectivityStatus = result;
-  }
+  /// 控制器层被打开后存活的时间
+  ///
+  /// Time to live after the controller layer is opened
+  final Duration controllerLiveDuration;
 
   /// 您可以传递一个[options]，但[options]并不会在内部使用，但您可以在各个回调中访问[options]:
   ///
@@ -167,11 +60,6 @@ abstract class _VideoController extends BaseVideoController
   /// ```
   ///
   final dynamic options;
-
-  @observable
-  double aspectRatio;
-  @action
-  void setAspectRatio(double v) => aspectRatio = v;
 
   /// icon动画的持续时间
   ///
@@ -189,13 +77,68 @@ abstract class _VideoController extends BaseVideoController
   /// Controller layer opening and closing animation duration
   final Duration controllerLayerDuration;
 
-  /// 控制器背景色
-  ///
-  /// Controller background color
-  @observable
-  Color barrierColor;
   @action
-  void setBarrierColor(Color v) => barrierColor = v;
+  _VideoController({
+    VideoPlayerController source,
+    this.skiptime = const Duration(seconds: 10),
+    this.autoplay = false,
+    this.looping = false,
+    this.volume = 1.0,
+    this.initPosition = const Duration(seconds: 0),
+    this.controllerWidgets = true,
+    this.controllerLiveDuration = const Duration(seconds: 2),
+    this.controllerLayerDuration = kTabScrollDuration,
+    this.animetedIconDuration = kTabScrollDuration,
+    this.options,
+  }) {
+    videoCtrl = source;
+    if (this.accelerometerEventsListenner == null)
+      addAccelerometerEventsListenner(kAccelerometerEventsListenner);
+
+    // 初始化所有需要的流
+
+    _streamSubscriptions$ ??=
+        accelerometerEvents.listen(_streamSubscriptionsCallback);
+    _connectivityChanged$ ??= Connectivity()
+        .onConnectivityChanged
+        .listen(_connectivityChangedCallBack);
+  }
+
+  @override
+  VideoPlayerController videoCtrl;
+  VideoPlayerValue get _value => videoCtrl.value;
+
+  /// 监听页面旋转流
+  StreamSubscription<dynamic> _streamSubscriptions$;
+  void _streamSubscriptionsCallback(AccelerometerEvent event) =>
+      accelerometerEventsListenner(this, event);
+
+  /// 监听网络连接
+  ConnectivityResult _connectivityStatus;
+  StreamSubscription<ConnectivityResult> _connectivityChanged$;
+  void _connectivityChangedCallBack(ConnectivityResult result) {
+    // printf('NetworkChange(%o)', result);
+
+    if (connectivityChangedListenner != null)
+      connectivityChangedListenner(this, result);
+
+    bool isReconnection = _connectivityStatus == ConnectivityResult.none &&
+        result != ConnectivityResult.none &&
+        isBfLoading &&
+        _value.buffered.isEmpty;
+    if (isReconnection) {
+      // 从断网中恢复过来, 重新连接解码器
+      // 所有事件监听器不会被移除
+      initialize(true);
+    }
+
+    _connectivityStatus = result;
+  }
+
+  @observable
+  double aspectRatio;
+  @action
+  void setAspectRatio(double v) => aspectRatio = v;
 
   bool get isPlayEnd =>
       (position ?? Duration.zero) >= (duration ?? Duration.zero);
@@ -223,16 +166,8 @@ abstract class _VideoController extends BaseVideoController
     if (_value.buffered?.isEmpty ?? true) return Duration.zero;
     // 经过我的测试发现这个buffered数组的length，总是为1
     // print('buffered length: ' + value.buffered.length.toString());
-
-    // range的start也总是 0
     return _value.buffered.last.end;
   }
-
-  /// cover
-  @observable
-  Widget cover;
-  @action
-  void setCover(Widget v) => cover = v;
 
   /// 是否显示封面，只有在第一次播放前显示
   ///
@@ -253,7 +188,7 @@ abstract class _VideoController extends BaseVideoController
   }
 
   @observable
-  double volume = 1.0;
+  double volume;
   @action
   void setVolume(double v) {
     volume = v;
@@ -321,6 +256,7 @@ abstract class _VideoController extends BaseVideoController
 
   @computed
   double get sliderBufferValue {
+    if (_buffered == null || duration == null) return 0;
     var r = _buffered.inSeconds / duration.inSeconds;
     return r.isNaN ? 0 : r;
   }
@@ -335,36 +271,54 @@ abstract class _VideoController extends BaseVideoController
     videoCtrl = source;
   }
 
-  /// 控制器层被打开后存活的时间
-  ///
-  /// Time to live after the controller layer is opened
-  final Duration controllerLiveDuration;
-
   /// 初始化viedo控制器
   ///
   /// Initialize the viedo controller
   @action
-  Future<void> initialize() async {
+  Future<dynamic> initialize([bool isReconnect = false]) async {
     assert(videoCtrl != null);
-    if (_isDispose) return; // 尽可能避免调用[dispose]还继续初始化的情况
-    initialized = false;
-    await videoCtrl.initialize();
-    videoCtrl.addListener(_videoListenner);
-    aspectRatio = _value.aspectRatio;
-    initialized = true;
-    videoCtrl
-      ..setLooping(looping)
-      ..setVolume(volume);
-    if (autoplay) {
-      setControllerLayer(false);
-      await videoCtrl.play();
-    }
 
-    if (initPosition != null && initPosition != Duration.zero)
-      seekTo(initPosition);
-    position = initPosition ?? _value.position ?? Duration.zero;
-    duration = _value.duration ?? Duration.zero;
-    updateAnimetedIconState();
+    if (isReconnect) {
+      try {
+        await videoCtrl.initialize();
+        videoCtrl
+          ..seekTo(position)
+          ..setLooping(looping)
+          ..setVolume(volume)
+          ..play()
+          ..setPlaybackSpeed(_playbackSpeed);
+      } catch (e) {
+        if (initializeErrorEventsListenner != null)
+          initializeErrorEventsListenner(e);
+        return e;
+      }
+    } else {
+      try {
+        initialized = false;
+        await videoCtrl.initialize();
+        videoCtrl.addListener(_videoListenner);
+        aspectRatio = _value.aspectRatio;
+        initialized = true;
+        videoCtrl
+          ..setLooping(looping)
+          ..setVolume(volume);
+        if (autoplay) {
+          setControllerLayer(false);
+          await videoCtrl.play();
+        }
+
+        if (initPosition != null && initPosition != Duration.zero)
+          seekTo(initPosition);
+        position = initPosition ?? _value.position ?? Duration.zero;
+        duration = _value.duration ?? Duration.zero;
+        updateAnimetedIconState();
+      } catch (e) {
+        if (initializeErrorEventsListenner != null)
+          initializeErrorEventsListenner(e);
+        return e;
+      }
+    }
+    return null;
   }
 
   /// 播放途中解码器被关闭（断网）
@@ -372,6 +326,23 @@ abstract class _VideoController extends BaseVideoController
       _value.position == Duration.zero &&
       _value.duration == null &&
       _connectivityStatus == ConnectivityResult.none;
+
+  /// 在极差的网络环境播放视频，可能导致解码器自动关闭(并未断网)
+  bool get _isPoorNetwork {
+    // 解码器彻底关闭
+    if (_value.position == Duration.zero &&
+        _value.duration == null &&
+        _value.buffered.isEmpty &&
+        !_isNetDisconnect &&
+        !_value.isPlaying) return true;
+
+    // 解码器关闭边缘...
+    if (_value.position.inSeconds == _buffered.inSeconds &&
+        !_isNetDisconnect &&
+        _value.isPlaying) return true;
+
+    return false;
+  }
 
   /// 视频播放时的监听器
   ///
@@ -383,8 +354,18 @@ abstract class _VideoController extends BaseVideoController
   /// 视频暂停不会触发
   @action
   void _videoListenner() {
-    if (_isNetDisconnect) {
+    // printf(
+    //   'position(%o), bufferd(%o), duration(%o), _isNetDisconnect(%b), isPlaying(%b)',
+    //   _value.position,
+    //   _value.buffered.isEmpty ? Duration.zero : _value.buffered.last.end,
+    //   _value.duration,
+    //   _isNetDisconnect,
+    //   _value.isPlaying,
+    // );
+
+    if (_isNetDisconnect || _isPoorNetwork) {
       isBfLoading = true;
+      _connectivityStatus = ConnectivityResult.none;
       return;
     }
 
@@ -393,7 +374,7 @@ abstract class _VideoController extends BaseVideoController
     if (_value.isPlaying) {
       isBfLoading = _value.position != null &&
           _value.position != Duration.zero &&
-          _buffered <= _value.position;
+          _buffered == _value.position;
     }
 
     if (isPlayEnd) {
@@ -469,8 +450,11 @@ abstract class _VideoController extends BaseVideoController
     seekTo(_value.position - (st ?? skiptime));
   }
 
+  double _playbackSpeed = 1.0;
+
   /// Set playback speed
   Future<void> setPlaybackSpeed(double speed) {
+    _playbackSpeed = speed;
     return videoCtrl.setPlaybackSpeed(speed);
   }
 
@@ -512,7 +496,6 @@ abstract class _VideoController extends BaseVideoController
   }
 
   void dispose() {
-    _isDispose = true;
     _controllerLayerTimer?.cancel();
     _animatedDispose();
     _streamDispose();
@@ -529,15 +512,12 @@ abstract class _VideoController extends BaseVideoController
         dataSource: videoCtrl.dataSource,
         dataSourceType: videoCtrl.dataSourceType,
         size: _value.size,
-        isLooping: _value.isLooping,
+        isLooping: looping,
         isPlaying: _value.isPlaying,
-        volume: _value.volume,
-        position: _value.position,
-        duration: _value.duration,
-        aspectRatio: _value.aspectRatio,
-        playbackSpeed: _value.playbackSpeed,
+        volume: volume,
+        position: position,
+        duration: duration,
+        aspectRatio: aspectRatio,
+        playbackSpeed: _playbackSpeed,
       );
-
-  @override
-  String toString() => value.toString();
 }

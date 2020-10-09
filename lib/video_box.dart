@@ -6,13 +6,18 @@ import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:video_player/video_player.dart';
 
 import '_util.dart';
+import 'mixin/custom_view_mixin.dart';
 import 'video.controller.dart';
+import 'widgets/buffer_slider.dart';
 import 'widgets/circular_progressIndicator_big.dart';
 import 'widgets/seek_to_view.dart';
-import 'widgets/video_bottom_ctroller.dart';
 
 export 'video.controller.dart';
 export 'package:video_player/video_player.dart';
+
+Widget kBottomViewBuilder(BuildContext context, VideoController c) {
+  return KBottomViewBuilder(controller: c);
+}
 
 class VideoBox extends StatefulObserverWidget {
   /// Example:
@@ -38,17 +43,29 @@ class VideoBox extends StatefulObserverWidget {
   /// see also:
   ///
   /// https://github.com/januwA/flutter_video_box/tree/master/example
-  VideoBox({
+  const VideoBox({
     Key key,
     @required this.controller,
-    this.afterChildren = const <Widget>[],
-    this.beforeChildren = const <Widget>[],
     this.children = const <Widget>[],
-  }) : super(key: key);
+    this.beforeChildren = const <Widget>[],
+    this.afterChildren = const <Widget>[],
+    this.background,
+    this.cover,
+    this.bottomPadding = const EdgeInsets.only(bottom: 10),
+    this.theme,
+    this.customLoadingWidget,
+    this.customBufferedWidget,
+    this.barrierColor,
+    this.bottomViewBuilder = kBottomViewBuilder,
+    this.customFullScreen = const KCustomFullScreen(),
+  })  : assert(controller != null),
+        super(key: key);
 
   static const double centerIconSize = 40.0;
 
   final VideoController controller;
+
+  final Widget background;
 
   /// video / beforeChildren / controllerWidgets-> children / afterChildren
   final List<Widget> afterChildren;
@@ -88,6 +105,52 @@ class VideoBox extends StatefulObserverWidget {
   /// ```
   final List<Widget> children;
 
+  final Widget cover;
+
+  final EdgeInsets bottomPadding;
+
+  ///
+  /// Set the color of the control
+  ///
+  ///```dart
+  /// var _theme = Theme.of(context);
+  ///
+  /// VideoBox(
+  ///  controller: vc,
+  ///  theme: ThemeData(
+  ///    iconTheme: IconThemeData(color: Colors.pinkAccent),
+  ///    textTheme: _theme.textTheme.copyWith(
+  ///     bodyText1: _theme.textTheme.bodyText1.copyWith(color: Colors.white),
+  ///    ),
+  ///     sliderTheme: _theme.sliderTheme.copyWith(
+  ///       trackHeight: 2,
+  ///       overlayShape: SliderComponentShape.noOverlay,
+  ///       thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.0),
+  ///       activeTrackColor: Colors.white,
+  ///       inactiveTrackColor: Colors.white24,
+  ///       thumbColor: Colors.white,
+  ///     ),
+  ///     accentColor: Colors.white,
+  ///   ),
+  /// )
+  ///```
+  final ThemeData theme;
+
+  /// This widget will be displayed when the video is first loaded.
+  final Widget customLoadingWidget;
+
+  /// This widget will be displayed when the video enters the buffer.
+  final Widget customBufferedWidget;
+
+  /// controller layer color
+  final Color barrierColor;
+
+  /// see also [kBottomViewBuilder]
+  final BottomViewBuilder bottomViewBuilder;
+
+  /// see also [KCustomFullScreen]
+  final CustomFullScreen customFullScreen;
+
   @override
   _VideoBoxState createState() => _VideoBoxState();
 }
@@ -98,37 +161,57 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
     controller = widget.controller
       ..initAnimetedIconController(this)
       ..children ??= widget.children
       ..beforeChildren ??= widget.beforeChildren
-      ..afterChildren ??= widget.afterChildren;
+      ..afterChildren ??= widget.afterChildren
+      ..background ??= widget.background
+      ..cover ??= widget.cover
+      ..bottomPadding ??= widget.bottomPadding
+      ..theme ??= widget.theme
+      ..customLoadingWidget ??= widget.customLoadingWidget
+      ..customBufferedWidget ??= widget.customBufferedWidget
+      ..barrierColor ??= widget.barrierColor
+      ..bottomViewBuilder ??= widget.bottomViewBuilder
+      ..customFullScreen ??= widget.customFullScreen;
   }
 
   @override
   Widget build(BuildContext context) {
+    var _theme = Theme.of(context);
+
+    controller.theme ??= _theme.copyWith(
+      iconTheme: IconThemeData(color: Colors.white),
+      textTheme: _theme.textTheme.copyWith(
+        bodyText1: _theme.textTheme.bodyText1.copyWith(color: Colors.white),
+      ),
+      sliderTheme: _theme.sliderTheme.copyWith(
+        trackHeight: 2,
+        overlayShape: SliderComponentShape.noOverlay,
+        thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6.0),
+        activeTrackColor: Colors.white,
+        inactiveTrackColor: Colors.white24,
+        thumbColor: Colors.white,
+      ),
+      accentColor: Colors.white,
+    );
+
     var _seekToView =
         Positioned.fill(child: SeekToView(controller: controller));
     return Theme(
-      data: ThemeData(iconTheme: IconThemeData(color: controller.color)),
+      data: controller.theme,
       child: GestureDetector(
         onTap: debounce(controller.toggleShowVideoCtrl),
         child: Stack(
           children: <Widget>[
             // background widget
-            Container(
-              color: controller.background,
-            ),
+            controller.background ?? Container(color: Colors.black),
             if (!controller.initialized) ...[
               // 加载中同时显示loading和海报
               if (controller.cover != null) Center(child: controller.cover),
               controller.customLoadingWidget ??
-                  Center(
-                    child: CircularProgressIndicatorBig(
-                      color: controller.circularProgressIndicatorColor,
-                    ),
-                  ),
+                  Center(child: CircularProgressIndicatorBig()),
             ] else ...[
               // 加载完成在第一帧显示海报
               controller.isShowCover
@@ -152,7 +235,8 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
                   duration: controller.controllerLayerDuration,
                   child: controller.controllerLayer
                       ? Container(
-                          color: controller.barrierColor,
+                          color: controller.barrierColor ??
+                              Colors.black.withOpacity(0.6),
                           child: Stack(
                             children: <Widget>[
                               _seekToView,
@@ -169,16 +253,9 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
                                         onPressed: controller.togglePlay,
                                       ),
                                     ),
-                              controller.bottomViewBuilder != null
-                                  ? controller.bottomViewBuilder(
-                                      context, controller)
-                                  : Positioned(
-                                      left: controller.bottomPadding.left,
-                                      bottom: controller.bottomPadding.bottom,
-                                      right: controller.bottomPadding.right,
-                                      child: VideoBottomView(
-                                          controller: controller),
-                                    ),
+                              if (controller.bottomViewBuilder != null)
+                                controller.bottomViewBuilder(
+                                    context, controller),
                               if (controller.children != null)
                                 ...controller.children,
                             ],
@@ -192,11 +269,7 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
                   duration: const Duration(milliseconds: 400),
                   child: controller.isBfLoading
                       ? controller.customBufferedWidget ??
-                          Center(
-                            child: CircularProgressIndicatorBig(
-                                color:
-                                    controller.circularProgressIndicatorColor),
-                          )
+                          Center(child: CircularProgressIndicatorBig())
                       : SizedBox(),
                 ),
               ],
@@ -285,6 +358,81 @@ class KVideoBoxFullScreenPage extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: VideoBox(controller: controller),
+      ),
+    );
+  }
+}
+
+class KBottomViewBuilder extends StatefulObserverWidget {
+  final VideoController controller;
+
+  const KBottomViewBuilder({Key key, @required this.controller})
+      : super(key: key);
+
+  @override
+  _VideoBottomViewState createState() => _VideoBottomViewState();
+}
+
+class _VideoBottomViewState extends State<KBottomViewBuilder> {
+  String get _timeText => widget.controller.initialized
+      ? "${widget.controller.positionText}/${widget.controller.durationText}"
+      : '00:00/00:00';
+
+  IconData get _volumeIcon => widget.controller.volume <= 0
+      ? Icons.volume_off
+      : widget.controller.volume <= 0.5
+          ? Icons.volume_down
+          : Icons.volume_up;
+
+  IconData get _screenIcon =>
+      widget.controller.isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen;
+
+  void _onTap() {}
+  void changed(double v) {
+    widget.controller.seekTo(
+        Duration(seconds: (v * widget.controller.duration.inSeconds).toInt()));
+  }
+
+  _onFullScreenSwitch() {
+    widget.controller.onFullScreenSwitch(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var theme = Theme.of(context);
+
+    return Positioned(
+      left: widget.controller.bottomPadding.left,
+      bottom: widget.controller.bottomPadding.bottom,
+      right: widget.controller.bottomPadding.right,
+      child: GestureDetector(
+        onTap: _onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            children: <Widget>[
+              Row(
+                children: <Widget>[
+                  Text(_timeText, style: theme.textTheme.bodyText1),
+                  Spacer(),
+                  IconButton(
+                    icon: Icon(_volumeIcon),
+                    onPressed: widget.controller.volumeToggle,
+                  ),
+                  IconButton(
+                    icon: Icon(_screenIcon),
+                    onPressed: _onFullScreenSwitch,
+                  ),
+                ],
+              ),
+              BufferSlider(
+                value: widget.controller.sliderValue,
+                bufferValue: widget.controller.sliderBufferValue,
+                onChanged: changed,
+              )
+            ],
+          ),
+        ),
       ),
     );
   }

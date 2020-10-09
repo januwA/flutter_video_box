@@ -18,10 +18,6 @@ class _VideosState extends State<Videos> {
     super.initState();
     vc = VideoController(
       source: VideoPlayerController.network(src1),
-      cover: Text(
-        'init cover',
-        style: TextStyle(color: Colors.white),
-      ),
     )..initialize();
   }
 
@@ -33,11 +29,11 @@ class _VideosState extends State<Videos> {
 
   void _changeSource(String src) async {
     vc.setSource(VideoPlayerController.network(src));
-    vc.setCover(Center(
+    vc.cover = Center(
         child: Text(
       src,
       style: TextStyle(color: Colors.white),
-    )));
+    ));
 
     vc.initialize();
   }
@@ -52,7 +48,13 @@ class _VideosState extends State<Videos> {
         children: <Widget>[
           AspectRatio(
             aspectRatio: 16 / 9,
-            child: VideoBox(controller: vc),
+            child: VideoBox(
+              controller: vc,
+              cover: Text(
+                'init cover',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,

@@ -5,7 +5,7 @@ import '../_util.dart';
 
 typedef ValueChanged<T> = void Function(T value);
 
-class BufferSlider extends StatelessWidget {
+class BufferSlider extends StatefulWidget {
   final double value;
   final double bufferValue;
   final ValueChanged<double> onChanged;
@@ -16,10 +16,6 @@ class BufferSlider extends StatelessWidget {
 
   final double min;
   final double max;
-
-  final Color activeColor;
-  final Color inactiveColor;
-  final Color bufferColor;
 
   static const double _defaultTrackHeight = 2;
   static const SliderTrackShape _defaultTrackShape =
@@ -46,68 +42,102 @@ class BufferSlider extends StatelessWidget {
     this.onChangeEnd,
     this.max = 1.0,
     this.min = 0.0,
-    this.activeColor,
-    this.inactiveColor,
-    this.bufferColor,
     this.borderRadius,
     this.pointWidget,
   }) : super(key: key);
+
+  @override
+  _BufferSliderState createState() => _BufferSliderState();
+}
+
+class _BufferSliderState extends State<BufferSlider> {
+  double _innerMinWidth = 0;
+
+  double _innerMaxWidth = 0;
+
+  double _constraintsX(double x) {
+    if (x <= _innerMinWidth) return _innerMinWidth;
+    if (x >= _innerMaxWidth) return _innerMaxWidth;
+    return x;
+  }
+
+  double _lerpValue(double x) {
+    return map(x, _innerMinWidth, _innerMaxWidth, widget.min, widget.max);
+  }
+
+  void _onPanDown(DragDownDetails d) {
+    double _value = _lerpValue(_constraintsX(d.localPosition.dx));
+    if (_value != widget.value) {
+      widget.onChanged(_value);
+    }
+  }
+
+  void _onPanStart(DragStartDetails d) {
+    double _value = _lerpValue(_constraintsX(d.localPosition.dx));
+    if (widget.onChangeStart != null) widget.onChangeStart(_value);
+    if (_value != widget.value) {
+      widget.onChanged(_value);
+    }
+  }
+
+  void _onPanUpdate(DragUpdateDetails d) {
+    double _value = _lerpValue(_constraintsX(d.localPosition.dx));
+    widget.onChanged(_value);
+  }
+
+  void _onPanEnd(DragEndDetails d) {
+    double _value = _lerpValue(widget.value);
+    if (widget.onChangeEnd != null) widget.onChangeEnd(_value);
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
     SliderThemeData sliderTheme = SliderTheme.of(context);
 
     sliderTheme = sliderTheme.copyWith(
-      trackHeight: sliderTheme.trackHeight ?? _defaultTrackHeight,
-      activeTrackColor: activeColor ??
-          sliderTheme.activeTrackColor ??
-          theme.colorScheme.primary,
-      inactiveTrackColor: inactiveColor ??
-          sliderTheme.inactiveTrackColor ??
+      trackHeight: sliderTheme.trackHeight ?? BufferSlider._defaultTrackHeight,
+      activeTrackColor:
+          sliderTheme.activeTrackColor ?? theme.colorScheme.primary,
+      inactiveTrackColor: sliderTheme.inactiveTrackColor ??
           theme.colorScheme.primary.withOpacity(0.24),
       disabledActiveTrackColor: sliderTheme.disabledActiveTrackColor ??
           theme.colorScheme.onSurface.withOpacity(0.32),
       disabledInactiveTrackColor: sliderTheme.disabledInactiveTrackColor ??
           theme.colorScheme.onSurface.withOpacity(0.12),
-      activeTickMarkColor: inactiveColor ??
-          sliderTheme.activeTickMarkColor ??
+      activeTickMarkColor: sliderTheme.activeTickMarkColor ??
           theme.colorScheme.onPrimary.withOpacity(0.54),
-      inactiveTickMarkColor: activeColor ??
-          sliderTheme.inactiveTickMarkColor ??
+      inactiveTickMarkColor: sliderTheme.inactiveTickMarkColor ??
           theme.colorScheme.primary.withOpacity(0.54),
       disabledActiveTickMarkColor: sliderTheme.disabledActiveTickMarkColor ??
           theme.colorScheme.onPrimary.withOpacity(0.12),
       disabledInactiveTickMarkColor:
           sliderTheme.disabledInactiveTickMarkColor ??
               theme.colorScheme.onSurface.withOpacity(0.12),
-      thumbColor:
-          activeColor ?? sliderTheme.thumbColor ?? theme.colorScheme.primary,
+      thumbColor: sliderTheme.thumbColor ?? theme.colorScheme.primary,
       disabledThumbColor: sliderTheme.disabledThumbColor ??
           theme.colorScheme.onSurface.withOpacity(0.38),
-      overlayColor: activeColor?.withOpacity(0.12) ??
-          sliderTheme.overlayColor ??
+      overlayColor: sliderTheme.overlayColor ??
           theme.colorScheme.primary.withOpacity(0.12),
-      valueIndicatorColor: activeColor ??
-          sliderTheme.valueIndicatorColor ??
-          theme.colorScheme.primary,
-      trackShape: sliderTheme.trackShape ?? _defaultTrackShape,
-      tickMarkShape: sliderTheme.tickMarkShape ?? _defaultTickMarkShape,
-      thumbShape: sliderTheme.thumbShape ?? _defaultThumbShape,
-      overlayShape: sliderTheme.overlayShape ?? _defaultOverlayShape,
+      valueIndicatorColor:
+          sliderTheme.valueIndicatorColor ?? theme.colorScheme.primary,
+      trackShape: sliderTheme.trackShape ?? BufferSlider._defaultTrackShape,
+      tickMarkShape: sliderTheme.tickMarkShape ?? BufferSlider._defaultTickMarkShape,
+      thumbShape: sliderTheme.thumbShape ?? BufferSlider._defaultThumbShape,
+      overlayShape: sliderTheme.overlayShape ?? BufferSlider._defaultOverlayShape,
       valueIndicatorShape:
-          sliderTheme.valueIndicatorShape ?? _defaultValueIndicatorShape,
+          sliderTheme.valueIndicatorShape ?? BufferSlider._defaultValueIndicatorShape,
       showValueIndicator:
-          sliderTheme.showValueIndicator ?? _defaultShowValueIndicator,
-      valueIndicatorTextStyle:
-          sliderTheme.valueIndicatorTextStyle ?? /* 在稳定分支会出现错误 */
-              theme.textTheme.bodyText1.copyWith(
-                color: theme.colorScheme.onPrimary,
-              ),
+          sliderTheme.showValueIndicator ?? BufferSlider._defaultShowValueIndicator,
+      valueIndicatorTextStyle: sliderTheme.valueIndicatorTextStyle ??
+          theme.textTheme.bodyText1.copyWith(
+            color: theme.colorScheme.onPrimary,
+          ),
     );
 
     Size pointSize = sliderTheme.thumbShape.getPreferredSize(true, true);
     BorderRadiusGeometry _borderRadius =
-        borderRadius ?? BorderRadius.circular(10);
+        widget.borderRadius ?? BorderRadius.circular(10);
     return Container(
       alignment: Alignment.centerLeft,
       child: LayoutBuilder(
@@ -115,49 +145,18 @@ class BufferSlider extends StatelessWidget {
           width: size.maxWidth - pointSize.width / 2,
           child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints size) {
-              double _innerMinWidth = 0;
-              double _innerMaxWidth = size.maxWidth;
+              _innerMaxWidth = size.maxWidth;
               double _currentVlaue =
-                  map(value, min, max, _innerMinWidth, _innerMaxWidth);
-              double _bufferValue = bufferValue != null
-                  ? map(bufferValue, min, max, _innerMinWidth, _innerMaxWidth)
-                  : null;
-
-              double _constraintsX(double x) {
-                if (x <= _innerMinWidth) return _innerMinWidth;
-                if (x >= _innerMaxWidth) return _innerMaxWidth;
-                return x;
-              }
-
-              double _lerpValue(double x) {
-                return map(x, _innerMinWidth, _innerMaxWidth, min, max);
-              }
+                  map(widget.value, widget.min, widget.max, _innerMinWidth, _innerMaxWidth);
+              double _bufferValue = widget.bufferValue != null
+                  ? map(widget.bufferValue, widget.min, widget.max, _innerMinWidth, _innerMaxWidth)
+                  : 0;
 
               return GestureDetector(
-                onPanDown: (DragDownDetails d) {
-                  double x = _constraintsX(d.localPosition.dx);
-                  double _value = _lerpValue(x);
-                  if (_value != value) {
-                    onChanged(_value);
-                  }
-                },
-                onPanStart: (DragStartDetails d) {
-                  double x = _constraintsX(d.localPosition.dx);
-                  double _value = _lerpValue(x);
-                  if (onChangeStart != null) onChangeStart(_value);
-                  if (_value != value) {
-                    onChanged(_value);
-                  }
-                },
-                onPanUpdate: (DragUpdateDetails d) {
-                  double x = _constraintsX(d.localPosition.dx);
-                  double _value = _lerpValue(x);
-                  onChanged(_value);
-                },
-                onPanEnd: (DragEndDetails d) {
-                  double _value = _lerpValue(value);
-                  if (onChangeEnd != null) onChangeEnd(_value);
-                },
+                onPanDown: _onPanDown,
+                onPanStart: _onPanStart,
+                onPanUpdate: _onPanUpdate,
+                onPanEnd: _onPanEnd,
                 child: Container(
                   color: Colors.transparent,
                   height: math.max(pointSize.height, sliderTheme.trackHeight),
@@ -183,14 +182,14 @@ class BufferSlider extends StatelessWidget {
                             height: sliderTheme.trackHeight,
                             width: math.min(_bufferValue, _innerMaxWidth),
                             decoration: BoxDecoration(
-                              color: bufferColor ??
-                                  theme.primaryColor.withOpacity(0.5),
+                              color:
+                                  sliderTheme.activeTrackColor.withOpacity(0.5),
                               borderRadius: _borderRadius,
                             ),
                           ),
                         ),
 
-                      // current value
+                      // current valu
                       Positioned(
                         left: 0,
                         child: Container(
@@ -203,21 +202,22 @@ class BufferSlider extends StatelessWidget {
                         ),
                       ),
 
-                      pointWidget ??
-                          Positioned(
-                            left: _currentVlaue - pointSize.width / 2,
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Container(
-                                width: pointSize.width,
-                                height: pointSize.height,
-                                decoration: BoxDecoration(
-                                  color: sliderTheme.thumbColor,
-                                  shape: BoxShape.circle,
+                      widget.pointWidget != null
+                          ? widget.pointWidget
+                          : Positioned(
+                              left: _currentVlaue - pointSize.width / 2,
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: Container(
+                                  width: pointSize.width,
+                                  height: pointSize.height,
+                                  decoration: BoxDecoration(
+                                    color: sliderTheme.thumbColor,
+                                    shape: BoxShape.circle,
+                                  ),
                                 ),
                               ),
-                            ),
-                          )
+                            )
                     ],
                   ),
                 ),
