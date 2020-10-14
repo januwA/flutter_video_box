@@ -37,14 +37,16 @@ class BufferSlider extends StatefulWidget {
     Key key,
     @required this.value,
     @required this.onChanged,
-    this.bufferValue,
+    this.bufferValue = 0,
     this.onChangeStart,
     this.onChangeEnd,
     this.max = 1.0,
     this.min = 0.0,
     this.borderRadius,
     this.pointWidget,
-  }) : super(key: key);
+  })  : assert(value >= 0),
+        assert(bufferValue >= 0),
+        super(key: key);
 
   @override
   _BufferSliderState createState() => _BufferSliderState();
@@ -54,6 +56,15 @@ class _BufferSliderState extends State<BufferSlider> {
   double _innerMinWidth = 0;
 
   double _innerMaxWidth = 0;
+  double _innerMaxHeight = 0;
+
+  double get _currentVlaue =>
+      map(widget.value, widget.min, widget.max, _innerMinWidth, _innerMaxWidth);
+
+  double get _bufferValue => widget.bufferValue != null
+      ? map(widget.bufferValue, widget.min, widget.max, _innerMinWidth,
+          _innerMaxWidth)
+      : 0;
 
   double _constraintsX(double x) {
     if (x <= _innerMinWidth) return _innerMinWidth;
@@ -122,13 +133,15 @@ class _BufferSliderState extends State<BufferSlider> {
       valueIndicatorColor:
           sliderTheme.valueIndicatorColor ?? theme.colorScheme.primary,
       trackShape: sliderTheme.trackShape ?? BufferSlider._defaultTrackShape,
-      tickMarkShape: sliderTheme.tickMarkShape ?? BufferSlider._defaultTickMarkShape,
+      tickMarkShape:
+          sliderTheme.tickMarkShape ?? BufferSlider._defaultTickMarkShape,
       thumbShape: sliderTheme.thumbShape ?? BufferSlider._defaultThumbShape,
-      overlayShape: sliderTheme.overlayShape ?? BufferSlider._defaultOverlayShape,
-      valueIndicatorShape:
-          sliderTheme.valueIndicatorShape ?? BufferSlider._defaultValueIndicatorShape,
-      showValueIndicator:
-          sliderTheme.showValueIndicator ?? BufferSlider._defaultShowValueIndicator,
+      overlayShape:
+          sliderTheme.overlayShape ?? BufferSlider._defaultOverlayShape,
+      valueIndicatorShape: sliderTheme.valueIndicatorShape ??
+          BufferSlider._defaultValueIndicatorShape,
+      showValueIndicator: sliderTheme.showValueIndicator ??
+          BufferSlider._defaultShowValueIndicator,
       valueIndicatorTextStyle: sliderTheme.valueIndicatorTextStyle ??
           theme.textTheme.bodyText1.copyWith(
             color: theme.colorScheme.onPrimary,
@@ -141,90 +154,84 @@ class _BufferSliderState extends State<BufferSlider> {
     return Container(
       alignment: Alignment.centerLeft,
       child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints size) => Container(
-          width: size.maxWidth - pointSize.width / 2,
-          child: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints size) {
-              _innerMaxWidth = size.maxWidth;
-              double _currentVlaue =
-                  map(widget.value, widget.min, widget.max, _innerMinWidth, _innerMaxWidth);
-              double _bufferValue = widget.bufferValue != null
-                  ? map(widget.bufferValue, widget.min, widget.max, _innerMinWidth, _innerMaxWidth)
-                  : 0;
+        builder: (BuildContext context, BoxConstraints size) {
+          _innerMaxWidth = math.max(size.maxWidth - pointSize.width / 2, 0);
+          _innerMaxHeight =
+              math.max(math.max(pointSize.height, sliderTheme.trackHeight), 0);
 
-              return GestureDetector(
-                onPanDown: _onPanDown,
-                onPanStart: _onPanStart,
-                onPanUpdate: _onPanUpdate,
-                onPanEnd: _onPanEnd,
-                child: Container(
-                  color: Colors.transparent,
-                  height: math.max(pointSize.height, sliderTheme.trackHeight),
-                  child: Stack(
-                    overflow: Overflow.visible,
-                    alignment: AlignmentDirectional.center,
-                    children: <Widget>[
-                      // 背景
-                      Container(
-                        height: sliderTheme.trackHeight,
-                        width: _innerMaxWidth,
-                        decoration: BoxDecoration(
-                          color: sliderTheme.inactiveTrackColor,
-                          borderRadius: _borderRadius,
-                        ),
-                      ),
+          assert(_innerMaxWidth >= 0);
+          assert(_innerMaxHeight >= 0);
 
-                      // 缓冲区
-                      if (_bufferValue != null)
-                        Positioned(
-                          left: 0,
-                          child: Container(
-                            height: sliderTheme.trackHeight,
-                            width: math.min(_bufferValue, _innerMaxWidth),
-                            decoration: BoxDecoration(
-                              color:
-                                  sliderTheme.activeTrackColor.withOpacity(0.5),
-                              borderRadius: _borderRadius,
-                            ),
-                          ),
-                        ),
-
-                      // current valu
-                      Positioned(
-                        left: 0,
-                        child: Container(
-                          height: sliderTheme.trackHeight,
-                          width: _currentVlaue,
-                          decoration: BoxDecoration(
-                            color: sliderTheme.activeTrackColor,
-                            borderRadius: _borderRadius,
-                          ),
-                        ),
-                      ),
-
-                      widget.pointWidget != null
-                          ? widget.pointWidget
-                          : Positioned(
-                              left: _currentVlaue - pointSize.width / 2,
-                              child: Align(
-                                alignment: Alignment.center,
-                                child: Container(
-                                  width: pointSize.width,
-                                  height: pointSize.height,
-                                  decoration: BoxDecoration(
-                                    color: sliderTheme.thumbColor,
-                                    shape: BoxShape.circle,
-                                  ),
-                                ),
-                              ),
-                            )
-                    ],
+          return GestureDetector(
+            onPanDown: _onPanDown,
+            onPanStart: _onPanStart,
+            onPanUpdate: _onPanUpdate,
+            onPanEnd: _onPanEnd,
+            child: Container(
+              color: Colors.transparent,
+              width: _innerMaxWidth,
+              height: _innerMaxHeight,
+              child: Stack(
+                overflow: Overflow.visible,
+                alignment: AlignmentDirectional.center,
+                children: <Widget>[
+                  // 背景轨道
+                  Container(
+                    height: sliderTheme.trackHeight,
+                    width: _innerMaxWidth,
+                    decoration: BoxDecoration(
+                      color: sliderTheme.inactiveTrackColor,
+                      borderRadius: _borderRadius,
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
-        ),
+
+                  // 缓冲区轨道
+                  Positioned(
+                    left: 0,
+                    child: Container(
+                      height: sliderTheme.trackHeight,
+                      width: math.min(_bufferValue, _innerMaxWidth),
+                      decoration: BoxDecoration(
+                        color: sliderTheme.activeTrackColor.withOpacity(0.5),
+                        borderRadius: _borderRadius,
+                      ),
+                    ),
+                  ),
+
+                  // current value
+                  Positioned(
+                    left: 0,
+                    child: Container(
+                      height: sliderTheme.trackHeight,
+                      width: _currentVlaue,
+                      decoration: BoxDecoration(
+                        color: sliderTheme.activeTrackColor,
+                        borderRadius: _borderRadius,
+                      ),
+                    ),
+                  ),
+
+                  Positioned(
+                    left: _currentVlaue - pointSize.width / 2,
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: widget.pointWidget != null
+                          ? widget.pointWidget
+                          : Container(
+                              width: pointSize.width,
+                              height: pointSize.height,
+                              decoration: BoxDecoration(
+                                color: sliderTheme.thumbColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                    ),
+                  )
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

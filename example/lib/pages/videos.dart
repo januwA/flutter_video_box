@@ -29,21 +29,14 @@ class _VideosState extends State<Videos> {
 
   void _changeSource(String src) async {
     vc.setSource(VideoPlayerController.network(src));
-    vc.cover = Center(
-        child: Text(
-      src,
-      style: TextStyle(color: Colors.white),
-    ));
-
+    vc.cover = Center(child: Text(src, style: TextStyle(color: Colors.white)));
     vc.initialize();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('videos'),
-      ),
+      appBar: AppBar(title: Text('videos')),
       body: ListView(
         children: <Widget>[
           AspectRatio(

@@ -299,6 +299,7 @@ abstract class _VideoController extends BaseVideoController
         videoCtrl.addListener(_videoListenner);
         aspectRatio = _value.aspectRatio;
         initialized = true;
+        isBfLoading = false;
         videoCtrl
           ..setLooping(looping)
           ..setVolume(volume);

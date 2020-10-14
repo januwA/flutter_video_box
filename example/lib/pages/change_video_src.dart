@@ -22,17 +22,16 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
     if (nv > _index) {
       // +
       nv = nv % source.length;
-      vc.autoplay = true;
-      vc.setSource(VideoPlayerController.network(source[nv]));
-      vc.initialize();
     } else {
       // -
       nv = (nv + source.length) % source.length;
-      vc.autoplay = false;
-      vc.setControllerLayer(true);
-      vc.setSource(VideoPlayerController.network(source[nv]));
-      vc.initialize();
     }
+    vc.pause();
+    vc.autoplay = true;
+    vc.setSource(VideoPlayerController.network(source[nv]));
+    vc.initialize()..then((_) {
+      print(vc);
+    });
     _index = nv;
   }
 

@@ -79,6 +79,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
   void _init() async {
     vc = VideoController(
       source: VideoPlayerController.network(src1),
+      autoplay: true,
     )..initialize().then((e) {
         if (e != null) {
           print('[video box init] error: ' + e.message);
