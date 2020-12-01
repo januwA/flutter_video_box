@@ -80,11 +80,19 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
     vc = VideoController(
       source: VideoPlayerController.network(src1),
       autoplay: true,
-    )..initialize().then((e) {
+    )
+      ..initialize().then((e) {
         if (e != null) {
           print('[video box init] error: ' + e.message);
         } else {
           print('[video box init] success');
+        }
+      })
+      ..addListener(() {
+        if (vc.videoCtrl.value.isBuffering) {
+          print('==============================');
+          print('isBuffering');
+          print('==============================');
         }
       });
   }
