@@ -172,7 +172,6 @@ class _BufferSliderState extends State<BufferSlider> {
               width: _innerMaxWidth,
               height: _innerMaxHeight,
               child: Stack(
-                overflow: Overflow.visible,
                 alignment: AlignmentDirectional.center,
                 children: <Widget>[
                   // 背景轨道

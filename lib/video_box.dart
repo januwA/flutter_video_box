@@ -1,5 +1,8 @@
 import 'dart:async';
+// ignore: avoid_web_libraries_in_flutter
+import 'dart:html' show document;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
@@ -325,11 +328,6 @@ class KCustomFullScreen extends CustomFullScreen {
     ]);
   }
 
-  @override
-  void close(BuildContext context, VideoController controller) {
-    Navigator.of(context).pop();
-  }
-
   Route<T> _route<T>(VideoController controller) {
     return MaterialPageRoute<T>(
       builder: (_) => KVideoBoxFullScreenPage(controller: controller),
@@ -337,12 +335,37 @@ class KCustomFullScreen extends CustomFullScreen {
   }
 
   @override
+  void close(BuildContext context, VideoController controller) {
+    Navigator.of(context).pop();
+  }
+
+  @override
   Future<Object> open(BuildContext context, VideoController controller) async {
-    SystemChrome.setEnabledSystemUIOverlays([]);
-    _setLandscape();
+    bool isClose = false;
+    StreamSubscription f;
+    if (kIsWeb) {
+      document.documentElement.requestFullscreen();
+      f = document.documentElement.onFullscreenChange.listen((e) {
+        if (document.fullscreenElement == null && !isClose) {
+          this.close(context, controller);
+          f?.cancel();
+        }
+      });
+    } else {
+      SystemChrome.setEnabledSystemUIOverlays([]);
+      _setLandscape();
+    }
     await Navigator.of(context).push(_route(controller));
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    _setPortrait();
+    if (kIsWeb) {
+      if (document.fullscreenElement != null) {
+        isClose = true;
+        f?.cancel();
+        document.exitFullscreen();
+      }
+    } else {
+      SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+      _setPortrait();
+    }
     return null;
   }
 }

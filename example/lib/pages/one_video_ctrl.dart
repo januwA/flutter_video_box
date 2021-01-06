@@ -1,65 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:video_box/video_box.dart';
 
 import '../globals.dart';
-
-class MyFullScreen implements CustomFullScreen {
-  const MyFullScreen();
-  @override
-  void close(BuildContext context, VideoController controller) {
-    print('pop...');
-    Navigator.of(context).pop(controller.value.positionText);
-  }
-
-  @override
-  Future open(BuildContext context, VideoController controller) async {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-    ]);
-    SystemChrome.setEnabledSystemUIOverlays([]);
-    await Navigator.of(context).push<String>(
-      MaterialPageRoute(
-        builder: (_) {
-          return Scaffold(
-            body: Center(child: VideoBox(controller: controller)),
-          );
-        },
-      ),
-    ).then(print);
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-  }
-}
-
-class CustomLoading extends StatelessWidget {
-  final String text;
-
-  const CustomLoading(this.text, {Key key}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        color: Colors.pink,
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            CircularProgressIndicator(),
-            SizedBox(height: 12),
-            Text(text),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class OneVideoCtrl extends StatefulWidget {
   @override
