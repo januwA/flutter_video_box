@@ -1,10 +1,9 @@
 # video_box
 
- A control that plays video in flutter, I make the control as flexible as possible, can play a single video, video list on the page.
+Play video in Flutter
 
 note:
 * Only tested on android
-* Development api may change at any time
 
 android: `<project root>/android/app/src/main/AndroidManifest.xml`:
 ```

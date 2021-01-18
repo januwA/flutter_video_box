@@ -11,8 +11,8 @@ import 'widgets/buffer_slider.dart';
 import 'widgets/circular_progressIndicator_big.dart';
 import 'widgets/seek_to_view.dart';
 
-import 'KCustomFullScreen_io.dart' if (dart.library.html) 'KCustomFullScreen_web.dart'
-    show KCustomFullScreen;
+import 'KCustomFullScreen_io.dart'
+    if (dart.library.html) 'KCustomFullScreen_web.dart' show KCustomFullScreen;
 
 export 'video.controller.dart';
 export 'package:video_player/video_player.dart';
@@ -209,6 +209,7 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
           children: <Widget>[
             // background widget
             controller.background ?? Container(color: Colors.black),
+
             if (!controller.initialized) ...[
               // 加载中同时显示loading和海报
               if (controller.cover != null) Center(child: controller.cover),
@@ -301,8 +302,6 @@ abstract class CustomFullScreen {
   /// 但，如果用户使用的是系统导航栏的返回按钮，此方法将不会被调用
   FutureOr<void> close(BuildContext context, VideoController controller);
 }
-
-
 
 class KVideoBoxFullScreenPage extends StatelessWidget {
   final controller;

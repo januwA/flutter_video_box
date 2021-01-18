@@ -1,3 +1,7 @@
+## 0.15.5 2021-1-18
+
+- fix: `Overflow.visible` to `Clip.none`
+
 ## 0.15.4 2021-1-6
 
 - 修复在Android上出现的错误
@@ -8,7 +12,7 @@
 
 ## 0.15.2 2020-12-1
 
-* 更新了依赖包，和example视频的资源。
+* update packages and example video url
 
 ## 0.15.1 2020-10-14
 
@@ -24,22 +28,21 @@
 
 ## 0.14.2 2020-10-8
 
-* 修复可能出现的`setState() or markNeedsBuild() called when widget tree was locked.`错误
+* fix: "setState() or markNeedsBuild() called when widget tree was locked." error
 
 ## 0.14.1 2020-10-8
 
-- 修复BoxConstraints的错误
+- fix: BoxConstraints error
 
 ## 0.14.0 2020-10-8
 
-* 更新依赖
-* 添加了 setPlaybackSpeed
+* update packages
+* add: `setPlaybackSpeed`
 * 修复了部分错误(可能修复了)
-* api 无重大变更
 
 ## 0.13.0 2020-6-14
 
-* 增加`addAccelerometerEventsListenner`钩子，可以监听屏幕的旋转，然后自定义事件 [#28](https://github.com/januwA/flutter_video_box/issues/28)
+* add: `addAccelerometerEventsListenner`钩子，可以监听屏幕的旋转，然后自定义事件 [#28](https://github.com/januwA/flutter_video_box/issues/28)
 * 就增加了一个api，其它无任何变更
 
 ## 0.12.0 2020-4-15
@@ -59,7 +62,7 @@
 
 ## 0.11.2 2020-4-1
 
-* 更新mobx依赖版本号
+* update mobx package
 * 为快进和快退动作增加了icon动画
 
 ## 0.11.1 2020-3-19
@@ -79,7 +82,7 @@
 
 ## 0.10.0 - 2020-1-25
 
-- 增加API: 
+- add: 
   - `options` 可以设置自定义参数
   - `bottomViewBuilder` 用于自定义VideoBox底部视图
 
@@ -91,8 +94,8 @@
 * 检查example的每个示例
 
 ## 0.9.0 - 2020-1-9
-* 增加Api: `customLoadingWidget`  `customBufferedWidget`  `customFullScreen` `controllerLayerDuration`
-* 变更API: `onFullScreen`=>`onFullScreenSwitch` `controllerDuration`=> `controllerLiveDuration`
+* add: `customLoadingWidget`  `customBufferedWidget`  `customFullScreen` `controllerLayerDuration`
+* change: `onFullScreen`=>`onFullScreenSwitch` `controllerDuration`=> `controllerLiveDuration`
 * 添加画中画example
 
 ## 0.8.2 - 2019-12-25
@@ -122,18 +125,18 @@
 ## 0.7.0 - 2019-11-8
 
 * api更变，构建方式发生了改变
-* 修复: 视频的原始尺寸
-* 修复: `paly()`和`pause()`AnimatedIcon显示错误
+* fix: 视频的原始尺寸
+* fix: `paly()`和`pause()`AnimatedIcon显示错误
 
 
 ## 0.6.0 - 2019-10-7
 
-* 增加: [改变屏幕亮度]和[媒体音量功能]
+* add: "改变屏幕亮度"和"媒体音量功能" (之后已废弃)
 
 
 ## 0.5.2 - 2019-10-2
 
-* 修复[children] [beforeChildren] [afterChildren] 的BUG
+* fix: `children` `beforeChildren` `afterChildren`
 
 ## 0.5.1 - 2019-9-23
 
@@ -148,18 +151,15 @@
 * 增加缓冲进度条
 * 自定义全屏页面
 
-
 ## 0.4.1 - 2019-9-5
 
 * 更新video_player依赖版本
-
 
 ## 0.4.0 - 2019-9-1
 
 * api 更改
 * 代码优化
 * 处理细微bug
-
 
 ## 0.3.1 - 2019-8-22
 
@@ -172,11 +172,9 @@
 * 优化ui
 * 优化视频播放完毕的处理事件
 
-
 ## 0.2.4 - 2019-7-9
 
 * 修复 ui的BUG
-
 
 ## 0.2.3 - 2019-7-7
 
@@ -192,7 +190,6 @@
 
 * 优化ui
 
-
 ## 0.2.0 - 2019-7-4
 
 * 更改api
@@ -200,7 +197,7 @@
 
 ## [0.1.2] - 2019-7-1
 
-* 更新依赖包
+* update packages
 
 ## [0.1.1] - 2019-6-26
 
