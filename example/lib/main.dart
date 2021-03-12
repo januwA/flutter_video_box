@@ -34,12 +34,12 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     void _push(String url) {
       Navigator.of(context).pushNamed(url);
     }
+
     return Scaffold(
       appBar: AppBar(title: Text('video_box example')),
       body: Center(
@@ -48,29 +48,27 @@ class HomePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              RaisedButton(
+              ElevatedButton(
                 child: Text('one video ctrl'),
                 onPressed: () => _push(oneVideoCtrl),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('list video'),
                 onPressed: () => _push(listVideo),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('change video src'),
-                onPressed: () =>
-                    _push(changeVideoSrc),
+                onPressed: () => _push(changeVideoSrc),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('videos'),
                 onPressed: () => _push(videos),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('VideoPlayerDemo'),
-                onPressed: () =>
-                    _push(videoPlayerDemo),
+                onPressed: () => _push(videoPlayerDemo),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('PiP'),
                 onPressed: () => _push(pipDemo),
               ),

@@ -52,15 +52,15 @@ class _VideosState extends State<Videos> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              RaisedButton(
+              ElevatedButton(
                 child: Text('第一集'),
                 onPressed: () => _changeSource(src1),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('第二集'),
                 onPressed: () => _changeSource(src2),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('第三集'),
                 onPressed: () => _changeSource(src3),
               ),

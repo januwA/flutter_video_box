@@ -1,3 +1,7 @@
+## 0.15.6 2021-3-12
+
+- refactor: flutter 2.0
+
 ## 0.15.5 2021-1-18
 
 - fix: `Overflow.visible` to `Clip.none`

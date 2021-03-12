@@ -1,6 +1,6 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=D:\my-tools\flutter"
+export "FLUTTER_ROOT=D:\dev\lang\flutter"
 export "FLUTTER_APPLICATION_PATH=D:\ajanuw\flutter_video_box\example"
 export "FLUTTER_TARGET=lib\main.dart"
 export "FLUTTER_BUILD_DIR=build"

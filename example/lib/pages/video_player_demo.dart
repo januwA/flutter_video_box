@@ -17,6 +17,9 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
     _controller = VideoPlayerController.network(src1)
       ..initialize().then((_) {
         setState(() {});
+      })
+      ..addListener(() {
+        print(_controller.value.isBuffering);
       });
   }
 
@@ -30,7 +33,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: _controller.value.initialized
+        child: _controller.value.isInitialized
             ? AspectRatio(
                 aspectRatio: _controller.value.aspectRatio,
                 child: VideoPlayer(_controller),
@@ -47,9 +50,8 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
                 : _controller.play();
           });
         },
-        child: Icon(
-          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow
-        ),
+        child:
+            Icon(_controller.value.isPlaying ? Icons.pause : Icons.play_arrow),
       ),
     );
   }

@@ -29,9 +29,10 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
     vc.pause();
     vc.autoplay = true;
     vc.setSource(VideoPlayerController.network(source[nv]));
-    vc.initialize()..then((_) {
-      print(vc);
-    });
+    vc.initialize()
+      ..then((_) {
+        print(vc);
+      });
     _index = nv;
   }
 
@@ -70,11 +71,11 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              RaisedButton(
+              ElevatedButton(
                 child: Text('Prev'),
                 onPressed: () => setState(() => index--),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('Next'),
                 onPressed: () => setState(() => index++),
               ),

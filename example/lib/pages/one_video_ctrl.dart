@@ -72,23 +72,23 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
           Wrap(
             alignment: WrapAlignment.spaceBetween,
             children: <Widget>[
-              RaisedButton(
+              ElevatedButton(
                 child: Text('play'),
                 onPressed: () {
                   vc.play();
                 },
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('pause'),
                 onPressed: () {
                   vc.pause();
                 },
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('full screen'),
                 onPressed: () => vc.onFullScreenSwitch(context),
               ),
-              RaisedButton(
+              ElevatedButton(
                 child: Text('print'),
                 onPressed: () {
                   print(vc);
