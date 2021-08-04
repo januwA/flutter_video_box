@@ -1,6 +1,6 @@
 import 'dart:async' show StreamSubscription, Timer;
 
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 // import 'package:dart_printf/dart_printf.dart';
 import 'package:sensors/sensors.dart';
 import 'package:flutter/material.dart';
@@ -35,8 +35,8 @@ void kAccelerometerEventsListenner(
 }
 
 abstract class BaseVideoController {
-  VideoPlayerController videoCtrl;
-  Duration animetedIconDuration;
+  late VideoPlayerController videoCtrl;
+  late Duration animetedIconDuration;
 }
 
 abstract class _VideoController extends BaseVideoController
@@ -44,7 +44,7 @@ abstract class _VideoController extends BaseVideoController
   /// 控制器层被打开后存活的时间
   ///
   /// Time to live after the controller layer is opened
-  final Duration controllerLiveDuration;
+  late final Duration controllerLiveDuration;
 
   /// 您可以传递一个[options]，但[options]并不会在内部使用，但您可以在各个回调中访问[options]:
   ///
@@ -65,26 +65,26 @@ abstract class _VideoController extends BaseVideoController
   ///
   /// icon animation duration
   @override
-  final Duration animetedIconDuration;
+  late final Duration animetedIconDuration;
 
   /// 快进，快退的时间
   ///
   /// Fast forward and rewind time
-  final Duration skiptime;
+  late final Duration skiptime;
 
   /// 控制器层打开和关闭动画的持续时间
   ///
   /// Controller layer opening and closing animation duration
-  final Duration controllerLayerDuration;
+  late final Duration controllerLayerDuration;
 
   @action
   _VideoController({
-    VideoPlayerController source,
+    required VideoPlayerController source,
     this.skiptime = const Duration(seconds: 10),
     this.autoplay = false,
     this.looping = false,
     this.volume = 1.0,
-    this.initPosition = const Duration(seconds: 0),
+    this.initPosition = Duration.zero,
     this.controllerWidgets = true,
     this.controllerLiveDuration = const Duration(seconds: 2),
     this.controllerLayerDuration = kTabScrollDuration,
@@ -105,22 +105,22 @@ abstract class _VideoController extends BaseVideoController
   }
 
   @override
-  VideoPlayerController videoCtrl;
+  late VideoPlayerController videoCtrl;
   VideoPlayerValue get _value => videoCtrl.value;
 
   /// 监听页面旋转流
-  StreamSubscription<dynamic> _streamSubscriptions$;
+  StreamSubscription<dynamic>? _streamSubscriptions$;
   void _streamSubscriptionsCallback(AccelerometerEvent event) =>
-      accelerometerEventsListenner(this, event);
+      accelerometerEventsListenner!(this as VideoController, event);
 
   /// 监听网络连接
-  ConnectivityResult _connectivityStatus;
-  StreamSubscription<ConnectivityResult> _connectivityChanged$;
+  ConnectivityResult? _connectivityStatus;
+  StreamSubscription<ConnectivityResult>? _connectivityChanged$;
   void _connectivityChangedCallBack(ConnectivityResult result) {
     // printf('NetworkChange(%o)', result);
 
     if (connectivityChangedListenner != null)
-      connectivityChangedListenner(this, result);
+      connectivityChangedListenner!(this as VideoController, result);
 
     bool isReconnection = _connectivityStatus == ConnectivityResult.none &&
         result != ConnectivityResult.none &&
@@ -135,24 +135,18 @@ abstract class _VideoController extends BaseVideoController
     _connectivityStatus = result;
   }
 
-  @observable
-  double aspectRatio;
-  @action
-  void setAspectRatio(double v) => aspectRatio = v;
-
-  bool get isPlayEnd =>
-      (position ?? Duration.zero) >= (duration ?? Duration.zero);
+  bool get isPlayEnd => (position) >= (duration);
 
   /// 自动关闭 Controller layer 的计时器
   ///
   /// Automatically turn off the timer of the Controller layer
-  Timer _controllerLayerTimer;
+  Timer? _controllerLayerTimer;
 
   /// 是否显示默认控件 默认[true]
   ///
   /// Whether to show default controls default [true]
   @observable
-  bool controllerWidgets;
+  late bool controllerWidgets;
   @action
   void setControllerWidgets(bool v) => controllerWidgets = v;
 
@@ -163,7 +157,7 @@ abstract class _VideoController extends BaseVideoController
 
   // 获取video的缓冲时间
   Duration get _buffered {
-    if (_value.buffered?.isEmpty ?? true) return Duration.zero;
+    if (_value.buffered.isEmpty) return Duration.zero;
     // 经过我的测试发现这个buffered数组的length，总是为1
     // print('buffered length: ' + value.buffered.length.toString());
     return _value.buffered.last.end;
@@ -179,27 +173,28 @@ abstract class _VideoController extends BaseVideoController
   }
 
   /// autoplay [false]
-  bool autoplay;
+  late bool autoplay;
 
-  bool looping = false;
+  late bool looping = false;
   void setLooping(bool loop) {
     this.looping = loop;
-    videoCtrl?.setLooping(loop);
+    videoCtrl.setLooping(loop);
   }
 
   @observable
-  double volume;
+  late double volume;
+
   @action
   void setVolume(double v) {
     volume = v;
-    videoCtrl?.setVolume(v);
+    videoCtrl.setVolume(v);
   }
 
   @observable
   bool initialized = false;
 
   /// Initialize the play position
-  Duration initPosition;
+  late Duration initPosition;
 
   /// Current position
   @observable
@@ -238,6 +233,7 @@ abstract class _VideoController extends BaseVideoController
   ///
   /// Total duration
   @computed
+  // ignore: unnecessary_null_comparison
   String get durationText => duration == null ? '' : durationString(duration);
 
   /// 00:01 当前时间
@@ -245,17 +241,20 @@ abstract class _VideoController extends BaseVideoController
   /// current time
   @computed
   String get positionText =>
+      // ignore: unnecessary_null_comparison
       (videoCtrl == null) ? '' : durationString(position);
 
   @computed
   double get sliderValue {
-    if (position == null || duration == null) return 0;
+    // ignore: unnecessary_null_comparison
+    if (duration == null) return 0;
     var r = position.inSeconds / duration.inSeconds;
     return r.isNaN ? 0 : r;
   }
 
   @computed
   double get sliderBufferValue {
+    // ignore: unnecessary_null_comparison
     if (_buffered == null || duration == null) return 0;
     var r = _buffered.inSeconds / duration.inSeconds;
     return r.isNaN ? 0 : r;
@@ -267,7 +266,7 @@ abstract class _VideoController extends BaseVideoController
   @action
   void setSource(VideoPlayerController source) {
     var oldCtrl = videoCtrl;
-    Future.delayed(const Duration(seconds: 1)).then((_) => oldCtrl?.dispose());
+    Future.delayed(const Duration(seconds: 1)).then((_) => oldCtrl.dispose());
     videoCtrl = source;
   }
 
@@ -276,8 +275,6 @@ abstract class _VideoController extends BaseVideoController
   /// Initialize the viedo controller
   @action
   Future<dynamic> initialize([bool isReconnect = false]) async {
-    assert(videoCtrl != null);
-
     if (isReconnect) {
       try {
         await videoCtrl.initialize();
@@ -289,7 +286,7 @@ abstract class _VideoController extends BaseVideoController
           ..setPlaybackSpeed(_playbackSpeed);
       } catch (e) {
         if (initializeErrorEventsListenner != null)
-          initializeErrorEventsListenner(e);
+          initializeErrorEventsListenner!(e);
         return e;
       }
     } else {
@@ -297,7 +294,7 @@ abstract class _VideoController extends BaseVideoController
         initialized = false;
         await videoCtrl.initialize();
         videoCtrl.addListener(_videoListenner);
-        aspectRatio = _value.aspectRatio;
+        print(_value.isInitialized);
         initialized = true;
         isBfLoading = false;
         videoCtrl
@@ -308,14 +305,13 @@ abstract class _VideoController extends BaseVideoController
           await videoCtrl.play();
         }
 
-        if (initPosition != null && initPosition != Duration.zero)
-          seekTo(initPosition);
-        position = initPosition ?? _value.position ?? Duration.zero;
-        duration = _value.duration ?? Duration.zero;
+        if (initPosition != Duration.zero) seekTo(initPosition);
+        position = _value.position;
+        duration = _value.duration;
         updateAnimetedIconState();
       } catch (e) {
         if (initializeErrorEventsListenner != null)
-          initializeErrorEventsListenner(e);
+          initializeErrorEventsListenner!(e);
         return e;
       }
     }
@@ -325,6 +321,7 @@ abstract class _VideoController extends BaseVideoController
   /// 播放途中解码器被关闭（断网）
   bool get _isNetDisconnect =>
       _value.position == Duration.zero &&
+      // ignore: unnecessary_null_comparison
       _value.duration == null &&
       _connectivityStatus == ConnectivityResult.none;
 
@@ -332,6 +329,7 @@ abstract class _VideoController extends BaseVideoController
   bool get _isPoorNetwork {
     // 解码器彻底关闭
     if (_value.position == Duration.zero &&
+        // ignore: unnecessary_null_comparison
         _value.duration == null &&
         _value.buffered.isEmpty &&
         !_isNetDisconnect &&
@@ -373,6 +371,7 @@ abstract class _VideoController extends BaseVideoController
     if (_value.position != Duration.zero) position = _value.position;
 
     if (_value.isPlaying) {
+      // ignore: unnecessary_null_comparison
       isBfLoading = _value.position != null &&
           _value.position != Duration.zero &&
           _buffered == _value.position;
@@ -380,7 +379,7 @@ abstract class _VideoController extends BaseVideoController
 
     if (isPlayEnd) {
       isBfLoading = false;
-      if (playEndListenner != null) playEndListenner(this);
+      if (playEndListenner != null) playEndListenner!(this as VideoController);
       setControllerLayer(true);
       updateAnimetedIconState();
     }
@@ -390,6 +389,7 @@ abstract class _VideoController extends BaseVideoController
   ///
   /// Turn sound on or off
   void volumeToggle() {
+    // ignore: unnecessary_null_comparison
     if (_value == null) return;
     setVolume(_value.volume > 0 ? 0.0 : 1.0);
   }
@@ -432,21 +432,17 @@ abstract class _VideoController extends BaseVideoController
   ///
   /// Controlling playback time position
   Future<void> seekTo(Duration d) async {
-    if (_value.duration != null) {
-      await videoCtrl.seekTo(d);
-    }
+    await videoCtrl.seekTo(d);
   }
 
   /// 快进
-  void fastForward([Duration st]) {
-    if (_value == null) return;
+  void fastForward([Duration? st]) {
     arrowIconLtRController?.forward();
     seekTo(_value.position + (st ?? skiptime));
   }
 
   /// 快退
-  void rewind([Duration st]) {
-    if (_value == null) return;
+  void rewind([Duration? st]) {
     arrowIconRtLController?.forward();
     seekTo(_value.position - (st ?? skiptime));
   }
@@ -469,7 +465,7 @@ abstract class _VideoController extends BaseVideoController
   void _setFullScreen(bool v) {
     isFullScreen = v;
     if (fullScreenChangeListenner != null)
-      fullScreenChangeListenner(this, isFullScreen);
+      fullScreenChangeListenner!(this as VideoController, isFullScreen);
   }
 
   /// 打开或关闭全屏
@@ -477,10 +473,10 @@ abstract class _VideoController extends BaseVideoController
   /// Turn full screen on or off
   Future<void> onFullScreenSwitch(BuildContext context) async {
     if (isFullScreen) {
-      customFullScreen.close(context, this);
+      customFullScreen!.close(context, this as VideoController);
     } else {
       _setFullScreen(true);
-      await customFullScreen.open(context, this);
+      await customFullScreen!.open(context, this as VideoController);
       _setFullScreen(false);
     }
   }
@@ -500,7 +496,7 @@ abstract class _VideoController extends BaseVideoController
     _controllerLayerTimer?.cancel();
     _animatedDispose();
     _streamDispose();
-    videoCtrl?.dispose();
+    videoCtrl.dispose();
   }
 
   VideoState get value => VideoState(
@@ -518,7 +514,6 @@ abstract class _VideoController extends BaseVideoController
         volume: volume,
         position: position,
         duration: duration,
-        aspectRatio: aspectRatio,
         playbackSpeed: _playbackSpeed,
       );
 }

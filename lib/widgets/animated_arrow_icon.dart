@@ -14,8 +14,8 @@ class AnimatedArrowIcon extends StatefulWidget {
   static final Curve _curve = Curves.easeInQuad;
 
   AnimatedArrowIcon({
-    Key key,
-    @required this.controller,
+    Key? key,
+    required this.controller,
     this.color = Colors.black,
     this.iconSize = 24.0,
   })  : _oneIconOpacityAnimation =

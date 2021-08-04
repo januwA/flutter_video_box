@@ -11,7 +11,7 @@ class Videos extends StatefulWidget {
 }
 
 class _VideosState extends State<Videos> {
-  VideoController vc;
+  late VideoController vc;
 
   @override
   void initState() {

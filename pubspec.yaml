@@ -1,19 +1,19 @@
 name: video_box
 description: A control that plays video in flutter, I make the control as flexible as possible, can play a single video, video list on the page.
-version: 0.15.6
+version: 0.16.0
 homepage: https://github.com/januwA/flutter_video_box
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  video_player: ^2.0.2
-  mobx: ^1.2.1+2
-  flutter_mobx: ^1.1.0+2
-  connectivity: ^3.0.2 # 监听网络连接
-  sensors: ^2.0.0 # 监听设备旋转
+  video_player: ^2.1.12
+  mobx: ^2.0.3
+  flutter_mobx: ^2.0.1
+  connectivity_plus: ^1.0.6 # 监听网络连接
+  sensors: ^2.0.3 # 监听设备旋转
   dart_printf: ^0.5.0
 
 dev_dependencies:

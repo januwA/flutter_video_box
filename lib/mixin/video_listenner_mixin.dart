@@ -1,4 +1,4 @@
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:sensors/sensors.dart' show AccelerometerEvent;
 
 import '../video.controller.dart';
@@ -18,16 +18,16 @@ typedef TLnitializeErrorEventsListenner = void Function(dynamic error);
 /// 各种监听事件
 mixin VideoListennerMixin on BaseVideoController {
   /// 监听video播放结束事件
-  TPlayEndListenner playEndListenner;
+  TPlayEndListenner? playEndListenner;
 
   /// 监听屏幕改变(开启/关闭全屏)事件
-  TFullScreenChangeListenner fullScreenChangeListenner;
+  TFullScreenChangeListenner? fullScreenChangeListenner;
 
   /// 监听网络变更事件
-  TConnectivityChangedListenner connectivityChangedListenner;
+  TConnectivityChangedListenner? connectivityChangedListenner;
 
   // 屏幕旋转事件
-  TAccelerometerEventsListenner accelerometerEventsListenner;
+  TAccelerometerEventsListenner? accelerometerEventsListenner;
 
   addConnectivityChangedListener(TConnectivityChangedListenner listener) {
     connectivityChangedListenner = listener;
@@ -42,7 +42,7 @@ mixin VideoListennerMixin on BaseVideoController {
   }
 
   /// initialize 初始化错误时
-  TLnitializeErrorEventsListenner initializeErrorEventsListenner;
+  TLnitializeErrorEventsListenner? initializeErrorEventsListenner;
   addInitializeErrorListenner(TLnitializeErrorEventsListenner listener) {
     initializeErrorEventsListenner = listener;
   }

@@ -42,12 +42,12 @@ class KCustomFullScreen extends CustomFullScreen {
   }
 
   @override
-  Future<Object> open(BuildContext context, VideoController controller) async {
+  Future<Object>? open(BuildContext context, VideoController controller) async {
     SystemChrome.setEnabledSystemUIOverlays([]);
     _setLandscape();
     await Navigator.of(context).push(_route(controller));
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     _setPortrait();
-    return null;
+    return Null;
   }
 }

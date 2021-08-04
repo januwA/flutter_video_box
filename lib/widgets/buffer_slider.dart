@@ -9,10 +9,10 @@ class BufferSlider extends StatefulWidget {
   final double value;
   final double bufferValue;
   final ValueChanged<double> onChanged;
-  final ValueChanged<double> onChangeStart;
-  final ValueChanged<double> onChangeEnd;
-  final BorderRadiusGeometry borderRadius;
-  final Widget pointWidget;
+  final ValueChanged<double>? onChangeStart;
+  final ValueChanged<double>? onChangeEnd;
+  final BorderRadiusGeometry? borderRadius;
+  final Widget? pointWidget;
 
   final double min;
   final double max;
@@ -34,9 +34,9 @@ class BufferSlider extends StatefulWidget {
       ShowValueIndicator.onlyForDiscrete;
 
   const BufferSlider({
-    Key key,
-    @required this.value,
-    @required this.onChanged,
+    Key? key,
+    required this.value,
+    required this.onChanged,
     this.bufferValue = 0,
     this.onChangeStart,
     this.onChangeEnd,
@@ -61,6 +61,7 @@ class _BufferSliderState extends State<BufferSlider> {
   double get _currentVlaue =>
       map(widget.value, widget.min, widget.max, _innerMinWidth, _innerMaxWidth);
 
+  // ignore: unnecessary_null_comparison
   double get _bufferValue => widget.bufferValue != null
       ? map(widget.bufferValue, widget.min, widget.max, _innerMinWidth,
           _innerMaxWidth)
@@ -85,7 +86,7 @@ class _BufferSliderState extends State<BufferSlider> {
 
   void _onPanStart(DragStartDetails d) {
     double _value = _lerpValue(_constraintsX(d.localPosition.dx));
-    if (widget.onChangeStart != null) widget.onChangeStart(_value);
+    if (widget.onChangeStart != null) widget.onChangeStart!(_value);
     if (_value != widget.value) {
       widget.onChanged(_value);
     }
@@ -98,7 +99,7 @@ class _BufferSliderState extends State<BufferSlider> {
 
   void _onPanEnd(DragEndDetails d) {
     double _value = _lerpValue(widget.value);
-    if (widget.onChangeEnd != null) widget.onChangeEnd(_value);
+    if (widget.onChangeEnd != null) widget.onChangeEnd!(_value);
   }
 
   @override
@@ -143,12 +144,12 @@ class _BufferSliderState extends State<BufferSlider> {
       showValueIndicator: sliderTheme.showValueIndicator ??
           BufferSlider._defaultShowValueIndicator,
       valueIndicatorTextStyle: sliderTheme.valueIndicatorTextStyle ??
-          theme.textTheme.bodyText1.copyWith(
+          theme.textTheme.bodyText1!.copyWith(
             color: theme.colorScheme.onPrimary,
           ),
     );
 
-    Size pointSize = sliderTheme.thumbShape.getPreferredSize(true, true);
+    Size pointSize = sliderTheme.thumbShape!.getPreferredSize(true, true);
     BorderRadiusGeometry _borderRadius =
         widget.borderRadius ?? BorderRadius.circular(10);
     return Container(
@@ -157,7 +158,7 @@ class _BufferSliderState extends State<BufferSlider> {
         builder: (BuildContext context, BoxConstraints size) {
           _innerMaxWidth = math.max(size.maxWidth - pointSize.width / 2, 0);
           _innerMaxHeight =
-              math.max(math.max(pointSize.height, sliderTheme.trackHeight), 0);
+              math.max(math.max(pointSize.height, sliderTheme.trackHeight!), 0);
 
           assert(_innerMaxWidth >= 0);
           assert(_innerMaxHeight >= 0);
@@ -193,7 +194,7 @@ class _BufferSliderState extends State<BufferSlider> {
                       height: sliderTheme.trackHeight,
                       width: math.min(_bufferValue, _innerMaxWidth),
                       decoration: BoxDecoration(
-                        color: sliderTheme.activeTrackColor.withOpacity(0.5),
+                        color: sliderTheme.activeTrackColor!.withOpacity(0.5),
                         borderRadius: _borderRadius,
                       ),
                     ),

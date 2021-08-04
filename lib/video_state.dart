@@ -3,22 +3,21 @@ import 'package:video_player/video_player.dart' show DataSourceType;
 
 class VideoState {
   const VideoState({
-    this.dataSource,
-    this.dataSourceType,
-    this.size,
-    this.isLooping,
-    this.isPlaying,
-    this.autoplay,
-    this.volume,
-    this.initPosition,
-    this.position,
-    this.duration,
-    this.skiptime,
-    this.positionText,
-    this.durationText,
-    this.sliderValue,
-    this.aspectRatio,
-    this.playbackSpeed,
+    required this.dataSource,
+    required this.dataSourceType,
+    required this.size,
+    required this.isLooping,
+    required this.isPlaying,
+    required this.autoplay,
+    required this.volume,
+    required this.initPosition,
+    required this.position,
+    required this.duration,
+    required this.skiptime,
+    required this.positionText,
+    required this.durationText,
+    required this.sliderValue,
+    required this.playbackSpeed,
   });
 
   final String dataSource;
@@ -35,7 +34,6 @@ class VideoState {
   final String positionText;
   final String durationText;
   final double sliderValue;
-  final double aspectRatio;
   final double playbackSpeed;
 
   Map<String, dynamic> toMap() {
@@ -54,7 +52,6 @@ class VideoState {
       "positionText": positionText,
       "durationText": durationText,
       "sliderValue": sliderValue,
-      "aspectRatio": aspectRatio,
       "playbackSpeed": playbackSpeed,
     };
   }

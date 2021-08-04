@@ -1,3 +1,8 @@
+## 0.16.0 2021-8-4
+
+- 升级到现代 flutter，api 可能也会随着发生变化
+- api change: 删除了 `aspectRatio` 选项，使用它时总是出现未知错误，所以删除了
+
 ## 0.15.6 2021-3-12
 
 - refactor: flutter 2.0

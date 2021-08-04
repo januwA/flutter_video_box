@@ -10,38 +10,38 @@ typedef BottomViewBuilder = Widget Function(
 
 mixin CustomViewMixin {
   /// to [VideoBox.children]
-  List<Widget> children;
+  List<Widget>? children;
 
   /// to [VideoBox.beforeChildren]
-  List<Widget> beforeChildren;
+  List<Widget>? beforeChildren;
 
   /// to [VideoBox.afterChildren]
-  List<Widget> afterChildren;
+  List<Widget>? afterChildren;
 
   /// to [VideoBox.customLoadingWidget]
-  Widget customLoadingWidget;
+  Widget? customLoadingWidget;
 
   /// to [VideoBox.customBufferedWidget]
-  Widget customBufferedWidget;
+  Widget? customBufferedWidget;
 
   /// to [VideoBox.customFullScreen]
-  CustomFullScreen customFullScreen;
+  CustomFullScreen? customFullScreen;
 
   /// to [VideoBox.bottomViewBuilder]
-  BottomViewBuilder bottomViewBuilder;
+  BottomViewBuilder? bottomViewBuilder;
 
   /// to [VideoBox.background]
-  Widget background;
+  Widget? background;
 
   /// to [VideoBox.bottomPadding]
-  EdgeInsets bottomPadding;
+  EdgeInsets? bottomPadding;
 
   /// to [VideoBox.cover]
-  Widget cover;
+  Widget? cover;
 
   /// to [VideoBox.theme]
-  ThemeData theme;
+  ThemeData? theme;
 
   /// to [VideoBox.barrierColor]
-  Color barrierColor;
+  Color? barrierColor;
 }

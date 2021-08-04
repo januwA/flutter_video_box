@@ -8,7 +8,7 @@ import 'animated_arrow_icon.dart';
 class SeekToView extends StatelessWidget {
   final VideoController controller;
 
-  const SeekToView({Key key, @required this.controller}) : super(key: key);
+  const SeekToView({Key? key, required this.controller}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     var theme = Theme.of(context);
@@ -21,13 +21,14 @@ class SeekToView extends StatelessWidget {
             child: Container(
               color: Colors.transparent,
               child: Center(
+                // ignore: unnecessary_null_comparison
                 child: controller.arrowIconRtLController != null
                     ? Transform.rotate(
                         angle: math.pi / 180 * 180,
                         child: AnimatedArrowIcon(
                           iconSize: VideoBox.centerIconSize,
-                          controller: controller.arrowIconRtLController,
-                          color: theme.iconTheme.color,
+                          controller: controller.arrowIconRtLController!,
+                          color: theme.iconTheme.color!,
                         ),
                       )
                     : SizedBox(),
@@ -44,11 +45,12 @@ class SeekToView extends StatelessWidget {
             child: Container(
               color: Colors.transparent,
               child: Center(
+                // ignore: unnecessary_null_comparison
                 child: controller.arrowIconLtRController != null
                     ? AnimatedArrowIcon(
                         iconSize: VideoBox.centerIconSize,
-                        controller: controller.arrowIconLtRController,
-                        color: theme.iconTheme.color,
+                        controller: controller.arrowIconLtRController!,
+                        color: theme.iconTheme.color!,
                       )
                     : SizedBox(),
               ),

@@ -12,7 +12,7 @@ class ChangeVideoSrc extends StatefulWidget {
 
 class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
   List<String> source = [src1, src2, src3];
-  VideoController vc;
+  late VideoController vc;
 
   int _index = 0;
 

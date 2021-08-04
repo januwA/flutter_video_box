@@ -9,7 +9,7 @@ class VideoPlayerDemo extends StatefulWidget {
 }
 
 class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
-  VideoPlayerController _controller;
+  late VideoPlayerController _controller;
 
   @override
   void initState() {

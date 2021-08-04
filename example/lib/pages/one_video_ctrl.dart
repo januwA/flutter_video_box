@@ -9,7 +9,7 @@ class OneVideoCtrl extends StatefulWidget {
 }
 
 class _OneVideoCtrlState extends State<OneVideoCtrl> {
-  VideoController vc;
+  late VideoController vc;
   ScrollController controller = ScrollController();
 
   @override
@@ -24,11 +24,12 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
       autoplay: true,
     )
       ..initialize().then((e) {
-        if (e != null) {
-          print('[video box init] error: ' + e.message);
-        } else {
-          print('[video box init] success');
-        }
+        print(e);
+        // if (e != null) {
+        //   print('[video box init] error: ' + e.message);
+        // } else {
+        //   print('[video box init] success');
+        // }
       })
       ..addListener(() {
         if (vc.videoCtrl.value.isBuffering) {
@@ -108,8 +109,8 @@ class VideoBar extends StatelessWidget {
   final List<double> speeds;
 
   const VideoBar({
-    Key key,
-    @required this.vc,
+    Key? key,
+    required this.vc,
     this.speeds = const [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0],
   }) : super(key: key);
   @override

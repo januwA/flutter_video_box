@@ -46,8 +46,8 @@ class VideoBox extends StatefulObserverWidget {
   ///
   /// https://github.com/januwA/flutter_video_box/tree/master/example
   const VideoBox({
-    Key key,
-    @required this.controller,
+    Key? key,
+    required this.controller,
     this.children = const <Widget>[],
     this.beforeChildren = const <Widget>[],
     this.afterChildren = const <Widget>[],
@@ -60,20 +60,19 @@ class VideoBox extends StatefulObserverWidget {
     this.barrierColor,
     this.bottomViewBuilder = kBottomViewBuilder,
     this.customFullScreen = const KCustomFullScreen(),
-  })  : assert(controller != null),
-        super(key: key);
+  }) : super(key: key);
 
   static const double centerIconSize = 40.0;
 
   final VideoController controller;
 
-  final Widget background;
+  final Widget? background;
 
   /// video / beforeChildren / controllerWidgets-> children / afterChildren
-  final List<Widget> afterChildren;
+  final List<Widget>? afterChildren;
 
   /// video / beforeChildren / controllerWidgets-> children / afterChildren
-  final List<Widget> beforeChildren;
+  final List<Widget>? beforeChildren;
 
   /// add your widget
   ///
@@ -105,11 +104,11 @@ class VideoBox extends StatefulObserverWidget {
   ///   ),
   /// ),
   /// ```
-  final List<Widget> children;
+  final List<Widget>? children;
 
-  final Widget cover;
+  final Widget? cover;
 
-  final EdgeInsets bottomPadding;
+  final EdgeInsets? bottomPadding;
 
   ///
   /// Set the color of the control
@@ -136,29 +135,29 @@ class VideoBox extends StatefulObserverWidget {
   ///   ),
   /// )
   ///```
-  final ThemeData theme;
+  final ThemeData? theme;
 
   /// This widget will be displayed when the video is first loaded.
-  final Widget customLoadingWidget;
+  final Widget? customLoadingWidget;
 
   /// This widget will be displayed when the video enters the buffer.
-  final Widget customBufferedWidget;
+  final Widget? customBufferedWidget;
 
   /// controller layer color
-  final Color barrierColor;
+  final Color? barrierColor;
 
   /// see also [kBottomViewBuilder]
-  final BottomViewBuilder bottomViewBuilder;
+  final BottomViewBuilder? bottomViewBuilder;
 
   /// see also [KCustomFullScreen]
-  final CustomFullScreen customFullScreen;
+  final CustomFullScreen? customFullScreen;
 
   @override
   _VideoBoxState createState() => _VideoBoxState();
 }
 
 class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
-  VideoController controller;
+  late VideoController controller;
 
   @override
   void initState() {
@@ -186,7 +185,7 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
     controller.theme ??= _theme.copyWith(
       iconTheme: IconThemeData(color: Colors.white),
       textTheme: _theme.textTheme.copyWith(
-        bodyText1: _theme.textTheme.bodyText1.copyWith(color: Colors.white),
+        bodyText1: _theme.textTheme.bodyText1!.copyWith(color: Colors.white),
       ),
       sliderTheme: _theme.sliderTheme.copyWith(
         trackHeight: 2,
@@ -202,7 +201,7 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
     var _seekToView =
         Positioned.fill(child: SeekToView(controller: controller));
     return Theme(
-      data: controller.theme,
+      data: controller.theme!,
       child: GestureDetector(
         onTap: debounce(controller.toggleShowVideoCtrl),
         child: Stack(
@@ -221,13 +220,13 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
                   ? Center(child: controller.cover)
                   : Center(
                       child: AspectRatio(
-                        aspectRatio: controller.aspectRatio,
+                        aspectRatio: controller.videoCtrl.value.aspectRatio,
                         child: VideoPlayer(controller.videoCtrl),
                       ),
                     ),
 
               if (controller.beforeChildren != null)
-                ...controller.beforeChildren,
+                ...?controller.beforeChildren,
 
               if (controller.controllerWidgets) ...[
                 // 快进快退
@@ -251,16 +250,16 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
                                         icon: AnimatedIcon(
                                           icon: AnimatedIcons.play_pause,
                                           progress:
-                                              controller.animetedIconTween,
+                                              controller.animetedIconTween!,
                                         ),
                                         onPressed: controller.togglePlay,
                                       ),
                                     ),
                               if (controller.bottomViewBuilder != null)
-                                controller.bottomViewBuilder(
+                                controller.bottomViewBuilder!(
                                     context, controller),
                               if (controller.children != null)
-                                ...controller.children,
+                                ...?controller.children,
                             ],
                           ),
                         )
@@ -278,7 +277,8 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
               ],
 
               // 自定义控件
-              if (controller.afterChildren != null) ...controller.afterChildren,
+              if (controller.afterChildren != null)
+                ...?controller.afterChildren,
             ]
           ],
         ),
@@ -295,18 +295,18 @@ abstract class CustomFullScreen {
   ///
   /// You need to return an asynchronous event (usually an asynchronous event waiting for the page to end)
   /// please refer to the example of [VideoController.customFullScreen]
-  Future<Object> open(BuildContext context, VideoController controller);
+  Future<Object>? open(BuildContext context, VideoController controller);
 
   /// 用户点击视图上的icon按钮时，将调用此方法
   ///
   /// 但，如果用户使用的是系统导航栏的返回按钮，此方法将不会被调用
-  FutureOr<void> close(BuildContext context, VideoController controller);
+  FutureOr<void>? close(BuildContext context, VideoController controller);
 }
 
 class KVideoBoxFullScreenPage extends StatelessWidget {
   final controller;
 
-  const KVideoBoxFullScreenPage({Key key, @required this.controller})
+  const KVideoBoxFullScreenPage({Key? key, @required this.controller})
       : super(key: key);
 
   @override
@@ -322,7 +322,7 @@ class KVideoBoxFullScreenPage extends StatelessWidget {
 class KBottomViewBuilder extends StatefulObserverWidget {
   final VideoController controller;
 
-  const KBottomViewBuilder({Key key, @required this.controller})
+  const KBottomViewBuilder({Key? key, required this.controller})
       : super(key: key);
 
   @override
@@ -358,9 +358,9 @@ class _VideoBottomViewState extends State<KBottomViewBuilder> {
     var theme = Theme.of(context);
 
     return Positioned(
-      left: widget.controller.bottomPadding.left,
-      bottom: widget.controller.bottomPadding.bottom,
-      right: widget.controller.bottomPadding.right,
+      left: widget.controller.bottomPadding!.left,
+      bottom: widget.controller.bottomPadding!.bottom,
+      right: widget.controller.bottomPadding!.right,
       child: GestureDetector(
         onTap: _onTap,
         child: Padding(

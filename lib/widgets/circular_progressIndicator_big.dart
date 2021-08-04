@@ -6,7 +6,7 @@ class CircularProgressIndicatorBig extends StatelessWidget {
   final double size;
 
   const CircularProgressIndicatorBig({
-    Key key,
+    Key? key,
     this.size = SIZE,
   }) : super(key: key);
 

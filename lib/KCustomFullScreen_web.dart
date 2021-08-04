@@ -21,21 +21,21 @@ class KCustomFullScreen extends CustomFullScreen {
   @override
   Future<Object> open(BuildContext context, VideoController controller) async {
     bool isClose = false;
-    StreamSubscription f;
-    document.documentElement.requestFullscreen();
-    f = document.documentElement.onFullscreenChange.listen((e) {
+    late StreamSubscription f;
+    document.documentElement!.requestFullscreen();
+    f = document.documentElement!.onFullscreenChange.listen((e) {
       if (document.fullscreenElement == null && !isClose) {
         this.close(context, controller);
-        f?.cancel();
+        f.cancel();
       }
     });
 
     await Navigator.of(context).push(_route(controller));
     if (document.fullscreenElement != null) {
       isClose = true;
-      f?.cancel();
+      f.cancel();
       document.exitFullscreen();
     }
-    return null;
+    return Future.value(null);
   }
 }

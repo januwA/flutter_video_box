@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import '../video.controller.dart';
 
 mixin AnimationIconMixin on BaseVideoController {
-  AnimationController animetedIconController;
-  Animation<double> animetedIconTween;
-  AnimationController arrowIconLtRController;
-  AnimationController arrowIconRtLController;
+  AnimationController? animetedIconController;
+  Animation<double>? animetedIconTween;
+  AnimationController? arrowIconLtRController;
+  AnimationController? arrowIconRtLController;
 
   Duration _arrowIconDuration = Duration(milliseconds: 800);
 
@@ -31,16 +31,17 @@ mixin AnimationIconMixin on BaseVideoController {
     animetedIconTween = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(animetedIconController);
+    ).animate(animetedIconController!);
     updateAnimetedIconState();
   }
 
   Future<void> updateAnimetedIconState() async {
+    // ignore: unnecessary_null_comparison
     if (animetedIconController == null) return;
     if (videoCtrl.value.isPlaying) {
-      await animetedIconController.forward();
+      await animetedIconController!.forward();
     } else {
-      await animetedIconController.reverse();
+      await animetedIconController!.reverse();
     }
   }
 }

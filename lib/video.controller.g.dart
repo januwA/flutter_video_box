@@ -9,56 +9,41 @@ part of 'video.controller.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$VideoController on _VideoController, Store {
-  Computed<bool> _$isShowCoverComputed;
+  Computed<bool>? _$isShowCoverComputed;
 
   @override
   bool get isShowCover =>
       (_$isShowCoverComputed ??= Computed<bool>(() => super.isShowCover,
               name: '_VideoController.isShowCover'))
           .value;
-  Computed<String> _$durationTextComputed;
+  Computed<String>? _$durationTextComputed;
 
   @override
   String get durationText =>
       (_$durationTextComputed ??= Computed<String>(() => super.durationText,
               name: '_VideoController.durationText'))
           .value;
-  Computed<String> _$positionTextComputed;
+  Computed<String>? _$positionTextComputed;
 
   @override
   String get positionText =>
       (_$positionTextComputed ??= Computed<String>(() => super.positionText,
               name: '_VideoController.positionText'))
           .value;
-  Computed<double> _$sliderValueComputed;
+  Computed<double>? _$sliderValueComputed;
 
   @override
   double get sliderValue =>
       (_$sliderValueComputed ??= Computed<double>(() => super.sliderValue,
               name: '_VideoController.sliderValue'))
           .value;
-  Computed<double> _$sliderBufferValueComputed;
+  Computed<double>? _$sliderBufferValueComputed;
 
   @override
   double get sliderBufferValue => (_$sliderBufferValueComputed ??=
           Computed<double>(() => super.sliderBufferValue,
               name: '_VideoController.sliderBufferValue'))
       .value;
-
-  final _$aspectRatioAtom = Atom(name: '_VideoController.aspectRatio');
-
-  @override
-  double get aspectRatio {
-    _$aspectRatioAtom.reportRead();
-    return super.aspectRatio;
-  }
-
-  @override
-  set aspectRatio(double value) {
-    _$aspectRatioAtom.reportWrite(value, super.aspectRatio, () {
-      super.aspectRatio = value;
-    });
-  }
 
   final _$controllerWidgetsAtom =
       Atom(name: '_VideoController.controllerWidgets');
@@ -192,17 +177,6 @@ mixin _$VideoController on _VideoController, Store {
       ActionController(name: '_VideoController');
 
   @override
-  void setAspectRatio(double v) {
-    final _$actionInfo = _$_VideoControllerActionController.startAction(
-        name: '_VideoController.setAspectRatio');
-    try {
-      return super.setAspectRatio(v);
-    } finally {
-      _$_VideoControllerActionController.endAction(_$actionInfo);
-    }
-  }
-
-  @override
   void setControllerWidgets(bool v) {
     final _$actionInfo = _$_VideoControllerActionController.startAction(
         name: '_VideoController.setControllerWidgets');
@@ -282,7 +256,6 @@ mixin _$VideoController on _VideoController, Store {
   @override
   String toString() {
     return '''
-aspectRatio: ${aspectRatio},
 controllerWidgets: ${controllerWidgets},
 isBfLoading: ${isBfLoading},
 volume: ${volume},
