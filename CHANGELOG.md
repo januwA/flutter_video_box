@@ -1,3 +1,7 @@
+## 0.15.6+1
+
+- Migrated from the deprecated connectivity plugin to connectivity_plus.
+
 ## 0.15.6 2021-3-12
 
 - refactor: flutter 2.0
