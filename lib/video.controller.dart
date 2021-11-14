@@ -1,8 +1,7 @@
 import 'dart:async' show StreamSubscription, Timer;
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-// import 'package:dart_printf/dart_printf.dart';
-import 'package:sensors/sensors.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

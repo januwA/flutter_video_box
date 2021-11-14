@@ -36,6 +36,6 @@ class KCustomFullScreen extends CustomFullScreen {
       f.cancel();
       document.exitFullscreen();
     }
-    return Future.value(null);
+    return Null;
   }
 }

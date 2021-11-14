@@ -4,6 +4,8 @@ import 'package:video_player/video_player.dart';
 import '../globals.dart';
 
 class VideoPlayerDemo extends StatefulWidget {
+  const VideoPlayerDemo({Key? key}) : super(key: key);
+
   @override
   _VideoPlayerDemoState createState() => _VideoPlayerDemoState();
 }
@@ -19,6 +21,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
         setState(() {});
       })
       ..addListener(() {
+        // ignore: avoid_print
         print(_controller.value.isBuffering);
       });
   }
@@ -38,9 +41,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
                 aspectRatio: _controller.value.aspectRatio,
                 child: VideoPlayer(_controller),
               )
-            : Container(
-                child: Center(child: Text('loading')),
-              ),
+            : const Center(child: Text('loading')),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

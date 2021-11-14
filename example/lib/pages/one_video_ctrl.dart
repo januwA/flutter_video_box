@@ -4,6 +4,8 @@ import 'package:video_box/video_box.dart';
 import '../globals.dart';
 
 class OneVideoCtrl extends StatefulWidget {
+  const OneVideoCtrl({Key? key}) : super(key: key);
+
   @override
   _OneVideoCtrlState createState() => _OneVideoCtrlState();
 }
@@ -24,6 +26,7 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
       autoplay: true,
     )
       ..initialize().then((e) {
+        // ignore: avoid_print
         print(e);
         // if (e != null) {
         //   print('[video box init] error: ' + e.message);
@@ -33,8 +36,11 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
       })
       ..addListener(() {
         if (vc.videoCtrl.value.isBuffering) {
+          // ignore: avoid_print
           print('==============================');
+          // ignore: avoid_print
           print('isBuffering');
+          // ignore: avoid_print
           print('==============================');
         }
       });
@@ -59,11 +65,11 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
               children: <Widget>[
                 VideoBar(vc: vc),
                 Align(
-                  alignment: Alignment(0.5, 0),
+                  alignment: const Alignment(0.5, 0),
                   child: IconButton(
                     iconSize: VideoBox.centerIconSize,
                     disabledColor: Colors.white60,
-                    icon: Icon(Icons.skip_next),
+                    icon: const Icon(Icons.skip_next),
                     onPressed: () {},
                   ),
                 ),
@@ -74,25 +80,27 @@ class _OneVideoCtrlState extends State<OneVideoCtrl> {
             alignment: WrapAlignment.spaceBetween,
             children: <Widget>[
               ElevatedButton(
-                child: Text('play'),
+                child: const Text('play'),
                 onPressed: () {
                   vc.play();
                 },
               ),
               ElevatedButton(
-                child: Text('pause'),
+                child: const Text('pause'),
                 onPressed: () {
                   vc.pause();
                 },
               ),
               ElevatedButton(
-                child: Text('full screen'),
+                child: const Text('full screen'),
                 onPressed: () => vc.onFullScreenSwitch(context),
               ),
               ElevatedButton(
-                child: Text('print'),
+                child: const Text('print'),
                 onPressed: () {
+                  // ignore: avoid_print
                   print(vc);
+                  // ignore: avoid_print
                   print(vc.value);
                 },
               ),
@@ -121,11 +129,11 @@ class VideoBar extends StatelessWidget {
       right: 0,
       child: AppBar(
         backgroundColor: Colors.transparent,
-        title: Text('test'),
+        title: const Text('test'),
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert),
             onPressed: () {
               showModalBottomSheet(
                 context: context,
@@ -134,8 +142,8 @@ class VideoBar extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       ListTile(
-                        leading: Icon(Icons.slow_motion_video),
-                        title: Text('play speed'),
+                        leading: const Icon(Icons.slow_motion_video),
+                        title: const Text('play speed'),
                         onTap: () {
                           showModalBottomSheet<double>(
                             context: context,

@@ -13,35 +13,39 @@ const videos = '/videos';
 const videoPlayerDemo = '/video-player-demo';
 const pipDemo = '/pip-demo';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       routes: <String, WidgetBuilder>{
-        oneVideoCtrl: (BuildContext context) => OneVideoCtrl(),
-        listVideo: (BuildContext context) => ListVideo(),
-        changeVideoSrc: (BuildContext context) => ChangeVideoSrc(),
-        videos: (BuildContext context) => Videos(),
-        videoPlayerDemo: (BuildContext context) => VideoPlayerDemo(),
+        oneVideoCtrl: (BuildContext context) => const OneVideoCtrl(),
+        listVideo: (BuildContext context) => const ListVideo(),
+        changeVideoSrc: (BuildContext context) => const ChangeVideoSrc(),
+        videos: (BuildContext context) => const Videos(),
+        videoPlayerDemo: (BuildContext context) => const VideoPlayerDemo(),
         // pipDemo: (BuildContext context) => PipPage(),
       },
-      home: HomePage(),
+      home: const HomePage(),
     );
   }
 }
 
 class HomePage extends StatelessWidget {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     void _push(String url) {
-      Navigator.of(context).pushNamed(url);
+      Navigator.of(context).restorablePushNamed(url);
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text('video_box example')),
+      appBar: AppBar(title: const Text('video_box example')),
       body: Center(
         child: IntrinsicWidth(
           child: Column(
@@ -49,27 +53,27 @@ class HomePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               ElevatedButton(
-                child: Text('one video ctrl'),
+                child: const Text('one video ctrl'),
                 onPressed: () => _push(oneVideoCtrl),
               ),
               ElevatedButton(
-                child: Text('list video'),
+                child: const Text('list video'),
                 onPressed: () => _push(listVideo),
               ),
               ElevatedButton(
-                child: Text('change video src'),
+                child: const Text('change video src'),
                 onPressed: () => _push(changeVideoSrc),
               ),
               ElevatedButton(
-                child: Text('videos'),
+                child: const Text('videos'),
                 onPressed: () => _push(videos),
               ),
               ElevatedButton(
-                child: Text('VideoPlayerDemo'),
+                child: const Text('VideoPlayerDemo'),
                 onPressed: () => _push(videoPlayerDemo),
               ),
               ElevatedButton(
-                child: Text('PiP'),
+                child: const Text('PiP'),
                 onPressed: () => _push(pipDemo),
               ),
             ],

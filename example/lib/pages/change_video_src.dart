@@ -6,6 +6,8 @@ import 'package:video_player/video_player.dart';
 import '../globals.dart';
 
 class ChangeVideoSrc extends StatefulWidget {
+  const ChangeVideoSrc({Key? key}) : super(key: key);
+
   @override
   _ChangeVideoSrcState createState() => _ChangeVideoSrcState();
 }
@@ -29,10 +31,10 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
     vc.pause();
     vc.autoplay = true;
     vc.setSource(VideoPlayerController.network(source[nv]));
-    vc.initialize()
-      ..then((_) {
-        print(vc);
-      });
+    vc.initialize().then((_) {
+      // ignore: avoid_print
+      print(vc);
+    });
     _index = nv;
   }
 
@@ -53,12 +55,12 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('change src'),
+        title: const Text('change src'),
       ),
       body: ListView(
         children: <Widget>[
           Center(
-            child: Container(
+            child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.8,
               height: MediaQuery.of(context).size.width * 0.8,
               child: VideoBox(controller: vc),
@@ -72,11 +74,11 @@ class _ChangeVideoSrcState extends State<ChangeVideoSrc> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               ElevatedButton(
-                child: Text('Prev'),
+                child: const Text('Prev'),
                 onPressed: () => setState(() => index--),
               ),
               ElevatedButton(
-                child: Text('Next'),
+                child: const Text('Next'),
                 onPressed: () => setState(() => index++),
               ),
             ],

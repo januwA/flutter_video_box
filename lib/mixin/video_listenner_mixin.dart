@@ -1,5 +1,5 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:sensors/sensors.dart' show AccelerometerEvent;
+import 'package:sensors_plus/sensors_plus.dart' show AccelerometerEvent;
 
 import '../video.controller.dart';
 

@@ -6,6 +6,8 @@ import 'package:video_player/video_player.dart';
 import '../globals.dart';
 
 class Videos extends StatefulWidget {
+  const Videos({Key? key}) : super(key: key);
+
   @override
   _VideosState createState() => _VideosState();
 }
@@ -29,21 +31,22 @@ class _VideosState extends State<Videos> {
 
   void _changeSource(String src) async {
     vc.setSource(VideoPlayerController.network(src));
-    vc.cover = Center(child: Text(src, style: TextStyle(color: Colors.white)));
+    vc.cover =
+        Center(child: Text(src, style: const TextStyle(color: Colors.white)));
     vc.initialize();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('videos')),
+      appBar: AppBar(title: const Text('videos')),
       body: ListView(
         children: <Widget>[
           AspectRatio(
             aspectRatio: 16 / 9,
             child: VideoBox(
               controller: vc,
-              cover: Text(
+              cover: const Text(
                 'init cover',
                 style: TextStyle(color: Colors.white),
               ),
@@ -53,15 +56,15 @@ class _VideosState extends State<Videos> {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               ElevatedButton(
-                child: Text('第一集'),
+                child: const Text('第一集'),
                 onPressed: () => _changeSource(src1),
               ),
               ElevatedButton(
-                child: Text('第二集'),
+                child: const Text('第二集'),
                 onPressed: () => _changeSource(src2),
               ),
               ElevatedButton(
-                child: Text('第三集'),
+                child: const Text('第三集'),
                 onPressed: () => _changeSource(src3),
               ),
             ],

@@ -195,7 +195,9 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
         inactiveTrackColor: Colors.white24,
         thumbColor: Colors.white,
       ),
-      accentColor: Colors.white,
+      colorScheme: _theme.colorScheme.copyWith(
+        primary: Colors.white,
+      ),
     );
 
     var _seekToView =

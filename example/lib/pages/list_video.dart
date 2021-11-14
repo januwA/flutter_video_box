@@ -6,6 +6,8 @@ import 'package:video_player/video_player.dart';
 import '../globals.dart';
 
 class ListVideo extends StatefulWidget {
+  const ListVideo({Key? key}) : super(key: key);
+
   @override
   _ListVideoState createState() => _ListVideoState();
 }
@@ -34,7 +36,7 @@ class _ListVideoState extends State<ListVideo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('list video')),
+      appBar: AppBar(title: const Text('list video')),
       body: ListView(
         controller: controller,
         children: <Widget>[
