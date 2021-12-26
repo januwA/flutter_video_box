@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'video.controller.dart';
 import 'video_box.dart';
 
 class KCustomFullScreen extends CustomFullScreen {
@@ -43,11 +44,9 @@ class KCustomFullScreen extends CustomFullScreen {
 
   @override
   Future<Object>? open(BuildContext context, VideoController controller) async {
-    // SystemChrome.setEnabledSystemUIOverlays([]);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     _setLandscape();
     await Navigator.of(context).push(_route(controller));
-    // SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     _setPortrait();
     return Null;

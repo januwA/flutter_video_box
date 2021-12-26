@@ -26,7 +26,7 @@ class SeekToView extends StatelessWidget {
                     ? Transform.rotate(
                         angle: math.pi / 180 * 180,
                         child: AnimatedArrowIcon(
-                          iconSize: VideoBox.centerIconSize,
+                          iconSize: 50,
                           controller: controller.arrowIconRtLController!,
                           color: theme.iconTheme.color!,
                         ),
@@ -48,7 +48,7 @@ class SeekToView extends StatelessWidget {
                 // ignore: unnecessary_null_comparison
                 child: controller.arrowIconLtRController != null
                     ? AnimatedArrowIcon(
-                        iconSize: VideoBox.centerIconSize,
+                        iconSize: 50,
                         controller: controller.arrowIconLtRController!,
                         color: theme.iconTheme.color!,
                       )

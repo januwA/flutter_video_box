@@ -2,6 +2,7 @@ import 'dart:async';
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:html' show document;
 import 'package:flutter/material.dart';
+import 'video.controller.dart';
 import 'video_box.dart';
 
 class KCustomFullScreen extends CustomFullScreen {
