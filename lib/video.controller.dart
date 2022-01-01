@@ -1,11 +1,55 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 import 'package:video_box/video_box.dart';
 import 'package:video_player/video_player.dart';
 
 import 'KCustomFullScreen_io.dart';
 import '_util.dart';
+import 'video_state.dart';
+
+void kAccelerometerEventsListenner(
+  VideoController controller,
+  AccelerometerEvent event,
+) {
+  if (!controller.isFullScreen) return;
+  bool isHorizontal = event.x.abs() > event.y.abs(); // 横屏模式
+  if (!isHorizontal) return;
+  if (event.x > 1) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft]);
+  } else if (event.x < -1) {
+    SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeRight]);
+  }
+}
+
+typedef TAccelerometerEventsListenner = void Function(
+    VideoController controller, AccelerometerEvent event);
+
+class UI {
+  final VideoController controller;
+  const UI(this.controller);
+
+  get timeText => controller.vpc.value.isInitialized
+      ? "${controller.positionText}/${controller.durationText}"
+      : '00:00/00:00';
+
+  IconData get volumeIcon {
+    var volume = controller.vpc.value.volume;
+    return volume <= 0
+        ? Icons.volume_off
+        : volume <= 0.5
+            ? Icons.volume_down
+            : Icons.volume_up;
+  }
+
+  IconData get screenIcon =>
+      controller.isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen;
+
+  Widget get bgWidth => controller.bg ?? Container(color: Colors.black);
+}
 
 class VideoController extends ChangeNotifier {
   late VideoPlayerController vpc;
@@ -25,6 +69,7 @@ class VideoController extends ChangeNotifier {
   AnimationController? arrowIconLtRController;
   AnimationController? arrowIconRtLController;
   AnimationController? playIconController;
+  late UI ui;
 
   VideoController({
     required this.vpc,
@@ -39,7 +84,39 @@ class VideoController extends ChangeNotifier {
     this.controlsBg,
     this.bg,
     this.theme,
-  });
+  }) {
+    ui = UI(this);
+
+    _accelerometerEventsSubscriptions$ ??=
+        accelerometerEvents.listen(_streamSubscriptionsCallback);
+    _connectivityChanged$ ??= Connectivity()
+        .onConnectivityChanged
+        .listen(_connectivityChangedCallBack);
+  }
+
+  /// 监听页面旋转流
+  TAccelerometerEventsListenner accelerometerEventsListenner =
+      kAccelerometerEventsListenner;
+  StreamSubscription<dynamic>? _accelerometerEventsSubscriptions$;
+  void _streamSubscriptionsCallback(AccelerometerEvent event) =>
+      accelerometerEventsListenner(this, event);
+
+  /// 监听网络连接
+  ConnectivityResult? _connectivityStatus;
+  StreamSubscription<ConnectivityResult>? _connectivityChanged$;
+  void _connectivityChangedCallBack(ConnectivityResult result) {
+    bool isReconnection = _connectivityStatus == ConnectivityResult.none &&
+        result != ConnectivityResult.none &&
+        _value.isBuffering &&
+        _value.buffered.isEmpty;
+    if (isReconnection) {
+      // 从断网中恢复过来, 重新连接解码器
+      // 所有事件监听器不会被移除
+      // initialize(true);
+    }
+
+    _connectivityStatus = result;
+  }
 
   /// 动画icon的初始化
   ///
@@ -201,9 +278,39 @@ class VideoController extends ChangeNotifier {
     vpc.seekTo(_value.position - (st ?? skiptime));
   }
 
+  void _animatedDispose() {
+    playIconController?.dispose();
+    arrowIconRtLController?.dispose();
+    arrowIconLtRController?.dispose();
+  }
+
+  void _streamDispose() {
+    _accelerometerEventsSubscriptions$?.cancel();
+    _connectivityChanged$?.cancel();
+  }
+
   @override
   void dispose() {
     super.dispose();
+
+    _controlsTimer?.cancel();
+    _animatedDispose();
+    _streamDispose();
     vpc.dispose();
   }
+
+  VideoState get value => VideoState(
+        skiptime: skiptime,
+        positionText: positionText,
+        durationText: durationText,
+        sliderValue: sliderValue,
+        dataSource: vpc.dataSource,
+        dataSourceType: vpc.dataSourceType,
+        size: _value.size,
+        isPlaying: _value.isPlaying,
+        volume: _value.volume,
+        position: _value.position,
+        duration: _value.duration,
+        playbackSpeed: _value.playbackSpeed,
+      );
 }

@@ -10,6 +10,29 @@ class VideoBox extends StatefulWidget {
   final VideoController controller;
   final List<Widget>? children;
 
+  /// Example:
+  ///
+  /// ```dart
+  /// import 'package:video_box/video.controller.dart';
+  /// import 'package:video_box/video_box.dart';
+  /// import 'package:video_player/video_player.dart';
+  /// VideoController vc = VideoController(source: VideoPlayerController.network('xxx.mp4'))..initialize();
+  ///
+  /// @override
+  /// void dispose() {
+  ///   vc.dispose();
+  /// }
+  ///
+  /// // display videoBox
+  /// AspectRatio(
+  ///   aspectRatio: 16 / 9,
+  ///   child: VideoBox(controller: vc),
+  /// )
+  /// ```
+  ///
+  /// see also:
+  ///
+  /// https://github.com/januwA/flutter_video_box/tree/master/example
   const VideoBox({
     Key? key,
     required this.controller,
@@ -66,7 +89,7 @@ class _VideoBoxState extends State<VideoBox> with TickerProviderStateMixin {
         onTap: widget.controller.controlsToggle,
         child: Stack(
           children: [
-            widget.controller.bg ?? Container(color: Colors.black),
+            widget.controller.ui.bgWidth,
             if (widget.controller.vpc.value.isInitialized)
               Center(
                 child: AspectRatio(
@@ -135,22 +158,6 @@ class KBottomViewBuilder extends StatelessWidget {
 
   const KBottomViewBuilder({Key? key, required this.vc}) : super(key: key);
 
-  String get _timeText => vc.vpc.value.isInitialized
-      ? "${vc.positionText}/${vc.durationText}"
-      : '00:00/00:00';
-
-  IconData get _volumeIcon {
-    var volume = vc.vpc.value.volume;
-    return volume <= 0
-        ? Icons.volume_off
-        : volume <= 0.5
-            ? Icons.volume_down
-            : Icons.volume_up;
-  }
-
-  IconData get _screenIcon =>
-      vc.isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen;
-
   void _onTap() {}
   void changed(double v) {
     vc.vpc.seekTo(
@@ -173,14 +180,14 @@ class KBottomViewBuilder extends StatelessWidget {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  Text(_timeText, style: theme.textTheme.bodyText1),
+                  Text(vc.ui.timeText, style: theme.textTheme.bodyText1),
                   const Spacer(),
                   IconButton(
-                    icon: Icon(_volumeIcon),
+                    icon: Icon(vc.ui.volumeIcon),
                     onPressed: vc.volumeToggle,
                   ),
                   IconButton(
-                    icon: Icon(_screenIcon),
+                    icon: Icon(vc.ui.screenIcon),
                     onPressed: () => vc.fullScreenToggle(context),
                   ),
                 ],

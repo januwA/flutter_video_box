@@ -6,11 +6,8 @@ class VideoState {
     required this.dataSource,
     required this.dataSourceType,
     required this.size,
-    required this.isLooping,
     required this.isPlaying,
-    required this.autoplay,
     required this.volume,
-    required this.initPosition,
     required this.position,
     required this.duration,
     required this.skiptime,
@@ -23,11 +20,8 @@ class VideoState {
   final String dataSource;
   final DataSourceType dataSourceType;
   final Size size;
-  final bool autoplay;
-  final bool isLooping;
   final bool isPlaying;
   final double volume;
-  final Duration initPosition;
   final Duration position;
   final Duration duration;
   final Duration skiptime;
@@ -41,11 +35,8 @@ class VideoState {
       "dataSource": dataSource,
       "dataSourceType": dataSourceType,
       "size": size,
-      "autoplay": autoplay,
-      "isLooping": isLooping,
       "isPlaying": isPlaying,
       "volume": volume,
-      "initPosition": initPosition,
       "position": position,
       "duration": duration,
       "skiptime": skiptime,
