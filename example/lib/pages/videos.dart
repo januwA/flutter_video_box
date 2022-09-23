@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:video_box/video.controller.dart';
+// ignore: depend_on_referenced_packages
 import 'package:video_box/video_box.dart';
-import 'package:video_player/video_player.dart';
 
 import '../globals.dart';
 
@@ -9,7 +8,7 @@ class Videos extends StatefulWidget {
   const Videos({Key? key}) : super(key: key);
 
   @override
-  _VideosState createState() => _VideosState();
+  createState() => _VideosState();
 }
 
 class _VideosState extends State<Videos> {

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../video.controller.dart';
 import '../video_box.dart';
 
 typedef BottomViewBuilder = Widget Function(

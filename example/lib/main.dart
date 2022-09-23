@@ -40,9 +40,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void _push(String url) {
-      Navigator.of(context).restorablePushNamed(url);
-    }
+    void push(String url) => Navigator.of(context).restorablePushNamed(url);
 
     return Scaffold(
       appBar: AppBar(title: const Text('video_box example')),
@@ -54,27 +52,27 @@ class HomePage extends StatelessWidget {
             children: <Widget>[
               ElevatedButton(
                 child: const Text('one video ctrl'),
-                onPressed: () => _push(oneVideoCtrl),
+                onPressed: () => push(oneVideoCtrl),
               ),
               ElevatedButton(
                 child: const Text('list video'),
-                onPressed: () => _push(listVideo),
+                onPressed: () => push(listVideo),
               ),
               ElevatedButton(
                 child: const Text('change video src'),
-                onPressed: () => _push(changeVideoSrc),
+                onPressed: () => push(changeVideoSrc),
               ),
               ElevatedButton(
                 child: const Text('videos'),
-                onPressed: () => _push(videos),
+                onPressed: () => push(videos),
               ),
               ElevatedButton(
                 child: const Text('VideoPlayerDemo'),
-                onPressed: () => _push(videoPlayerDemo),
+                onPressed: () => push(videoPlayerDemo),
               ),
               ElevatedButton(
                 child: const Text('PiP'),
-                onPressed: () => _push(pipDemo),
+                onPressed: () => push(pipDemo),
               ),
             ],
           ),

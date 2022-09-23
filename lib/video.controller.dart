@@ -393,6 +393,12 @@ abstract class _VideoController extends BaseVideoController
     setVolume(_value.volume > 0 ? 0.0 : 1.0);
   }
 
+  /// set video volume
+  ///
+  void setVideoVolume(double value) {
+    setVolume(value);
+  }
+
   /// 播放或暂停
   ///
   /// Play or pause

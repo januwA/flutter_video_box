@@ -2,7 +2,6 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:video_box/video_box.dart';
 
-import '../video.controller.dart';
 import 'animated_arrow_icon.dart';
 
 class SeekToView extends StatelessWidget {

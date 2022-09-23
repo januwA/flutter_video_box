@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:video_player/video_player.dart';
@@ -376,6 +375,15 @@ class _VideoBottomViewState extends State<KBottomViewBuilder> {
                   IconButton(
                     icon: Icon(_volumeIcon),
                     onPressed: widget.controller.volumeToggle,
+                  ),
+                  SizedBox(
+                    width: 80,
+                    child: Slider(
+                      value: widget.controller.volume,
+                      onChanged: widget.controller.setVideoVolume,
+                      min: 0,
+                      max: 1,
+                    ),
                   ),
                   IconButton(
                     icon: Icon(_screenIcon),

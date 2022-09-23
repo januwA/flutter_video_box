@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// ignore: depend_on_referenced_packages
 import 'package:video_box/video_box.dart';
 
 import '../globals.dart';
@@ -7,7 +8,7 @@ class OneVideoCtrl extends StatefulWidget {
   const OneVideoCtrl({Key? key}) : super(key: key);
 
   @override
-  _OneVideoCtrlState createState() => _OneVideoCtrlState();
+  createState() => _OneVideoCtrlState();
 }
 
 class _OneVideoCtrlState extends State<OneVideoCtrl> {
